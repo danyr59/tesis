@@ -53,6 +53,14 @@ class EmbeddingConfig:
 
 
 @dataclass
+class SeedConfig:
+    """Configuración para la Fábrica de Semillas (Módulo 4)."""
+    methodology_size: int = 20
+    domain_size: int =5
+    seed_dir: str = "./data/seed/predictive_maintenance"
+
+
+@dataclass
 class VectorStoreConfig:
     """Configuración de ChromaDB (Módulo 1)."""
     persist_directory: str = "./data/vectordb"
@@ -149,10 +157,12 @@ class PipelineConfig:
     # --- Recuperación (Módulo 2) ---
     retrieval: RetrievalConfig = field(default_factory=RetrievalConfig)
 
-    # --- Contexto (Módulo 3) ---
     context_builder: ContextBuilderConfig = field(
         default_factory=ContextBuilderConfig
     )
+
+    # --- Maestro (Módulo 4) ---
+    seed_factory: SeedConfig = field(default_factory=SeedConfig)
 
     # --- RNN (Módulo 6) ---
     rnn: RNNConfig = field(default_factory=RNNConfig)
@@ -196,6 +206,7 @@ class PipelineConfig:
         vector_store = VectorStoreConfig(**data.pop("vector_store", {}))
         retrieval = RetrievalConfig(**data.pop("retrieval", {}))
         context_builder = ContextBuilderConfig(**data.pop("context_builder", {}))
+        seed_factory = SeedConfig(**data.pop("seed_factory", {}))
         rnn = RNNConfig(**data.pop("rnn", {}))
         hallucination = HallucinationConfig(**data.pop("hallucination", {}))
         return cls(
@@ -206,6 +217,7 @@ class PipelineConfig:
             vector_store=vector_store,
             retrieval=retrieval,
             context_builder=context_builder,
+            seed_factory=seed_factory,
             rnn=rnn,
             hallucination=hallucination,
             **data,

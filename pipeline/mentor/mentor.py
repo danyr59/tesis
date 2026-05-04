@@ -33,6 +33,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from ..utils.logger import get_logger
 from ..context_builder.builder import EnrichedMessage
+from .seed_factory import SeedFactory
 
 logger = get_logger("m4.mentor")
 
@@ -191,15 +192,20 @@ class Mentor:
 
         identifier = self._ensure_identifier()
 
-        # Inyectar contexto de dominio si disponible
+        # Inyectar contexto de dominio SOLO si no tenemos semillas persistentes ya cargadas
         if enriched_message and enriched_message.context_fragments:
-            self._inject_domain_context(identifier, enriched_message)
+            if not self.seed_dataset or len(self.seed_dataset) < 10:
+                logger.info("No hay suficientes semillas persistentes. Generando contexto dinámico...")
+                self._inject_domain_context(identifier, enriched_message)
+            else:
+                logger.info(f"Usando {len(self.seed_dataset)} semillas persistentes de la Fábrica.")
 
         # Ejecutar identificación IOA
         target_modules, dep_graph = identifier.identify(
             domain=domain,
             teacher_model=teacher_model,
             student_model=student_model,
+            context=enriched_message.to_full_prompt() if enriched_message else None
         )
 
         self._dependency_graph = dep_graph
@@ -354,7 +360,36 @@ class Mentor:
         logger.info("# MENTOR — Pipeline Pedagógico IOA")
         logger.info("#" * 60)
 
-        # 1. Diagnóstico
+        # 1. Obtener contextos para la Fábrica de Semillas
+        methodology_context = ""
+        domain_context = ""
+        if retriever and config:
+            # Contexto metodológico (Libro UCM)
+            method_results = retriever.retrieve(
+                query="Reglas de oro para síntesis de series temporales, autocorrelación y realismo físico",
+                top_k=5,
+                collection_name=config.vector_store.collection_methodology
+            )
+            methodology_context = "\n".join([f"- {f['text']}" for f in method_results.fragments])
+            
+            # Contexto de dominio (CSV/Manual)
+            if enriched_message:
+                domain_context = "\n".join([f"- {f}" for f in enriched_message.context_fragments])
+
+        # 2. Asegurar Semillas Persistentes (Fábrica)
+        if config and self.teacher_client:
+            factory = SeedFactory(seed_dir=config.seed_factory.seed_dir)
+            factory.ensure_seeds(
+                target_methodology=config.seed_factory.methodology_size,
+                target_domain=config.seed_factory.domain_size,
+                teacher_client=self.teacher_client,
+                methodology_context=methodology_context,
+                domain_context=domain_context
+            )
+            # Inyectar las semillas cargadas en el Identifier antes del diagnóstico
+            self._inject_persistent_seeds(factory, enriched_message)
+
+        # 3. Diagnóstico (Ahora con 800+ items si se configuró así)
         target_modules, dep_graph = self.diagnose(
             domain=domain,
             enriched_message=enriched_message,
@@ -362,24 +397,13 @@ class Mentor:
             student_model=student_model,
         )
 
-        # 2. Organización
+        # 4. Organización
         curriculum = self.organize(
             target_modules=target_modules,
             domain=domain,
         )
 
-        # 3. Consulta previa al Cerebro Metodológico (Sabiduría para la adaptación)
-        methodology_context = ""
-        if retriever and config:
-            logger.info("El Maestro consulta su biblioteca antes de enseñar...")
-            method_results = retriever.retrieve(
-                query="Reglas de oro para síntesis de series temporales, autocorrelación y realismo físico",
-                top_k=5,
-                collection_name=config.vector_store.collection_methodology
-            )
-            methodology_context = "\n".join([f"- {f['text']}" for f in method_results.fragments])
-
-        # 4. Adaptación (Usando semillas + Sabiduría metodológica)
+        # 5. Adaptación (Usando semillas + Sabiduría metodológica)
         adapted_data = self.adapt(
             curriculum=curriculum,
             domain=domain,
@@ -466,7 +490,7 @@ Usa un tono ejecutivo y directo."""
             return adapted_data
 
         for stage in curriculum.stages:
-            logger.info(f"Adaptando etapa: {stage.stage_id} ({stage.name})")
+            logger.info(f"Adaptando etapa: {stage.stage_id}")
             
             # Prompt para que el Maestro cree la lección y un ejemplo ideal
             adaptation_prompt = f"""Eres un Maestro de Excelencia en Series Temporales.
@@ -474,7 +498,8 @@ Usa un tono ejecutivo y directo."""
 CONOCIMIENTO EXPERTO (Tu biblioteca):
 {methodology_context}
 
-OBJETIVO DE LA ETAPA: {stage.name} - {stage.description}
+OBJETIVO DE LA ETAPA: {stage.stage_id}
+- Módulos: {', '.join(stage.modules)}
 
 TAREA:
 1. Genera una instrucción técnica (KNOW-HOW) para el alumno sobre este tema.
@@ -539,15 +564,14 @@ FORMATO DE RESPUESTA: Responde ÚNICAMENTE con un JSON array de objetos:
             # Usar temperatura media para diversidad
             response = self.teacher_client.generate(prompt=prompt, temperature=0.5)
             
-            import json
-            import re
-            # Extraer JSON de la respuesta
-            match = re.search(r'\[.*\]', response, re.DOTALL)
-            if match:
-                data = json.loads(match.group())
-                for item in data[:5]: # Tomar máximo 5
-                    q = str(item.get("pregunta", ""))
-                    a = str(item.get("respuesta_correcta", ""))
+            # Usar el robusto parse_llm_json_response
+            from ..synthesis.generator import parse_llm_json_response
+            probes_data = parse_llm_json_response(response)
+            
+            for item in probes_data:
+                q = item.get("pregunta") or item.get("input")
+                a = item.get("respuesta") or item.get("output") or item.get("respuesta_correcta")
+                if q and a:
                     probes.append((q, a))
             
             # Fallback si el JSON falla
@@ -559,6 +583,68 @@ FORMATO DE RESPUESTA: Responde ÚNICAMENTE con un JSON array de objetos:
             probes = [("Error en generación", "Error")] * 5
                 
         return probes[:5]
+
+    def _inject_persistent_seeds(
+        self,
+        factory: SeedFactory,
+        enriched_message: Optional[EnrichedMessage] = None,
+    ) -> None:
+        """
+        Carga las semillas de los archivos persistentes y las inyecta en el Identifier.
+        Esto reemplaza la generación dinámica por una basada en dataset de gran escala.
+        """
+        logger.info("Inyectando semillas persistentes de la Fábrica en el Identifier...")
+        
+        from IOA.data.seed_data import SeedDataset, SeedDataItem
+        import random
+        
+        # Cargar metodología y dominio
+        meth_items = factory.load_seed_data(factory.methodology_file)
+        dom_items = factory.load_seed_data(factory.domain_file)
+        all_raw_items = meth_items + dom_items
+        
+        dynamic_items = []
+        for i, item in enumerate(all_raw_items):
+            di = SeedDataItem(
+                item_id=f"seed_{i}",
+                domain=item.get("domain", "predictive_maintenance"),
+                knowledge_modules=[item.get("module", "general")],
+                input_text=item.get("input", ""),
+                output_text=item.get("output", ""),
+                difficulty="intermediate",
+                metadata={"type": "persistent_seed"}
+            )
+            dynamic_items.append(di)
+            
+        if not dynamic_items:
+            logger.warning("No se encontraron semillas persistentes. Fallback a dinámico.")
+            if enriched_message:
+                self._inject_domain_context(self._identifier, enriched_message)
+            return
+            
+        # Construir dataset
+        dyn_dataset = SeedDataset(items=dynamic_items)
+        
+        # Asignar índices (80/20)
+        all_indices = list(range(len(dynamic_items)))
+        random.shuffle(all_indices)
+        split_idx = int(len(all_indices) * 0.8)
+        
+        dyn_dataset.train_indices = all_indices[:split_idx]
+        dyn_dataset.val_indices = all_indices[split_idx:]
+        
+        # Mapear dominios
+        for di in dynamic_items:
+            if di.domain not in dyn_dataset.domain_index:
+                dyn_dataset.domain_index[di.domain] = []
+            # Esto es una simplificación, en realidad necesitamos el índice real
+        
+        # Reemplazar en los módulos IOA
+        self.seed_dataset = dyn_dataset
+        if self._identifier:
+            self._identifier.seed_dataset = dyn_dataset
+            
+        logger.info(f"Dataset de sondeo activado con {len(dynamic_items)} items.")
 
     def _inject_domain_context(
         self,

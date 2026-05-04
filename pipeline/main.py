@@ -317,7 +317,9 @@ class TesisPipeline:
                     domain="predictive_maintenance",
                     enriched_message=enriched_message,
                     retriever=self.retriever,
-                    config=self.config
+                    config=self.config,
+                    teacher_model=self.teacher_client,
+                    student_model=self.student_client
                 )
                 result.m4_mentor_completed = True
                 logger.info(f"  [OUTPUT] Guías de síntesis generadas.")
