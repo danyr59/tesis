@@ -194,20 +194,23 @@ class TesisPipeline:
     def ingest(
         self,
         source: str | Path,
+        collection_name: Optional[str] = None,
         reset: bool = False,
     ) -> int:
         """
-        Ingesta documentos del dominio en la base vectorial.
+        Ingesta documentos en la base vectorial (Dominio o Metodología).
 
         Args:
             source: Ruta a un archivo o directorio con documentos.
+            collection_name: Nombre de la colección (default: domain).
             reset: Si True, elimina datos previos antes de ingestar.
 
         Returns:
             Cantidad de chunks ingestados.
         """
+        collection_name = collection_name or self.config.vector_store.collection_domain
         logger.info("═" * 60)
-        logger.info("M1: INGESTIÓN — Preparación del conocimiento del dominio")
+        logger.info(f"M1: INGESTIÓN — Preparación: '{collection_name}'")
         logger.info("═" * 60)
 
         source = Path(source)
@@ -229,10 +232,12 @@ class TesisPipeline:
             return 0
 
         # Almacenar en VectorDB
-        count = self.vector_store.add_chunks(chunks)
-        self._ingested = True
+        count = self.vector_store.add_chunks(chunks, collection_name=collection_name)
+        
+        if collection_name == self.config.vector_store.collection_domain:
+            self._ingested = True
 
-        logger.info(f"M1 completo: {count} chunks ingestados")
+        logger.info(f"M1 completo: {count} chunks ingestados en '{collection_name}'")
         return count
 
     # ══════════════════════════════════════════════════════════════════════
@@ -269,12 +274,24 @@ class TesisPipeline:
         logger.info("╚" + "═" * 58 + "╝")
         logger.info(f"Consulta: {query}")
 
+        # --- PREPARACIÓN: Asegurar Cerebro del Maestro (Metodología) ---
+        method_path = Path("data/methodology")
+        if self.vector_store.count(collection_name=self.config.vector_store.collection_methodology) == 0:
+            if method_path.exists():
+                logger.info("Cerebro del Maestro vacío. Ingestando metodología...")
+                self.ingest(method_path, collection_name=self.config.vector_store.collection_methodology)
+            else:
+                logger.warning("No se encontró carpeta 'data/methodology'. El Maestro operará sin base experta.")
+
         try:
-            # ── M2: Recuperación ─────────────────────────────────────────
-            logger.info("\n═══ M2: RECUPERACIÓN ═══")
+            # ── M2: Recuperación (DOMINIO) ───────────────────────────────
+            logger.info("\n═══ M2: RECUPERACIÓN (DOMINIO) ═══")
             logger.info(f"  [INPUT] Consulta del usuario: '{query}'")
             if self._ingested:
-                retrieval_result = self.retriever.retrieve(query)
+                retrieval_result = self.retriever.retrieve(
+                    query,
+                    collection_name=self.config.vector_store.collection_domain
+                )
                 result.m2_fragments_retrieved = retrieval_result.total_found
                 logger.info(f"  [OUTPUT] {retrieval_result.total_found} fragmentos de conocimiento recuperados.")
             else:
@@ -299,6 +316,8 @@ class TesisPipeline:
                 mentor_result = self.mentor.run(
                     domain="predictive_maintenance",
                     enriched_message=enriched_message,
+                    retriever=self.retriever,
+                    config=self.config
                 )
                 result.m4_mentor_completed = True
                 logger.info(f"  [OUTPUT] Guías de síntesis generadas.")
@@ -527,7 +546,7 @@ def main():
     parser.add_argument(
         "--log-level",
         type=str,
-        default="INFO",
+        default="DEBUG",
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
     )
 

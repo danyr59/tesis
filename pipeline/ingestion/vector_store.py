@@ -31,7 +31,7 @@ class VectorStore:
         self.config = config or VectorStoreConfig()
         self.embedder = embedder or Embedder()
         self._client = None
-        self._collection = None
+        self._collections: Dict[str, Any] = {}
 
     # ── Lazy init ─────────────────────────────────────────────────────────
 
@@ -48,15 +48,7 @@ class VectorStore:
             self._client = chromadb.PersistentClient(
                 path=str(persist_dir)
             )
-            self._collection = self._client.get_or_create_collection(
-                name=self.config.collection_name,
-                metadata={"hnsw:space": self.config.distance_metric},
-            )
-
-            logger.info(
-                f"ChromaDB inicializado — colección '{self.config.collection_name}' "
-                f"({self._collection.count()} documentos)"
-            )
+            logger.info(f"ChromaDB conectado en: {persist_dir}")
 
         except ImportError:
             logger.error(
@@ -64,16 +56,29 @@ class VectorStore:
             )
             raise
 
+    def _get_collection(self, name: Optional[str] = None):
+        self._ensure_client()
+        name = name or self.config.collection_domain
+        
+        if name not in self._collections:
+            self._collections[name] = self._client.get_or_create_collection(
+                name=name,
+                metadata={"hnsw:space": self.config.distance_metric},
+            )
+            logger.info(f"Colección cargada: '{name}' ({self._collections[name].count()} docs)")
+            
+        return self._collections[name]
+
     # ── CRUD ──────────────────────────────────────────────────────────────
 
-    def add_chunks(self, chunks: List[Chunk]) -> int:
+    def add_chunks(self, chunks: List[Chunk], collection_name: Optional[str] = None) -> int:
         """
         Agrega chunks a la base vectorial.
 
         Returns:
             Cantidad de chunks agregados.
         """
-        self._ensure_client()
+        collection = self._get_collection(collection_name)
 
         if not chunks:
             return 0
@@ -94,7 +99,7 @@ class VectorStore:
         embeddings = self.embedder.encode(texts)
 
         # Upsert en ChromaDB
-        self._collection.upsert(
+        collection.upsert(
             ids=ids,
             documents=texts,
             embeddings=embeddings.tolist(),
@@ -109,6 +114,7 @@ class VectorStore:
         query_text: str,
         top_k: int = 5,
         where: Optional[Dict[str, Any]] = None,
+        collection_name: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         """
         Busca los k fragmentos más cercanos a una consulta.
@@ -116,11 +122,11 @@ class VectorStore:
         Returns:
             Lista de dicts con keys: id, text, score, metadata
         """
-        self._ensure_client()
+        collection = self._get_collection(collection_name)
 
         query_embedding = self.embedder.encode_query(query_text)
 
-        results = self._collection.query(
+        results = collection.query(
             query_embeddings=[query_embedding.tolist()],
             n_results=top_k,
             where=where,
@@ -140,10 +146,10 @@ class VectorStore:
 
         return items
 
-    def count(self) -> int:
+    def count(self, collection_name: Optional[str] = None) -> int:
         """Retorna la cantidad de documentos en la colección."""
-        self._ensure_client()
-        return self._collection.count()
+        collection = self._get_collection(collection_name)
+        return collection.count()
 
     def delete_collection(self) -> None:
         """Elimina la colección completa."""
@@ -152,15 +158,17 @@ class VectorStore:
         self._collection = None
         logger.info(f"Colección '{self.config.collection_name}' eliminada")
 
-    def reset(self) -> None:
+    def reset(self, collection_name: Optional[str] = None) -> None:
         """Reset: elimina y recrea la colección."""
         self._ensure_client()
+        name = collection_name or self.config.collection_domain
         try:
-            self._client.delete_collection(self.config.collection_name)
+            self._client.delete_collection(name)
         except Exception:
             pass
-        self._collection = self._client.get_or_create_collection(
-            name=self.config.collection_name,
-            metadata={"hnsw:space": self.config.distance_metric},
-        )
-        logger.info("VectorDB reseteado")
+        
+        if name in self._collections:
+            del self._collections[name]
+            
+        _ = self._get_collection(name)
+        logger.info(f"VectorDB reseteado: {name}")

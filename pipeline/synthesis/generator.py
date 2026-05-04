@@ -248,7 +248,10 @@ class SyntheticGenerator:
                     all_rows.extend(batch_rows)
                     logger.info(f"  [Progreso] {len(all_rows)}/{num_samples} registros generados...")
                 else:
-                    logger.warning(f"  [Aviso] El lote {attempts} no devolvió JSON válido. Reintentando...")
+                    logger.warning(f"  [Aviso] El lote {attempts} no devolvió JSON válido.")
+                    logger.warning(f"  [RAW RESPONSE DEBUG]: {response[:300]}...")
+                    # Reintentar con temperatura más baja si falla mucho
+                    attempts += 0.5 # No penalizar tanto el intento si falló el formato
 
             except Exception as e:
                 logger.error(f"Error en intento {attempts}: {e}")

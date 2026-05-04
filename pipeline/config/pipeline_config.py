@@ -56,7 +56,8 @@ class EmbeddingConfig:
 class VectorStoreConfig:
     """Configuración de ChromaDB (Módulo 1)."""
     persist_directory: str = "./data/vectordb"
-    collection_name: str = "domain_knowledge"
+    collection_domain: str = "domain_knowledge"
+    collection_methodology: str = "methodology_knowledge"
     distance_metric: str = "cosine"   # cosine | l2 | ip
 
 

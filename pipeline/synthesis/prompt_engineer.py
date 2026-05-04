@@ -62,7 +62,10 @@ INSTRUCCIONES:
 2. Mantener las correlaciones entre variables.
 3. Introducir variabilidad realista (no copiar valores exactos).
 4. Los datos deben ser físicamente plausibles para {self.domain}.
-5. Formato de salida: JSON array con objetos por registro.
+REGLA DE FORMATO CRÍTICA:
+- RESPONDE ÚNICAMENTE CON EL JSON.
+- NO INCLUYAS TEXTO EXPLICATIVO, INTRODUCCIONES NI CONCLUSIONES.
+- EL RESULTADO DEBE SER UN ARRAY JSON VÁLIDO.
 
 FORMATO DE SALIDA:
 ```json
@@ -72,7 +75,7 @@ FORMATO DE SALIDA:
 ]
 ```
 
-Genera los {num_samples} registros:"""
+Genera los {num_samples} registros siguiendo estrictamente los principios de excelencia y el formato JSON:"""
 
     # ── Auto-regresiva con Contexto ──────────────────────────────────────
 

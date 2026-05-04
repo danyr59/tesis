@@ -335,6 +335,8 @@ class Mentor:
         enriched_message: Optional[EnrichedMessage] = None,
         teacher_model: Any = None,
         student_model: Any = None,
+        retriever: Optional[Any] = None,
+        config: Optional[Any] = None,
     ) -> MentorResult:
         """
         Ejecuta el pipeline pedagógico completo: Diagnóstico → Organización → Adaptación.
@@ -366,24 +368,59 @@ class Mentor:
             domain=domain,
         )
 
-        # 3. Adaptación
+        # 3. Consulta previa al Cerebro Metodológico (Sabiduría para la adaptación)
+        methodology_context = ""
+        if retriever and config:
+            logger.info("El Maestro consulta su biblioteca antes de enseñar...")
+            method_results = retriever.retrieve(
+                query="Reglas de oro para síntesis de series temporales, autocorrelación y realismo físico",
+                top_k=5,
+                collection_name=config.vector_store.collection_methodology
+            )
+            methodology_context = "\n".join([f"- {f['text']}" for f in method_results.fragments])
+
+        # 4. Adaptación (Usando semillas + Sabiduría metodológica)
         adapted_data = self.adapt(
             curriculum=curriculum,
             domain=domain,
             enriched_message=enriched_message,
+            methodology_context=methodology_context
         )
 
-        # Compilar directrices de síntesis desde el conocimiento adaptado
+        # 5. Compilar directrices de síntesis
         guidelines = []
         for stage_id, data in adapted_data.items():
-            for item in data.get("synthetic_items", []):
-                # Extraer la lógica destilada (output_text o final_answer)
-                if hasattr(item, "output_text") and item.output_text:
-                    guidelines.append(f"- {item.output_text}")
-                elif hasattr(item, "final_answer") and item.final_answer:
-                    guidelines.append(f"- {item.problem}: {item.final_answer}")
+            if "know_how" in data:
+                guidelines.append(f"- REGLA: {data['know_how']}")
+            if "ejemplo_ideal" in data:
+                reasoning = data.get("justificacion_cientifica", "Sin justificación adicional.")
+                guidelines.append(f"- EJEMPLO IDEAL: {data['ejemplo_ideal']}\n  - RAZONAMIENTO: {reasoning}")
         
-        synthesis_guidelines = "\n".join(list(set(guidelines))) # Deduplicar
+        raw_guidelines = "\n".join(list(set(guidelines)))
+            
+        # 5. Refinamiento Final (Combinar Dominio + Metodología)
+        synthesis_guidelines = raw_guidelines
+        if methodology_context and self.teacher_client:
+            logger.info("Refinando guías con sabiduría metodológica...")
+            refinement_prompt = f"""Eres un Profesor Experto en Estadística y Física.
+            
+CONOCIMIENTO TÉCNICO (Dominio):
+{raw_guidelines}
+
+CONOCIMIENTO METODOLÓGICO (Tu Cerebro):
+{methodology_context}
+
+TAREA: Fusiona ambos conocimientos en un "Protocolo de Generación de Excelencia" para tu alumno. 
+Enséñale no solo qué generar, sino CÓMO generarlo estadísticamente para que sea físicamente plausible.
+Usa un tono ejecutivo y directo."""
+            
+            try:
+                synthesis_guidelines = self.teacher_client.generate(refinement_prompt, max_tokens=1024)
+                logger.info("Protocolo de excelencia generado con éxito.")
+            except Exception as e:
+                logger.warning(f"Error en refinamiento: {e}. Usando guías base.")
+        elif methodology_context:
+            synthesis_guidelines = f"METODOLOGÍA:\n{methodology_context}\n\nREGLAS TÉCNICAS:\n{raw_guidelines}"
         
         # Compilar resultado
         result = MentorResult(
@@ -411,6 +448,57 @@ class Mentor:
 
         return result
 
+    def adapt(
+        self,
+        curriculum: Curriculum,
+        domain: str,
+        enriched_message: Optional[EnrichedMessage] = None,
+        methodology_context: str = "",
+    ) -> Dict[str, Any]:
+        """
+        Fase de Adaptación: El Maestro genera lecciones y ejemplos ideales.
+        
+        Si las semillas reales son insuficientes, el Maestro crea 'Ejemplos Prototípicos'
+        basados en su Cerebro Metodológico.
+        """
+        adapted_data = {}
+        if not curriculum or not curriculum.stages:
+            return adapted_data
+
+        for stage in curriculum.stages:
+            logger.info(f"Adaptando etapa: {stage.stage_id} ({stage.name})")
+            
+            # Prompt para que el Maestro cree la lección y un ejemplo ideal
+            adaptation_prompt = f"""Eres un Maestro de Excelencia en Series Temporales.
+            
+CONOCIMIENTO EXPERTO (Tu biblioteca):
+{methodology_context}
+
+OBJETIVO DE LA ETAPA: {stage.name} - {stage.description}
+
+TAREA:
+1. Genera una instrucción técnica (KNOW-HOW) para el alumno sobre este tema.
+2. Si la semilla real no es suficiente para demostrar el concepto, GENERA UN EJEMPLO IDEAL (Prototipo).
+
+FORMATO DE RESPUESTA (JSON):
+{{
+  "know_how": "Regla de oro sobre el tema...",
+  "ejemplo_ideal": [0.1, 0.2, 0.5, 0.8, ...],
+  "justificacion_cientifica": "RAZONAMIENTO PROFUNDO: Conecta una regla específica de tu biblioteca experta con el ejemplo ideal. Explica por qué, bajo las leyes de la física o estadística, este patrón es el correcto y cómo se cumple la ley en este caso específico."
+}}"""
+            
+            try:
+                response = self.teacher_client.generate(adaptation_prompt)
+                import json
+                import re
+                match = re.search(r'\{.*\}', response, re.DOTALL)
+                if match:
+                    adapted_data[stage.stage_id] = json.loads(match.group())
+            except Exception as e:
+                logger.warning(f"Error en adaptación de etapa {stage.stage_id}: {e}")
+                
+        return adapted_data
+
     # ── Helpers ───────────────────────────────────────────────────────────
 
     def _generate_probes_from_fragments(
@@ -421,41 +509,56 @@ class Mentor:
         Usa el Maestro para inventar un examen (Pregunta/Respuesta) 
         basado en los fragmentos de RAG.
         """
-        if not self.teacher_client:
-            return [("Analiza el fragmento", "Basado en el contexto...")] * len(fragments)
+        if not self.teacher_client or not fragments:
+            return [("Analiza el fragmento", "Basado en el contexto...")] * 5
             
-        probes = []
         logger.info(f"Inventando examen dinámico (sondeo) basado en {len(fragments)} fragmentos...")
         
-        for fragment in fragments:
-            prompt = f"""Basado en este fragmento de conocimiento técnico sobre mantenimiento predictivo:
-"{fragment}"
+        context_text = "\n---\n".join(fragments)
+        prompt = f"""Eres un Profesor de Nivel Doctorado en Ingeniería y Estadística. 
+        
+CONTEXTO TÉCNICO:
+{context_text}
 
-TAREA: Genera una pregunta de examen técnica y específica cuya respuesta se encuentre en el texto.
-REGLA: La pregunta debe ser directa y la respuesta debe ser breve (máximo 2 frases).
+TAREA: Inventa un examen de sondeo EXTREMADAMENTE DIFÍCIL de 5 preguntas.
+REGLAS DE ORO PARA EL MAESTRO "TIRANO":
+1. PROHIBIDO preguntar cosas que se puedan copiar y pegar del texto.
+2. EXIGE INFERENCIA: Pide al alumno que prediga el futuro de la serie temporal basado en la tendencia actual.
+3. EXIGE CÁLCULO: Pide cálculos matemáticos precisos sobre tasas de cambio o promedios ponderados.
+4. EXIGE CAUSALIDAD: Pide que explique la física profunda (termodinámica, fricción) detrás de un cambio de datos.
+5. El objetivo es encontrar los límites del conocimiento del alumno.
 
-FORMATO DE RESPUESTA: Responde únicamente con un objeto JSON:
-{{"pregunta": "...", "respuesta_correcta": "..."}}
-"""
-            try:
-                # Usar temperatura baja para consistencia en el examen
-                response = self.teacher_client.generate(prompt=prompt, temperature=0.1)
+FORMATO DE RESPUESTA: Responde ÚNICAMENTE con un JSON array de objetos:
+[
+  {{"pregunta": "...", "respuesta_correcta": "..."}},
+  ...
+]"""
+
+        probes = []
+        try:
+            # Usar temperatura media para diversidad
+            response = self.teacher_client.generate(prompt=prompt, temperature=0.5)
+            
+            import json
+            import re
+            # Extraer JSON de la respuesta
+            match = re.search(r'\[.*\]', response, re.DOTALL)
+            if match:
+                data = json.loads(match.group())
+                for item in data[:5]: # Tomar máximo 5
+                    q = str(item.get("pregunta", ""))
+                    a = str(item.get("respuesta_correcta", ""))
+                    probes.append((q, a))
+            
+            # Fallback si el JSON falla
+            if not probes:
+                probes.append((f"Analiza la relación entre temperatura y vibración", "Respuesta en contexto"))
                 
-                import json
-                import re
-                # Extraer JSON de la respuesta
-                match = re.search(r'\{.*\}', response, re.DOTALL)
-                if match:
-                    data = json.loads(match.group())
-                    probes.append((data["pregunta"], data["respuesta_correcta"]))
-                else:
-                    # Fallback si no hay JSON
-                    probes.append((f"Analiza técnicamente: {fragment[:100]}...", "Respuesta pendiente"))
-            except Exception as e:
-                logger.warning(f"Error generando pregunta de sondeo: {e}")
-                probes.append((f"Analiza técnicamente: {fragment[:50]}...", "Error"))
+        except Exception as e:
+            logger.warning(f"Error generando examen: {e}")
+            probes = [("Error en generación", "Error")] * 5
                 
-        return probes
+        return probes[:5]
 
     def _inject_domain_context(
         self,

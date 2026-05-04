@@ -44,6 +44,7 @@ class Retriever:
         query: str,
         top_k: Optional[int] = None,
         filters: Optional[Dict[str, Any]] = None,
+        collection_name: Optional[str] = None,
     ) -> RetrievalResult:
         """
         Recupera los fragmentos más relevantes para una consulta.
@@ -52,6 +53,7 @@ class Retriever:
             query: Consulta en lenguaje natural.
             top_k: Cantidad de fragmentos a recuperar (default: config.top_k).
             filters: Filtros adicionales (e.g., {"source": "manual.pdf"}).
+            collection_name: Nombre de la colección a consultar.
 
         Returns:
             RetrievalResult con los fragmentos encontrados y sus scores.
@@ -64,6 +66,7 @@ class Retriever:
             query_text=query,
             top_k=k,
             where=filters,
+            collection_name=collection_name,
         )
 
         # Filtrar por umbral de score
