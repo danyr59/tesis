@@ -122,34 +122,37 @@ def create_dataloaders(
         f"val={len(val_data)}, test={len(test_data)}"
     )
 
-    train_ds = TimeSeriesDataset(
-        train_data,
-        sequence_length=config.sequence_length,
-        prediction_horizon=config.prediction_horizon,
-        target_col=target_col,
-    )
-    val_ds = TimeSeriesDataset(
-        val_data,
-        sequence_length=config.sequence_length,
-        prediction_horizon=config.prediction_horizon,
-        target_col=target_col,
-    )
-    test_ds = TimeSeriesDataset(
-        test_data,
-        sequence_length=config.sequence_length,
-        prediction_horizon=config.prediction_horizon,
-        target_col=target_col,
-    )
+    # Crear datasets solo si hay datos suficientes
+    train_ds = None
+    if len(train_data) > config.sequence_length + config.prediction_horizon:
+        train_ds = TimeSeriesDataset(
+            train_data,
+            sequence_length=config.sequence_length,
+            prediction_horizon=config.prediction_horizon,
+            target_col=target_col,
+        )
 
-    train_loader = DataLoader(
-        train_ds, batch_size=config.batch_size, shuffle=True
-    )
-    val_loader = DataLoader(
-        val_ds, batch_size=config.batch_size, shuffle=False
-    )
-    test_loader = DataLoader(
-        test_ds, batch_size=config.batch_size, shuffle=False
-    )
+    val_ds = None
+    if len(val_data) > config.sequence_length + config.prediction_horizon:
+        val_ds = TimeSeriesDataset(
+            val_data,
+            sequence_length=config.sequence_length,
+            prediction_horizon=config.prediction_horizon,
+            target_col=target_col,
+        )
+
+    test_ds = None
+    if len(test_data) > config.sequence_length + config.prediction_horizon:
+        test_ds = TimeSeriesDataset(
+            test_data,
+            sequence_length=config.sequence_length,
+            prediction_horizon=config.prediction_horizon,
+            target_col=target_col,
+        )
+
+    train_loader = DataLoader(train_ds, batch_size=config.batch_size, shuffle=True) if train_ds else None
+    val_loader = DataLoader(val_ds, batch_size=config.batch_size, shuffle=False) if val_ds else None
+    test_loader = DataLoader(test_ds, batch_size=config.batch_size, shuffle=False) if test_ds else None
 
     return train_loader, val_loader, test_loader
 

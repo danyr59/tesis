@@ -78,21 +78,16 @@ class Judge:
 
     def __init__(
         self,
+        config: Optional[HallucinationConfig] = None,
         domain_constraints: Optional[Dict[str, Any]] = None,
-        approval_threshold: float = 0.7,
     ):
         """
         Args:
-            domain_constraints: Restricciones del dominio.
-                Ejemplo: {
-                    "temperatura": {"min": -40, "max": 200, "unit": "°C"},
-                    "vibración": {"min": 0, "max": 100, "unit": "mm/s"},
-                    "correlations": {"temperatura_vibración": 0.6}
-                }
-            approval_threshold: Umbral para aprobar predicciones.
+            config: Configuración de umbrales de alucinación y juicio.
+            domain_constraints: Restricciones físicas del dominio.
         """
+        self.config = config or HallucinationConfig()
         self.domain_constraints = domain_constraints or {}
-        self.approval_threshold = approval_threshold
 
     def evaluate(
         self,
@@ -145,7 +140,7 @@ class Judge:
 
         # Calcular confianza global
         confidence = float(np.mean(scores))
-        approved = confidence >= self.approval_threshold
+        approved = confidence >= self.config.approval_threshold
 
         # Calcular hallucination score (inverso de calidad)
         hallucination_score = max(0.0, 1.0 - confidence)
@@ -172,23 +167,23 @@ class Judge:
         score = 1.0
 
         # R² muy bajo indica mal modelo
-        if pred_result.r2 < 0.5:
+        if pred_result.r2 < self.config.min_r2:
             issues.append(
                 JudgmentIssue(
                     severity="critical",
                     category="metrics",
-                    description=f"R² muy bajo: {pred_result.r2:.4f} (umbral: 0.5)",
+                    description=f"R² muy bajo: {pred_result.r2:.4f} (umbral: {self.config.min_r2})",
                 )
             )
             score *= 0.5
 
         # MAPE alto
-        if pred_result.mape > 20:
+        if pred_result.mape > self.config.max_mape:
             issues.append(
                 JudgmentIssue(
                     severity="warning",
                     category="metrics",
-                    description=f"MAPE alto: {pred_result.mape:.1f}% (umbral: 20%)",
+                    description=f"MAPE alto: {pred_result.mape:.1f}% (umbral: {self.config.max_mape}%)",
                 )
             )
             score *= 0.7
@@ -198,12 +193,12 @@ class Judge:
             range_val = np.ptp(pred_result.actuals)
             if range_val > 0:
                 nrmse = pred_result.rmse / range_val
-                if nrmse > 0.3:
+                if nrmse > self.config.max_nrmse:
                     issues.append(
                         JudgmentIssue(
                             severity="warning",
                             category="metrics",
-                            description=f"NRMSE alto: {nrmse:.4f} (umbral: 0.3)",
+                            description=f"NRMSE alto: {nrmse:.4f} (umbral: {self.config.max_nrmse})",
                         )
                     )
                     score *= 0.8
@@ -290,14 +285,14 @@ class Judge:
             corr_diff = np.abs(pred_corr - act_corr)
             max_diff = np.max(corr_diff)
 
-            if max_diff > 0.5:
+            if max_diff > self.config.max_corr_diff:
                 issues.append(
                     JudgmentIssue(
                         severity="warning",
                         category="consistency",
                         description=(
                             f"Estructura de correlaciones alterada "
-                            f"(diferencia máx: {max_diff:.2f})"
+                            f"(diferencia máx: {max_diff:.2f}, umbral: {self.config.max_corr_diff})"
                         ),
                     )
                 )
@@ -321,19 +316,19 @@ class Judge:
 
         # Comparar media
         mean_diff_pct = abs(np.mean(preds) - np.mean(acts)) / (abs(np.mean(acts)) + 1e-8) * 100
-        if mean_diff_pct > 15:
+        if mean_diff_pct > self.config.max_mean_diff_pct:
             issues.append(
                 JudgmentIssue(
                     severity="warning",
                     category="distribution",
-                    description=f"Media de predicciones difiere {mean_diff_pct:.1f}% del real",
+                    description=f"Media de predicciones difiere {mean_diff_pct:.1f}% del real (umbral: {self.config.max_mean_diff_pct}%)",
                 )
             )
             score *= 0.8
 
         # Comparar varianza
         std_ratio = np.std(preds) / (np.std(acts) + 1e-8)
-        if std_ratio < 0.5 or std_ratio > 2.0:
+        if std_ratio < self.config.min_std_ratio or std_ratio > self.config.max_std_ratio:
             issues.append(
                 JudgmentIssue(
                     severity="warning",

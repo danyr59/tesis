@@ -64,10 +64,14 @@ class SyntheticGenerator:
 
     def __init__(
         self,
-        domain: str = "predictive_maintenance",
+        domain: str = None,
         random_seed: int = 42,
+        config: Any = None
     ):
+        if domain is None:
+            raise ValueError("El Generador requiere un dominio explícito.")
         self.domain = domain
+        self.config = config # SynthesisConfig
         self.analyzer = SeedAnalyzer(random_seed=random_seed)
         self.prompt_engineer = PromptEngineer(domain=domain)
 
@@ -193,6 +197,12 @@ class SyntheticGenerator:
     ) -> np.ndarray:
         """Genera datos usando el LLM con diferentes estrategias de prompting."""
 
+        # Configuración desde objeto o defaults
+        batch_size = self.config.batch_size if self.config else 5
+        temperature = self.config.temperature if self.config else 0.85
+        jitter_val = self.config.mandatory_jitter if self.config else 0.002
+        div_threshold = self.config.diversity_threshold if self.config else 0.5
+
         # Seleccionar semillas
         seeds = self.analyzer.select_seeds(real_data, num_seeds=5, method="diverse")
         logger.info(f"Semillas seleccionadas del CSV para guiar la generación:")
@@ -201,7 +211,6 @@ class SyntheticGenerator:
 
         # Generar en lotes pequeños para evitar timeouts y asegurar calidad
         all_rows = []
-        batch_size = 10
         max_attempts = (num_samples // batch_size) + 2
         attempts = 0
         
@@ -234,17 +243,29 @@ class SyntheticGenerator:
                 response = llm_client.generate(
                     prompt=prompt,
                     max_tokens=2048,
-                    temperature=0.8, # Un poco más de creatividad
+                    temperature=temperature,
                 )
 
                 parsed = parse_llm_json_response(response)
                 if parsed:
+                    # Procesar lote con ruido de sensor y filtro de diversidad
                     batch_rows = []
                     for record in parsed:
                         if isinstance(record, dict):
                             row = [record.get(name, 0.0) for name in profile.feature_names]
-                            batch_rows.append([float(v) for v in row])
+                            # Convertir a float y aplicar micro-ruido de sensor obligatorio
+                            # Esto garantiza que no haya valores idénticos y simula ruido real
+                            jitter = 1.0 + np.random.uniform(-jitter_val, jitter_val, len(row))
+                            noisy_row = [float(v) * j for v, j in zip(row, jitter)]
+                            batch_rows.append(noisy_row)
                     
+                    # Verificar diversidad del lote: si casi todos son iguales, descartar
+                    if len(batch_rows) > 1:
+                        unique_rows = np.unique(np.round(batch_rows, 4), axis=0)
+                        if len(unique_rows) < len(batch_rows) * div_threshold:
+                            logger.warning(f"  [Aviso] Lote {attempts} descartado por falta de diversidad.")
+                            continue
+
                     all_rows.extend(batch_rows)
                     logger.info(f"  [Progreso] {len(all_rows)}/{num_samples} registros generados...")
                 else:

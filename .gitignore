@@ -1,2 +1,10 @@
-/ChatTS
-/IOA
+repo_externo/
+.models/
+
+outputs/
+data/vectordb/
+chroma_db/
+models/
+
+.DS_Store
+.env
