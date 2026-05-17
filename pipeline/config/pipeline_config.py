@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 import sys
+import torch
 from typing import Optional, Any
 
 # Agregar proyecto_tesis/ al path
@@ -14,11 +15,12 @@ from pipeline.ioa_engine.config.config import IOAConfig
 class ChunkingConfig:
     chunk_size: int = 512
     chunk_overlap: int = 64
+    separators: list = field(default_factory=lambda: ["\n\n", "\n", ".", " ", ""])
 
 @dataclass
 class EmbeddingConfig:
     model_name: str = "all-MiniLM-L6-v2"
-    device: str = "cpu"
+    device: str = "cuda" if torch.cuda.is_available() else "cpu"
     batch_size: int = 32
     normalize: bool = True
     max_length: int = 512
@@ -56,6 +58,7 @@ class ContextBuilderConfig:
 @dataclass
 class LLMConfig:
     teacher_model: str = "./models/profesor"
+    teacher_type: str = "local"
     teacher_timeout: int = 120
     student_type: str = "local"
     student_model: str = "./models/student"

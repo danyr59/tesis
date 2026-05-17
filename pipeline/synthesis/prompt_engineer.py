@@ -31,17 +31,23 @@ class PromptEngineer:
         num_continue: int = 5,
         profile: Any = None
     ) -> str:
-        """Prompt específico para generación autoregresiva."""
+        """Prompt ultra-estricto para modelos de 8B."""
         features_str = ", ".join(feature_names) if feature_names else "sensores"
         seeds_str = "\n".join([", ".join(map(str, s)) for s in seeds])
         
         prompt = (
-            f"Eres un sistema experto en {self.domain}.\n"
-            f"Tu objetivo es continuar la serie temporal de estos registros: [{features_str}].\n\n"
-            f"REGLAS DE DOMINIO:\n{guidelines}\n\n"
-            f"DATOS RECIENTES (Semillas):\n{seeds_str}\n\n"
-            f"TAREA:\nGenera exactamente {num_continue} nuevos registros siguiendo la tendencia física.\n"
-            f"Formato: CSV puro, sin encabezados, solo números."
+            f"SYSTEM: Solo genera datos numéricos. NO hables. NO expliques.\n"
+            f"DOMINIO: {self.domain}\n"
+            f"COLUMNAS: [{features_str}]\n"
+            f"REGLAS FÍSICAS: {guidelines}\n\n"
+            f"DATOS DE ENTRADA (Últimas lecturas):\n{seeds_str}\n\n"
+            f"TAREA:\nGenera {num_continue} líneas adicionales de datos siguiendo la tendencia.\n"
+            f"REQUERIMIENTO TÉCNICO:\n"
+            f"- Formato: JSON list de listas.\n"
+            f"- Ejemplo de salida: [[25.4, 3.2, 10.1, 1800.5], [26.1, 3.5, 10.2, 1810.0]]\n"
+            f"- NO incluyas texto antes ni después del JSON.\n"
+            f"- NO incluyas encabezados.\n"
+            f"RESPUESTA:"
         )
         return prompt
 

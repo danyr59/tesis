@@ -88,7 +88,7 @@ class Predictor:
         elif model is not None:
             self.model = model
             self.device = (
-                torch.device(device) if device else torch.device("cpu")
+                torch.device(device) if device else torch.device("cuda" if torch.cuda.is_available() else ("mps" if hasattr(torch.backends, "mps") and torch.backends.mps.is_available() else "cpu"))
             )
             self._means = None
             self._stds = None

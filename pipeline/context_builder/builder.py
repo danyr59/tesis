@@ -45,6 +45,15 @@ class EnrichedMessage:
                 f"{ctx}\n"
             )
 
+        if self.metadata.get("data_profile"):
+            profile = self.metadata["data_profile"]
+            cols = ", ".join(profile.get("columns", []))
+            parts.append(
+                f"[EVIDENCIA DE DATOS REALES]\n"
+                f"El dataset actual tiene las siguientes columnas: {cols}\n"
+                f"Estadísticas clave:\n{profile.get('stats')}\n"
+            )
+
         parts.append(f"[CONSULTA DEL USUARIO]\n{self.user_prompt}")
 
         return "\n\n".join(parts)
@@ -65,6 +74,7 @@ class ContextBuilder:
         query: str,
         retrieval_result: RetrievalResult,
         domain_context: Optional[str] = None,
+        data_profile: Optional[Dict[str, Any]] = None,
         extra_data: Optional[Dict[str, Any]] = None,
     ) -> EnrichedMessage:
         """
@@ -110,6 +120,8 @@ class ContextBuilder:
                 }
             ),
         }
+        if data_profile:
+            metadata["data_profile"] = data_profile
         if extra_data:
             metadata["extra"] = extra_data
 

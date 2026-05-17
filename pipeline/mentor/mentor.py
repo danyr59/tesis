@@ -128,7 +128,7 @@ class Mentor:
                 logger.warning(f"Error adaptación: {e}")
         return adapted_data
 
-    def run(self, domain: Optional[str] = None, enriched_message=None, teacher_model=None, student_model=None, retriever=None, config=None) -> MentorResult:
+    def run(self, domain: Optional[str] = None, enriched_message=None, teacher_model=None, student_model=None, retriever=None, config=None, data_profile=None) -> MentorResult:
         if domain is None:
             raise ValueError("ERROR CRÍTICO: Debe especificar un dominio (ej. 'stock_prices', 'predictive_maintenance') para ejecutar el Mentor.")
             
@@ -138,15 +138,26 @@ class Mentor:
         methodology_context = ""
         domain_context = ""
         if retriever and config:
-            res = retriever.retrieve("Reglas de síntesis", collection_name=config.vector_store.collection_methodology)
-            methodology_context = "\n".join([f["text"] for f in res.fragments])
+            # Query en inglés para matchear papers académicos + umbral relajado
+            raw_methodology = retriever.vector_store.query(
+                query_text="time series synthetic data generation predictive maintenance methodology",
+                top_k=5,
+                collection_name=config.vector_store.collection_methodology,
+            )
+            # Usar umbral relajado de 0.3 (papers en inglés vs query bilingüe)
+            methodology_fragments = [r for r in raw_methodology if r["score"] >= 0.3]
+            methodology_context = "\n".join([f["text"] for f in methodology_fragments])
+            logger.info(f"Contexto metodológico: {len(methodology_fragments)} fragmentos recuperados")
+            
             if enriched_message:
                 domain_context = "\n".join([f for f in enriched_message.context_fragments])
 
-        if config and self.teacher_client:
-            factory = SeedFactory(seed_dir=config.seed_factory.seed_dir)
-            factory.ensure_seeds(config.seed_factory.methodology_size, config.seed_factory.domain_size, self.teacher_client, methodology_context, domain_context)
-            self._inject_persistent_seeds(factory)
+        # Load or generate seed questions (ahora separados por dominio)
+        import os
+        domain_seed_dir = os.path.join(self.seed_config.seed_dir, domain)
+        factory = SeedFactory(seed_dir=domain_seed_dir)
+        factory.ensure_seeds(config.seed_factory.methodology_size, config.seed_factory.domain_size, self.teacher_client, methodology_context, domain_context, data_profile=data_profile)
+        self._inject_persistent_seeds(factory)
 
         # 2. Diagnose & Organize
         target_modules, dep_graph = self.diagnose(domain, enriched_message, teacher_model, student_model)
@@ -200,7 +211,29 @@ class Mentor:
         meth_items = factory.load_seed_data(factory.methodology_file)
         dom_items = factory.load_seed_data(factory.domain_file)
         all_items = meth_items + dom_items
-        dynamic_items = [SeedDataItem(item_id=f"s_{i}", domain="unknown", knowledge_modules=["gen"], input_text=it["input"], output_text=it["output"]) for i, it in enumerate(all_items)]
+        
+        dynamic_items = []
+        for i, it in enumerate(all_items):
+            try:
+                # Si it es un diccionario (esperado)
+                if isinstance(it, dict):
+                    inp = it.get("input", "")
+                    out = str(it.get("output", ""))
+                else:
+                    # Fallback si viene como lista u otro formato
+                    inp = str(it[0]) if len(it) > 0 else ""
+                    out = str(it[1]) if len(it) > 1 else ""
+                
+                dynamic_items.append(SeedDataItem(
+                    item_id=f"s_{i}", 
+                    domain="unknown", 
+                    knowledge_modules=["gen"], 
+                    input_text=inp, 
+                    output_text=out
+                ))
+            except Exception:
+                continue
+
         if dynamic_items:
             self.seed_dataset = SeedDataset(items=dynamic_items)
             if self._identifier: self._identifier.seed_dataset = self.seed_dataset

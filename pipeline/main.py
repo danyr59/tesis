@@ -42,12 +42,13 @@ class Pipeline:
         # Clientes LLM
         from pipeline.ioa_engine.utils.llm_client import create_teacher_client
         self.teacher_client = create_teacher_client(
-            teacher_type=self.config.llm.student_type, # Usamos el configurado
+            teacher_type=self.config.llm.teacher_type,
             model_name=self.config.llm.teacher_model
         )
         self.student_client = create_teacher_client(
             teacher_type=self.config.llm.student_type,
-            model_name=self.config.llm.student_model
+            model_name=self.config.llm.student_model,
+            use_lora=self.config.ioa.model.use_lora
         )
 
         # M4: Mentor
@@ -68,27 +69,48 @@ class Pipeline:
         logger.info(f"Iniciando ejecución para dominio: {self.config.domain}")
         logger.info(f"Consulta: {self.config.query}")
         
-        # 1. Recuperar contexto
-        res = self.retriever.retrieve(self.config.query)
-        enriched_message = self.context_builder.build(self.config.query, res)
+        # 1. Auto-Ingestión Dual (M1)
+        from pipeline.ingestion.auto_ingestor import AutoIngestor
+        ingestor = AutoIngestor(self.config, self.vector_store)
+        ingestor.run()
         
-        # 2. Mentor (IOA)
+        # 2. Recuperar contexto y generar perfil de datos
+        logger.info("\n═══ M2/M3: RECUPERACIÓN Y CONTEXTO ═══")
+        
+        # Extraer perfil estadístico del CSV para el Maestro
+        import pandas as pd
+        seed_df = pd.read_csv("data/raw/sensores_bomba.csv")
+        data_profile = {
+            "columns": list(seed_df.columns),
+            "stats": seed_df.describe().to_dict(),
+            "sample": seed_df.head(3).to_dict()
+        }
+        
+        res = self.retriever.retrieve(self.config.query)
+        # Inyectamos el perfil de datos en el constructor de contexto
+        enriched_message = self.context_builder.build(
+            query=self.config.query, 
+            retrieval_result=res,
+            data_profile=data_profile
+        )
+        
+        # 3. Mentor (IOA)
         mentor_result = self.mentor.run(
             domain=self.config.domain,
             enriched_message=enriched_message,
             teacher_model=self.teacher_client,
             student_model=self.student_client,
             retriever=self.retriever,
-            config=self.config
+            config=self.config,
+            data_profile=data_profile
         )
         
-        # 3. Síntesis de datos
+        # 4. Síntesis de datos
         logger.info("\n═══ M5: GENERACIÓN DE DATOS SINTÉTICOS ═══")
-        # Cargamos el dataset base para usarlo como semilla
         import pandas as pd
-        seed_data = pd.read_csv("data/raw/sensores_bomba.csv")
-        real_data_array = seed_data.values
-        feature_names = list(seed_data.columns)
+        seed_df = pd.read_csv("data/raw/sensores_bomba.csv")
+        real_data_array = seed_df.values
+        feature_names = list(seed_df.columns)
 
         synthetic_array = self.synthetic_generator.generate_from_data(
             real_data=real_data_array,

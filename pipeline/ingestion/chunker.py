@@ -35,8 +35,9 @@ class Chunk:
         if not self.chunk_id:
             import hashlib
 
+            import uuid
             self.chunk_id = hashlib.md5(
-                f"{self.source}:{self.position}:{self.text[:50]}".encode()
+                f"{self.source}:{self.position}:{self.text[:50]}:{uuid.uuid4()}".encode()
             ).hexdigest()[:12]
 
 

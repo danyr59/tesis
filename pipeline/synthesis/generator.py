@@ -33,27 +33,81 @@ try:
     from data.data_utils import parse_llm_json_response
 except ImportError:
     # Fallback local si IOA no está disponible
-    def parse_llm_json_response(response: str) -> List[Dict[str, Any]]:
+    def parse_llm_json_response(response: str) -> List[Any]:
         import re
-
-        response = response.strip()
-        if response.startswith("```json"):
-            response = response[7:]
-        elif response.startswith("```"):
-            response = response[3:]
-        if response.endswith("```"):
-            response = response[:-3]
-        response = response.strip()
+        import json
+        import ast
+        
+        # 1. Limpieza agresiva de bloques markdown
+        response = re.sub(r"```[a-zA-Z]*", "", response)
+        response = response.replace("```", "").strip()
+        
+        # 1.5 Limpieza de comas colgantes (ej: [{},])
+        response = re.sub(r",\s*([\]}])", r"\1", response)
+        
+        # 2. Intentar parseo directo
         try:
             data = json.loads(response)
             return data if isinstance(data, list) else [data]
         except json.JSONDecodeError:
-            match = re.search(r"\[[\s\S]*\]", response)
-            if match:
+            # 3. Fuerza bruta: Buscar el primer '[' y el último ']'
+            # Mejora: Si hay múltiples listas numéricas sueltas [..], [..], envolverlas
+            matches = re.findall(r"\[[0-9\.,\s\-]+\]", response)
+            if matches:
                 try:
-                    return json.loads(match.group())
+                    data = []
+                    for m in matches:
+                        data.append(json.loads(m))
+                    return data
                 except Exception:
                     pass
+            
+            match = re.search(r"(\[[\s\S]*\])", response)
+            if match:
+                try:
+                    clean_json = match.group(1)
+                    clean_json = re.sub(r",\s*([\]}])", r"\1", clean_json) # Limpieza extra
+                    data = json.loads(clean_json)
+                    return data if isinstance(data, list) else [data]
+                except Exception:
+                    # Intento con ast.literal_eval como fallback final
+                    try:
+                        py_str = clean_json.replace("true", "True").replace("false", "False").replace("null", "None")
+                        data = ast.literal_eval(py_str)
+                        return data if isinstance(data, list) else [data]
+                    except Exception:
+                        pass
+            
+            # Rescate final: extraer diccionarios individuales { ... }
+            items = []
+            dict_matches = re.findall(r"\{[\s\S]*?\}", response)
+            for m in dict_matches:
+                try:
+                    m_clean = re.sub(r",\s*([\]}])", r"\1", m)
+                    items.append(json.loads(m_clean))
+                except Exception:
+                    try:
+                        py_str = m_clean.replace("true", "True").replace("false", "False").replace("null", "None")
+                        items.append(ast.literal_eval(py_str))
+                    except Exception:
+                        continue
+            if items:
+                return items
+            
+            # 4. Fallback: Intentar extraer líneas numéricas (si es CSV)
+            # Esto es un seguro de vida si el modelo ignora el JSON y manda CSV
+            csv_match = re.findall(r"^[0-9\.,\s\-]+$", response, re.MULTILINE)
+            if csv_match:
+                # Convertir CSV líneas a lista de listas
+                try:
+                    data = []
+                    for line in csv_match:
+                        nums = [float(x.strip()) for x in line.split(",") if x.strip()]
+                        if nums: data.append(nums)
+                    return data
+                except:
+                    pass
+            
             return []
 
 
@@ -251,14 +305,25 @@ class SyntheticGenerator:
                     # Procesar lote con ruido de sensor y filtro de diversidad
                     batch_rows = []
                     for record in parsed:
+                        row = None
                         if isinstance(record, dict):
-                            row = [record.get(name, 0.0) for name in profile.feature_names]
+                            row = [float(record.get(name, 0.0)) for name in profile.feature_names]
+                        elif isinstance(record, list) and len(record) == len(profile.feature_names):
+                            try:
+                                row = [float(v) for v in record]
+                            except (ValueError, TypeError):
+                                pass
+                        
+                        if row is not None:
                             # Convertir a float y aplicar micro-ruido de sensor obligatorio
                             # Esto garantiza que no haya valores idénticos y simula ruido real
                             jitter = 1.0 + np.random.uniform(-jitter_val, jitter_val, len(row))
-                            noisy_row = [float(v) * j for v, j in zip(row, jitter)]
+                            noisy_row = [v * j for v, j in zip(row, jitter)]
                             batch_rows.append(noisy_row)
                     
+                    if not batch_rows:
+                        logger.warning(f"  [Aviso] Lote parseado pero sin formato válido. Raw Response: {response[:300]}...")
+                        
                     # Verificar diversidad del lote: si casi todos son iguales, descartar
                     if len(batch_rows) > 1:
                         unique_rows = np.unique(np.round(batch_rows, 4), axis=0)

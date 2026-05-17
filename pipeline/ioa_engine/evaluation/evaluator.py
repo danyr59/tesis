@@ -37,7 +37,7 @@ class Evaluator:
         self,
         model: Any = None,
         tokenizer: Any = None,
-        device: str = "cuda"
+        device: str = "cpu"
     ):
         """
         Initialize the evaluator.

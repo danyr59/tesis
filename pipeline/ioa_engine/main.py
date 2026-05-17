@@ -163,11 +163,37 @@ class IOAPipeline:
             if self.tokenizer.pad_token is None:
                 self.tokenizer.pad_token = self.tokenizer.eos_token
             
+            # Determine device
+            if torch.cuda.is_available():
+                device_map = "auto"
+                is_cuda = True
+            elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+                device_map = {"": "mps"}
+                is_cuda = False
+            else:
+                device_map = {"": "cpu"}
+                is_cuda = False
+
+            kwargs = {
+                "torch_dtype": torch.float16 if self.config.model.fp16 else torch.float32,
+                "device_map": device_map,
+                "trust_remote_code": True
+            }
+
+            # If CUDA and LoRA are used, we can inject BitsAndBytesConfig for 4-bit quantization
+            if is_cuda and self.config.model.use_lora:
+                try:
+                    from transformers import BitsAndBytesConfig
+                    kwargs["quantization_config"] = BitsAndBytesConfig(
+                        load_in_4bit=True,
+                        bnb_4bit_compute_dtype=torch.float16
+                    )
+                except ImportError:
+                    pass
+
             self.student_model = AutoModelForCausalLM.from_pretrained(
                 student_name,
-                torch_dtype=torch.float16 if self.config.model.fp16 else torch.float32,
-                device_map="auto",
-                trust_remote_code=True
+                **kwargs
             )
             
             # Apply LoRA if configured

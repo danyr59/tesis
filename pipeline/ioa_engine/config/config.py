@@ -171,8 +171,8 @@ class ModelConfig:
     # Use LoRA for models > 3B parameters
     use_lora: bool = False
     
-    # Device settings
-    device: str = "cuda"
+    import torch
+    device: str = "cuda" if torch.cuda.is_available() else "cpu"
     fp16: bool = True
     bf16: bool = False
 

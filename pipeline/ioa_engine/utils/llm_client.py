@@ -221,18 +221,39 @@ class LocalLLMClient(BaseLLMClient):
     def __init__(
         self,
         model_name: str,
-        device: str = "cuda",
+        device: str = "auto",
         use_vllm: bool = False,
-        tensor_parallel_size: int = 1
+        tensor_parallel_size: int = 1,
+        use_lora: bool = False
     ):
+        import torch
         self.model_name = model_name
-        self.device = device
-        self.use_vllm = use_vllm
+        if device == "auto" or device == "cuda":
+            if torch.cuda.is_available():
+                self.device = "cuda"
+            elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+                # Nota: MPS es rápido pero a veces inestable en modelos específicos
+                self.device = "mps"
+            else:
+                self.device = "cpu"
+        else:
+            self.device = device
+            
+        self.use_vllm = use_vllm and self.device == "cuda"
+        self.use_lora = use_lora
         
-        if use_vllm:
+        if self.use_vllm:
             self._init_vllm(tensor_parallel_size)
         else:
-            self._init_transformers()
+            try:
+                self._init_transformers()
+            except Exception as e:
+                if self.device == "mps":
+                    print(f"AVISO: MPS falló ({e}). Reintentando en CPU para estabilidad.")
+                    self.device = "cpu"
+                    self._init_transformers()
+                else:
+                    raise e
     
     def _init_vllm(self, tensor_parallel_size: int):
         """Initialize vLLM for fast inference"""
@@ -257,12 +278,58 @@ class LocalLLMClient(BaseLLMClient):
                 self.model_name,
                 trust_remote_code=True
             )
+            
+            kwargs = {
+                "trust_remote_code": True,
+            }
+            
+            # Hardware-agnostic loading
+            if self.device == "cuda":
+                kwargs["device_map"] = "auto"
+                if self.use_lora:
+                    try:
+                        from transformers import BitsAndBytesConfig
+                        kwargs["quantization_config"] = BitsAndBytesConfig(
+                            load_in_4bit=True,
+                            bnb_4bit_compute_dtype=torch.float16
+                        )
+                    except ImportError:
+                        pass
+                else:
+                    kwargs["torch_dtype"] = torch.float16
+            elif self.device == "mps":
+                # Apple Silicon: avoid device_map="auto" to prevent CPU fallback
+                kwargs["device_map"] = {"": "mps"}
+                kwargs["torch_dtype"] = torch.float16
+            else:
+                kwargs["device_map"] = {"": "cpu"}
+                kwargs["torch_dtype"] = torch.float32
+                
             self.model = AutoModelForCausalLM.from_pretrained(
                 self.model_name,
-                torch_dtype=torch.float16,
-                device_map="auto",
-                trust_remote_code=True
+                **kwargs
             )
+            
+            # Aplicar LoRA/PEFT si está habilitado
+            if self.use_lora:
+                try:
+                    from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
+                    if self.device == "cuda" and "quantization_config" in kwargs:
+                        self.model = prepare_model_for_kbit_training(self.model)
+                        
+                    lora_config = LoraConfig(
+                        r=16,
+                        lora_alpha=32,
+                        target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+                        lora_dropout=0.05,
+                        bias="none",
+                        task_type="CAUSAL_LM"
+                    )
+                    self.model = get_peft_model(self.model, lora_config)
+                except ImportError:
+                    print("AVISO: PEFT no instalado. Omitiendo LoRA.")
+                    pass
+                    
             self.model.eval()
         except ImportError:
             raise ImportError("Transformers not installed. Run: pip install transformers")
@@ -408,7 +475,7 @@ class LLMClient:
             )
         elif model_type == "local":
             # Filtrar kwargs para evitar errores en LocalLLMClient
-            local_kwargs = {k: v for k, v in kwargs.items() if k in ["device", "use_vllm", "tensor_parallel_size"]}
+            local_kwargs = {k: v for k, v in kwargs.items() if k in ["device", "use_vllm", "tensor_parallel_size", "use_lora"]}
             model_path = model_name if (model_name and "/" in model_name) else model_name
             self.client = LocalLLMClient(
                 model_name=model_path,
@@ -543,7 +610,8 @@ def create_teacher_client(
     api_key: Optional[str] = None,
     api_base: Optional[str] = None,
     model_name: Optional[str] = None,
-    timeout: int = 120
+    timeout: int = 120,
+    **kwargs
 ) -> LLMClient:
     """
     Create a client for the teacher model.
@@ -556,6 +624,7 @@ def create_teacher_client(
         api_base: API base URL
         model_name: Specific model name
         timeout: Timeout in seconds
+        kwargs: Additional arguments
     
     Returns:
         LLMClient configured for the teacher model
@@ -566,7 +635,8 @@ def create_teacher_client(
             model_name=model_name or "o1-preview",
             api_key=api_key,
             api_base=api_base,
-            timeout=timeout
+            timeout=timeout,
+            **kwargs
         )
     elif teacher_type == "deepseek":
         return LLMClient(
@@ -574,13 +644,15 @@ def create_teacher_client(
             model_name=model_name or "deepseek-reasoner",
             api_key=api_key,
             api_base=api_base,
-            timeout=timeout
+            timeout=timeout,
+            **kwargs
         )
     elif teacher_type == "local":
         return LLMClient(
             model_type="local",
             model_name=model_name,
-            timeout=timeout
+            timeout=timeout,
+            **kwargs
         )
     else:
         raise ValueError(f"Unknown teacher type: {teacher_type}")
