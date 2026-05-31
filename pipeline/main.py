@@ -111,6 +111,11 @@ class Pipeline:
         seed_df = pd.read_csv("data/raw/sensores_bomba.csv")
         real_data_array = seed_df.values
         feature_names = list(seed_df.columns)
+        
+        # Ajuste dinámico de dimensiones de la RNN según el archivo semilla
+        num_features = len(feature_names)
+        self.config.training.input_size = num_features
+        self.config.training.output_size = num_features
 
         synthetic_array = self.synthetic_generator.generate_from_data(
             real_data=real_data_array,

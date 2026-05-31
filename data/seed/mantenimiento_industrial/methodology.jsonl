@@ -1,5 +1,0 @@
-{"input": "¿Cuál es el rango de temperatura en el sensor?", "output": "El rango de temperatura es de 67.92 a 91.54 grados Celsius.", "domain": "mantenimiento_predictivo", "module": "domain/sensor_thresholds"}
-{"input": "¿Cuál es la vibración promedio en el sensor?", "output": "La vibración promedio es de 2.51 unidades", "domain": "mantenimiento_predictivo", "module": "domain/sensor_thresholds"}
-{"input": "¿Cuál es la presión promedio en el sensor?", "output": "La presión promedio es de 10.01 unidades", "domain": "mantenimiento_predictivo", "module": "domain/sensor_thresholds"}
-{"input": "¿Cuál es el rango de rpm en el sensor?", "output": "El rango de rpm es de 1762.9 a 1846.2 revoluciones por minuto", "domain": "mantenimiento_predictivo", "module": "domain/sensor_thresholds"}
-{"input": "¿Cuál es el porcentaje de variación de la temperatura?", "output": "-7.76%", "domain": "mantenimiento_predictivo", "module": "domain/sensor_thresholds"}

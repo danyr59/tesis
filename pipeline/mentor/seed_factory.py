@@ -146,13 +146,26 @@ class SeedFactory:
             if existing_inputs:
                 avoid_clause = "\n\nYA GENERASTE ESTAS PREGUNTAS, NO LAS REPITAS:\n" + "\n".join(f"- {inp}" for inp in existing_inputs[-5:])
 
-            prompt = f"""Genera {current_batch} preguntas técnicas sobre sensores de bomba industrial.
+            prompt = f"""Genera {current_batch} preguntas técnicas, analíticas y MUY COMPLEJAS sobre sensores de bomba industrial. Tu objetivo es crear preguntas de nivel experto para evaluar y hacer fallar a un estudiante básico.
 
+CONTEXTO METODOLÓGICO Y ACADÉMICO (BASA TUS PREGUNTAS EN ESTA TEORÍA):
+{context}
+
+PERFIL ESTADÍSTICO DE LOS SENSORES REALES:
 {csv_summary}
 {avoid_clause}
 
-Cada pregunta debe usar valores del dataset. RESPONDE SOLO JSON:
-[{{"input": "pregunta con valor numérico", "output": "respuesta técnica", "domain": "mantenimiento_predictivo", "module": "domain/sensor_thresholds"}}]"""
+Cada pregunta debe combinar la teoría del contexto con los valores estadísticos o rangos reales del dataset. Deben ser escenarios difíciles que requieran razonamiento avanzado.
+
+EJEMPLO DEL FORMATO ESPERADO:
+[{{
+  "input": "Dado que la temperatura media histórica es 75°C con desviación de 5°C, ¿qué implica una lectura sostenida de 90°C?",
+  "output": "Una lectura de 90°C está 3 desviaciones estándar por encima de la media, lo que indica un posible sobrecalentamiento crítico en los rodamientos o fricción anormal.",
+  "domain": "mantenimiento_predictivo",
+  "module": "domain/sensor_thresholds"
+}}]
+
+RESPONDE SOLO CON EL JSON VÁLIDO:"""
 
             try:
                 response = client.generate(prompt)
@@ -210,13 +223,27 @@ Cada pregunta debe usar valores del dataset. RESPONDE SOLO JSON:
             if existing_inputs:
                 avoid_clause = "\n\nNO REPITAS ESTAS PREGUNTAS:\n" + "\n".join(f"- {inp}" for inp in existing_inputs[-5:])
 
-            prompt = f"""Genera {current_batch} casos de diagnóstico sobre: {topic}
+            prompt = f"""Genera {current_batch} casos de diagnóstico extremadamente difíciles sobre: {topic}
+Tu objetivo es plantear problemas de nivel ingeniero experto para hacer fallar a un estudiante básico.
 
+CONTEXTO TEÓRICO Y DOMINIO (APLICA ESTOS CONCEPTOS A TUS CASOS):
+{context}
+
+PERFIL ESTADÍSTICO DE LOS SENSORES REALES:
 {csv_summary}
 {avoid_clause}
 
-Usa valores reales del dataset. RESPONDE SOLO JSON:
-[{{"input": "escenario con datos numéricos", "output": "diagnóstico técnico", "domain": "mantenimiento_predictivo", "module": "domain/fault_signatures"}}]"""
+Usa valores reales del dataset (o desviaciones realistas de ellos) para construir escenarios donde múltiples variables interactúen de forma compleja según la teoría del contexto.
+
+EJEMPLO DEL FORMATO ESPERADO:
+[{{
+  "input": "Lecturas: Temperatura=92°C, Vibración=3.8g, RPM=3600. ¿Cuál es el diagnóstico?",
+  "output": "Fallo inminente por cavitación térmica debido a la alta temperatura y vibración anómala.",
+  "domain": "mantenimiento_predictivo",
+  "module": "domain/fault_signatures"
+}}]
+
+RESPONDE SOLO CON EL JSON VÁLIDO:"""
             
             try:
                 response = client.generate(prompt)

@@ -69,7 +69,7 @@ class LLMConfig:
 @dataclass
 class SeedFactoryConfig:
     seed_dir: str = "./data/seed"
-    methodology_size: int = 5
+    methodology_size: int = 25
     domain_size: int = 5
 
 @dataclass
@@ -101,7 +101,7 @@ class RNNConfig:
     input_size: int = 4
     hidden_size: int = 64
     num_layers: int = 2
-    output_size: int = 1
+    output_size: int = 4
     dropout: float = 0.2
     bidirectional: bool = False
     learning_rate: float = 0.001
