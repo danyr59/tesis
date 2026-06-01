@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from huggingface_hub import snapshot_download
 
 def setup_models():
-    # Cargar variables de entorno
+   
     load_dotenv()
     
     token = os.getenv("HF_TOKEN")
@@ -12,13 +12,13 @@ def setup_models():
     teacher_path = os.getenv("TEACHER_MODEL_PATH")
     student_path = os.getenv("STUDENT_MODEL_PATH")
 
-    if not token or token == "tu_token_aqui":
+    if not token :
         print("ERROR: Por favor, configura tu HF_TOKEN en el archivo .env")
         return
 
-    print(f"--- Iniciando descarga de modelos para Tesis ---")
+    print(f"--- Iniciando descarga de modelos ---")
 
-    # Descargar Maestro (3B)
+    # Descargar Maestro 
     print(f"\n[1/2] Descargando Maestro: {teacher_id}...")
     snapshot_download(
         repo_id=teacher_id,
@@ -28,7 +28,7 @@ def setup_models():
         ignore_patterns=["*.msgpack", "*.h5", "*.ot"] # Evitar archivos innecesarios
     )
 
-    # Descargar Estudiante (1B)
+    # Descargar Estudiante 
     print(f"\n[2/2] Descargando Estudiante: {student_id}...")
     snapshot_download(
         repo_id=student_id,
