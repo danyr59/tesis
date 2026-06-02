@@ -1,7 +1,7 @@
 from sentence_transformers import SentenceTransformer
 import chromadb
 
-CHROMA_DB_PATH = "./memoria_maestro"
+CHROMA_DB_PATH = "./../rag/maestro"
 COLLECTION_NAME = "time_series_generation"
 
 model = SentenceTransformer('all-mpnet-base-v2')
@@ -17,7 +17,7 @@ def consultar_maestro(consulta_usuario, top_k=3):
 if __name__ == "__main__":
     # Simula lo que llegaría del estudiante
     consulta = "Necesito series temporales de temperatura en Mérida, Venezuela, dominio clima, frecuencia diaria, para detección de anomalías"
-    resultados = consultar_maestro(consulta, top_k=3)
+    resultados = consultar_maestro(consulta, top_k=200)
     
     print("El maestro ha encontrado estas series semilla:\n")
     for i, (id_, metadata, distance) in enumerate(zip(resultados['ids'][0], 

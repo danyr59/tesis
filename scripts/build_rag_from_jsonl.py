@@ -3,8 +3,8 @@ import re
 from sentence_transformers import SentenceTransformer
 import chromadb
 
-JSONL_PATH = "time_series_generation.jsonl"
-CHROMA_DB_PATH = "./memoria_maestro"
+JSONL_PATH = "./../data/time_series_generation.jsonl"
+CHROMA_DB_PATH = "./../rag/maestro"
 COLLECTION_NAME = "time_series_generation"
 
 patron_lista = r'\[\s*(?:-?\d+(?:\.\d+)?|\'[\dA-Za-z.-]+\'|"[\dA-Za-z.-]+")(?:\s*,\s*(?:-?\d+(?:\.\d+)?|\'[\dA-Za-z.-]+\'|"[\dA-Za-z.-]+"))*\s*\]'

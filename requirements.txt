@@ -1,23 +1,18 @@
-# ── Pipeline de Mantenimiento Predictivo ──
-# Core
+# ── Pipeline de Generación de Series Temporales (Tesis) ──
+# Core & Matemáticas
 numpy>=1.24.0
+pandas>=2.0.0
 torch>=2.0.0
 
-# Módulo 1: Ingestión
-sentence-transformers>=2.2.0
+# Base de Datos Vectorial (RAG)
 chromadb>=0.4.0
-pdfplumber>=0.9.0
+sentence-transformers>=2.2.0
 
-# Módulo 4: Mentor (IOA / LLM)
-requests>=2.28.0
-tenacity>=8.2.0
+# LLM y Destilación (Agentes Maestro/Estudiante)
+transformers>=4.35.0
+peft>=0.7.0
+trl>=0.7.0
+python-dotenv>=1.0.0
 
-# Opcional: modelos locales
-# transformers>=4.35.0
-# vllm>=0.3.0
-
-# Visualización & métricas
+# Visualización & métricas (M6-M8)
 matplotlib>=3.7.0
-
-# Desarrollo
-# pytest>=7.0.0

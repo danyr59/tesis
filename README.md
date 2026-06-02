@@ -1,98 +1,97 @@
-# Pipeline de Mantenimiento Predictivo con Destilación Pedagógica
+# Proyecto de Tesis: Generación de Series Temporales Sintéticas mediante Destilación Maestro-Estudiante con RAG
 
-Sistema modular de 9 módulos que integra la metodología pedagógica **IOA** (Identifier-Organizer-Adapter) con capacidades de series temporales para predicción de fallas en equipos industriales.
+Este proyecto de tesis implementa una arquitectura avanzada de agentes LLM (Maestro-Estudiante) interactuando con una base de datos vectorial (RAG) para la **generación autónoma de datos sintéticos de series temporales**, con el objetivo de entrenar posteriormente arquitecturas predictivas (Redes Neuronales Recurrentes M6).
 
-## Arquitectura
+## 🚀 Arquitectura y Flujo de Ejecución (6 Pasos)
 
+El núcleo del sistema es un bucle interactivo y conversacional orquestado por el Agente Estudiante, que sigue exactamente este flujo de 6 pasos:
+
+### 1. Entrada del Usuario (CLI)
+El sistema inicia de forma interactiva a través de la consola (`pipeline/main.py`), donde el usuario ingresa su requerimiento inicial (ej. *"Necesito series temporales de temperatura en Mérida"*).
+
+### 2. Análisis, Razonamiento y Estructuración (Estudiante)
+Un LLM liviano (configurable en `.env`) toma el mando:
+- **Interpretación Semántica:** Identifica sinónimos y ambigüedades.
+- **Identificación de Tipo de Serie:** Razona automáticamente si se requieren datos **univariados** o **multivariados**.
+- **Diálogo Interactivo:** Si faltan parámetros clave (dominio, frecuencia, localización, variables) o su confianza es `< 80%`, el Estudiante **pausa y dialoga con el usuario vía consola** para completarlos.
+- **Prompt Estructurado:** Consolida todo en un JSON justificando sus inferencias y enviando una estrategia sugerida al Maestro.
+
+### 3. Búsqueda, Evaluación y Selección (Maestro + RAG)
+Un LLM experto (configurable en `.env`) que tiene acceso a un RAG de series temporales (ChromaDB):
+- **Búsqueda Fija:** Ejecuta consultas en la base vectorial, extrayendo siempre un **top_k de 200 ítems**.
+- **Filtro Cognitivo (Sin Hardcode):** El Maestro lee un resumen de los metadatos y razona si las series son coherentes con el requerimiento del estudiante, y si la longitud o la diversidad son adecuadas.
+- **Refinamiento:** Si la calidad es baja o hay menos de 3 ejemplos válidos, relaja los parámetros de forma autónoma y vuelve a buscar.
+- **Salida:** Envía un "Dataset Semilla" validado y un "Resumen de Calidad" justificado al Estudiante.
+
+### 4. Destilación (Fine-Tuning Inteligente)
+El Estudiante recibe las semillas y razona sobre cómo debe entrenarse:
+- Decide dinámicamente los hiperparámetros (épocas, batch size, learning rate) dependiendo de si hay muchos o pocos datos (para evitar sobreajuste).
+- Explica sus decisiones de forma explícita en consola (`verbose`).
+- Entrena sobre su modelo base utilizando técnicas ligeras (PEFT/LoRA).
+
+### 5. Ciclo de Retroalimentación (Iteraciones)
+- El Estudiante lee el Resumen de Calidad del Maestro y evalúa si la diversidad/calidad de su entrenamiento es buena.
+- Si determina que la calidad es baja (ej. demasiada similitud), formula una acción correctiva y **pide más datos al Maestro**.
+- Mantiene un registro de las estrategias ya usadas en este ciclo para no repetir errores. 
+- Este bucle se ejecuta un máximo de **3 iteraciones** (configurable en settings).
+
+### 6. Generación de Dataset (Estructura HuggingFace/RNN)
+Una vez el Estudiante está conforme, el LLM procede a generar numéricamente las series sintéticas solicitadas, respetando la estacionalidad y características.
+- **Output Robusto:** Convierte los datos a un CSV de "formato largo" (long format tabular: `series_id`, `time_step`, `var1`, `var2`...).
+- Los datos se guardan en `data/synthetic/synthetic_series.csv` de manera independiente, dejándolos listos para que herramientas como Pandas, PyTorch o los siguientes módulos de la tesis los consuman directamente sin limpieza adicional.
+
+---
+
+## 🛠 Modelos y Configuración Global
+
+**Cero Datos "Quemados" (Hardcodeados):**
+- La lógica no está atada a "Llama 1B" ni "Llama 3B". Los modelos (en función de $N$ y $n$ parámetros) se inyectan dinámicamente.
+- Todos los umbrales lógicos, iteraciones y rutas residen centralizados en `pipeline/config/settings.py`.
+
+El archivo `.env` debe configurarse de esta manera:
+```env
+TEACHER_MODEL_ID=meta-llama/Llama-3.2-3B-Instruct
+STUDENT_MODEL_ID=meta-llama/Llama-3.2-1B-Instruct
+HF_TOKEN=tu_token_aqui
 ```
-Consulta NL ──► M0 Orquestador
-                 │
-                 ├── M1 Ingestión        (Chunking + Embeddings + ChromaDB)
-                 ├── M2 Recuperación     (Búsqueda semántica)
-                 ├── M3 Contexto         (Mensaje enriquecido RAG)
-                 ├── M4 Mentor (IOA)     (Diagnóstico + Organización + Adaptación)
-                 ├── M5 Síntesis         (Generación datos sintéticos)
-                 ├── M6 Entrenamiento    (RNN Lineal: LSTM/GRU)
-                 ├── M7 Predicción       (Métricas: RMSE, MAE, R², MAPE)
-                 └── M8 Evaluación       (Juez + Detección de alucinaciones)
+
+---
+
+## 📂 Estructura de Directorios
+
+```text
+proyecto_tesis/
+├── pipeline/
+│   ├── main.py                # Entrada (CLI) del pipeline
+│   ├── config/
+│   │   └── settings.py        # Configuración global del proyecto
+│   ├── student_agent/         # Módulo: LLM Liviano (Razonamiento, LoRA, Generación .csv)
+│   ├── teacher_agent/         # Módulo: LLM Experto (RAG ChromaDB, Filtrado, Evaluación)
+│   ├── training/              # Módulo 6 (M6): Entrenamiento de red RNN Lineal (LSTM/GRU)
+│   ├── prediction/            # Módulo 7 (M7): Predicción de series
+│   ├── evaluation/            # Módulo 8 (M8): Métricas, RMSE, Detección de Alucinaciones
+│   └── utils/                 # Utilidades generales y Logger
+├── data/
+│   └── synthetic/             # Destino final: Dataframes .csv listos para Entrenamiento (M6)
+├── rag/
+│   └── maestro/               # Persistencia local de ChromaDB (Vector Store)
+├── models/                    # Guardado local de modelos LLM descargados
+└── requirements.txt           # Dependencias (transformers, peft, chromadb, etc.)
 ```
 
-## Inicio Rápido
+---
+
+## 💻 Inicio Rápido
+
+Para iniciar el ciclo interactivo de agentes de forma autónoma:
 
 ```bash
-# Instalar dependencias
+# 1. Instalar requerimientos y librerías clave
 pip install -r requirements.txt
 
-# Ejecutar pipeline completo (con datos placeholder)
-python -m pipeline.main --query "Predecir fallas en bomba hidráulica"
+# 2. Ejecutar CLI de forma interactiva (Te preguntará qué necesitas)
+python -m pipeline.main
 
-# Ejecutar con documentos de dominio
-python -m pipeline.main \
-    --data-dir ./data/raw \
-    --query "Analizar patrón de degradación del compresor" \
-    --num-synthetic 1000
+# 3. O ejecutar pasándole la consulta directo como parámetro
+python -m pipeline.main --query "necesito series temporales de temperatura para la ciudad de Mérida, Venezuela"
 ```
-
-## Uso Programático
-
-```python
-from pipeline.main import TesisPipeline
-import numpy as np
-
-# Crear pipeline
-pipeline = TesisPipeline()
-
-# Ingestar documentos del dominio
-pipeline.ingest("./data/raw")
-
-# Ejecutar con datos de sensores reales
-sensor_data = np.loadtxt("./data/sensor_readings.csv", delimiter=",", skiprows=1)
-result = pipeline.run(
-    query="Predecir fallas en bomba hidráulica",
-    real_data=sensor_data,
-    feature_names=["temperatura", "vibracion", "presion", "rpm"],
-    num_synthetic=500,
-)
-
-print(result.summary())
-```
-
-## Estructura del Proyecto
-
-```
-proyecto_tesis/
-├── IOA/                     # Framework pedagógico (intacto)
-├── ChatTS/                  # Series temporales (referencia)
-├── pipeline/                # Pipeline unificado (NUEVO)
-│   ├── main.py              # M0: Orquestador
-│   ├── config/              # Configuración centralizada
-│   ├── ingestion/           # M1: Chunker + Embedder + VectorStore
-│   ├── retrieval/           # M2: Retriever
-│   ├── context_builder/     # M3: ContextBuilder
-│   ├── mentor/              # M4: Wrapper IOA
-│   ├── synthesis/           # M5: SeedAnalyzer + PromptEngineer + Generator
-│   ├── training/            # M6: LinearRNN + Dataset + Trainer
-│   ├── prediction/          # M7: Predictor
-│   ├── evaluation/          # M8: Judge + HallucinationDetector
-│   └── utils/               # Logger
-├── data/                    # Datos
-│   ├── raw/                 # Documentos originales
-│   ├── processed/           # Chunks procesados
-│   └── synthetic/           # Datos sintéticos
-├── outputs/                 # Resultados
-└── requirements.txt
-```
-
-## Módulos
-
-| # | Módulo | Descripción |
-|---|--------|-------------|
-| 0 | Orquestador | Recibe consulta NL y coordina el flujo |
-| 1 | Ingestión | Segmenta, embebe y almacena documentos en ChromaDB |
-| 2 | Recuperación | Busca fragmentos por similitud semántica |
-| 3 | Contexto | Construye mensaje enriquecido (RAG) |
-| 4 | Mentor (IOA) | Diagnóstica gaps, organiza curriculum, adapta conocimiento |
-| 5 | Síntesis | Genera datos sintéticos (estadístico/LLM) |
-| 6 | Entrenamiento | Entrena RNN lineal (LSTM/GRU) con early stopping |
-| 7 | Predicción | Genera predicciones y calcula métricas |
-| 8 | Evaluación | Juez de calidad + detección de alucinaciones numéricas |

@@ -1,16 +1,12 @@
 """
-Pipeline de 9 Módulos — Tesis de Mantenimiento Predictivo
-con Destilación Pedagógica (IOA) y Series Temporales
+Pipeline de Generación de Series Temporales con Destilación Pedagógica
 
-Módulo 0: Estudiante Orquestador
-Módulo 1: Ingestión (Chunking + Embeddings + VectorDB)
-Módulo 2: Recuperación (Retrieval)
-Módulo 3: Preparación del Envío
-Módulo 4: Know-how del Maestro (IOA Pedagógico)
-Módulo 5: Generación de Datos Sintéticos
-Módulo 6: Entrenamiento RNN Lineal
-Módulo 7: Prueba y Predicción
-Módulo 8: Evaluador (Estudiante como Juez)
+Arquitectura Maestro-Estudiante con RAG:
+- Agente Estudiante (Razonamiento, Destilación, Generación Sintética)
+- Agente Maestro (Búsqueda RAG, Evaluación, Selección)
+- Módulo 6: Entrenamiento RNN Lineal
+- Módulo 7: Prueba y Predicción
+- Módulo 8: Evaluador (Estudiante como Juez)
 """
 
-__version__ = "0.1.0"
+__version__ = "1.0.0"
