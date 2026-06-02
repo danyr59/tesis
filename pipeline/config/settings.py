@@ -22,3 +22,11 @@ class Settings:
     @classmethod
     def get_student_model_id(cls):
         return os.getenv("STUDENT_MODEL_ID", "meta-llama/Llama-3.2-1B-Instruct")
+
+    @classmethod
+    def get_teacher_model_path(cls):
+        return os.getenv("TEACHER_MODEL_PATH", "./models/profesor")
+        
+    @classmethod
+    def get_student_model_path(cls):
+        return os.getenv("STUDENT_MODEL_PATH", "./models/student")

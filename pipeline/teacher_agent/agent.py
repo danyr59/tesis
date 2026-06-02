@@ -13,15 +13,15 @@ class TeacherAgent:
         self.collection = self.chroma_client.get_collection(Settings.RAG_COLLECTION_NAME)
         self.embedder = SentenceTransformer('all-mpnet-base-v2')
         
-        model_id = Settings.get_teacher_model_id()
+        model_id = Settings.get_teacher_model_path()
         print(f"[{self.__class__.__name__}] Cargando LLM Maestro: {model_id}")
-        # self.llm = pipeline(
-        #     "text-generation",
-        #     model=model_id,
-        #     model_kwargs={"torch_dtype": "auto"},
-        #     device_map="auto"
-        # )
-        self.llm = None  # Modo simulación
+        self.llm = pipeline(
+            "text-generation",
+            model=model_id,
+            model_kwargs={"torch_dtype": "auto"},
+            device_map="auto"
+        )
+        #self.llm = None  # Modo simulación
         self.refinements_history = []
 
     def process_request(self, student_prompt: dict) -> dict:

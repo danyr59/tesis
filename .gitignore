@@ -3,3 +3,64 @@ models/
 data/
 .DS_Store
 .env
+__pycache__/
+*.pyc
+
+# Python bytecode y cachés
+**/__pycache__/
+*.py[cod]
+*.so
+
+# Archivos de entorno virtual
+venv/
+env/
+.venv/
+.env
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Modelos descargados (ocupan mucho espacio)
+models/
+
+# Datos generados o grandes (opcional, si no quieres subir ningún data)
+data/
+
+# RAG – base de vectores generada por scripts
+rag/maestro/
+
+# Logs
+*.log
+logs/
+
+# Archivos binarios o de serialización
+*.pkl
+*.pickle
+*.pt
+*.pth
+*.bin
+*.safetensors  # aunque los pesos suelen ignorarse, la carpeta models/ ya los cubre
+
+# Notebooks (si usas Jupyter)
+.ipynb_checkpoints/
+*.ipynb
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos comprimidos
+*.zip
+*.tar.gz
+*.7z
+
+# Archivos de caché de Hugging Face (si no quieres subir la caché global, pero normalmente está fuera del repo)
+# ~/.cache/huggingface/  # Esto va en .gitignore global del usuario, no del repo
+
+# Cualquier archivo temporal
+*.tmp
+*.temp

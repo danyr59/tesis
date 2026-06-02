@@ -9,16 +9,16 @@ from pipeline.teacher_agent.agent import TeacherAgent
 class StudentAgent:
     def __init__(self):
         print(f"[{self.__class__.__name__}] Inicializando...")
-        model_id = Settings.get_student_model_id()
+        model_id = Settings.get_student_model_path()
         print(f"[{self.__class__.__name__}] Cargando LLM Estudiante: {model_id}")
         
-        # self.llm = pipeline(
-        #     "text-generation",
-        #     model=model_id,
-        #     model_kwargs={"torch_dtype": "auto"},
-        #     device_map="auto"
-        # )
-        self.llm = None  # Modo simulación
+        self.llm = pipeline(
+            "text-generation",
+            model=model_id,
+            model_kwargs={"torch_dtype": "auto"},
+            device_map="auto"
+        )
+        #self.llm = None  # Modo simulación
         self.teacher = TeacherAgent()
         self.iteration_history = []
         
