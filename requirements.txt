@@ -16,3 +16,5 @@ python-dotenv>=1.0.0
 
 # Visualización & métricas (M6-M8)
 matplotlib>=3.7.0
+datasets>=2.14.0
+accelerate>=0.25.0

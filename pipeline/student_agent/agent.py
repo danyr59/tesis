@@ -1,299 +1,487 @@
-import os
 import json
+import os
 import re
+from typing import Any, Dict, List, Optional, Tuple
+
+import numpy as np
 import pandas as pd
-from transformers import pipeline
+
 from pipeline.config.settings import Settings
+from pipeline.numeric_pipeline import run_numeric_pipeline
+from pipeline.student_agent.fine_tuner import run_lora_fine_tune
 from pipeline.teacher_agent.agent import TeacherAgent
+from pipeline.utils.llm_client import LLMClient
+from pipeline.utils.series_utils import (
+  extend_series,
+  extract_numeric_series,
+  seeds_statistics,
+)
+
 
 class StudentAgent:
-    def __init__(self):
-        print(f"[{self.__class__.__name__}] Inicializando...")
-        model_id = Settings.get_student_model_path()
-        print(f"[{self.__class__.__name__}] Cargando LLM Estudiante: {model_id}")
-        
-        self.llm = pipeline(
-            "text-generation",
-            model=model_id,
-            model_kwargs={"torch_dtype": "auto"},
-            device_map="auto"
+  def __init__(self):
+    print(f"[{self.__class__.__name__}] Inicializando...")
+    self.llm = LLMClient(
+      Settings.get_student_model_path(),
+      role_name="Estudiante (agente liviano con razonamiento)",
+    )
+    self.teacher = TeacherAgent()
+    self.iteration_history: List[Dict[str, Any]] = []
+    self.user_query: str = ""
+    self.best_snapshot: Optional[Dict[str, Any]] = None
+    self.best_score: float = -1.0
+    self.lora_adapter_path: Optional[str] = None
+    self.num_series_target = Settings.SYNTHETIC_NUM_SERIES
+    self.points_per_series_target = Settings.SYNTHETIC_POINTS_PER_SERIES
+
+  def run_pipeline(self, initial_query: str) -> None:
+    self.user_query = initial_query
+    # Volumen fijo desde Settings (.env o pipeline/config/settings.py)
+    self.num_series_target = Settings.SYNTHETIC_NUM_SERIES
+    self.points_per_series_target = Settings.SYNTHETIC_POINTS_PER_SERIES
+
+    print(f"\n--- Iniciando Flujo Maestro-Estudiante ---")
+    print(
+      f"[{self.__class__.__name__}] Generación sintética (fija): "
+      f"{Settings.synthetic_generation_summary()}"
+    )
+
+    structured_prompt = self.interpret_request(initial_query)
+
+    iteration = 0
+    quality_accepted = False
+    final_model_path: Optional[str] = None
+    current_dataset: Optional[List[dict]] = None
+    current_teacher_response: Optional[dict] = None
+    structured_prompt_active = structured_prompt
+
+    while iteration < Settings.MAX_ITERATIONS and not quality_accepted:
+      iteration += 1
+      print(f"\n--- Iteración {iteration}/{Settings.MAX_ITERATIONS} ---")
+
+      teacher_response = self.teacher.process_request(structured_prompt_active)
+      current_dataset = teacher_response.get("seed_dataset", [])
+      current_teacher_response = teacher_response
+
+      if not current_dataset:
+        print(
+          f"[{self.__class__.__name__}] El Maestro no encontró datos semilla. "
+          "Finalizando ejecución."
         )
-        #self.llm = None  # Modo simulación
-        self.teacher = TeacherAgent()
-        self.iteration_history = []
-        
-    def run_pipeline(self, initial_query: str):
-        """
-        Punto de entrada principal.
-        """
-        print(f"\n--- Iniciando Flujo Maestro-Estudiante ---")
-        
-        # 2. Análisis y Razonamiento
-        structured_prompt = self.interpret_request(initial_query)
-        
-        iteration = 0
-        quality_accepted = False
-        final_model = None
-        current_dataset = None
-        
-        while iteration < Settings.MAX_ITERATIONS and not quality_accepted:
-            iteration += 1
-            print(f"\n--- Iteración {iteration}/{Settings.MAX_ITERATIONS} ---")
-            
-            # 3. Consulta al Maestro
-            teacher_response = self.teacher.process_request(structured_prompt)
-            current_dataset = teacher_response['seed_dataset']
-            
-            if not current_dataset:
-                print(f"[{self.__class__.__name__}] El Maestro no encontró datos semilla válidos. Abortando.")
-                return
-                
-            # 4. Destilación (Fine-Tuning)
-            final_model = self.fine_tune(current_dataset, teacher_response['metadata_summary'])
-            
-            # 5. Evaluación e Iteración
-            quality_accepted, feedback = self.evaluate_quality_and_iterate(current_dataset, teacher_response['quality_summary'])
-            
-            if not quality_accepted:
-                self.iteration_history.append(feedback)
-                structured_prompt["suggested_search"] = f"{structured_prompt.get('suggested_search', '')}. {feedback}"
-                print(f"[{self.__class__.__name__}] Refinando búsqueda en iteración: {feedback}")
-                
-        # 6. Generación Final
-        if final_model or current_dataset:
-            self.generate_final_series(current_dataset, structured_prompt)
+        return
 
-    def interpret_request(self, query: str) -> dict:
-        print(f"[{self.__class__.__name__}] Interpretando consulta: '{query}'")
-        
-        prompt = f"""Eres un agente Estudiante, un LLM liviano con gran capacidad de razonamiento lógico.
-Tu tarea es analizar el requerimiento del usuario sobre generación de series temporales y estructurar la información.
+      self._update_best_snapshot(
+        current_dataset, teacher_response, final_model_path, structured_prompt_active
+      )
 
+      final_model_path = self.fine_tune(
+        current_dataset, teacher_response.get("metadata_summary", {})
+      )
+
+      quality_accepted, feedback, eval_payload = self.evaluate_quality_and_iterate(
+        current_dataset,
+        teacher_response.get("quality_summary", ""),
+        final_model_path,
+      )
+
+      if self._ask_user_early_approval():
+        quality_accepted = True
+        print(f"[{self.__class__.__name__}] Visto bueno del usuario recibido.")
+        break
+
+      if not quality_accepted:
+        self.iteration_history.append(eval_payload)
+        extra = feedback or eval_payload.get("feedback_to_teacher", "")
+        structured_prompt_active["suggested_search"] = (
+          f"{structured_prompt_active.get('suggested_search', '')}. {extra}"
+        ).strip()
+        if eval_payload.get("re_train_with_params"):
+          structured_prompt_active["re_train_hint"] = eval_payload["re_train_with_params"]
+        print(f"[{self.__class__.__name__}] Acción correctiva: {extra}")
+
+    if not quality_accepted and self.best_snapshot:
+      print(
+        f"[{self.__class__.__name__}] Máximo de iteraciones sin calidad plena; "
+        "usando el mejor conjunto obtenido hasta el momento."
+      )
+      current_dataset = self.best_snapshot["dataset"]
+      current_teacher_response = self.best_snapshot["teacher_response"]
+      final_model_path = self.best_snapshot.get("model_path") or final_model_path
+      structured_prompt_active = self.best_snapshot.get(
+        "structured_prompt", structured_prompt_active
+      )
+
+    if not current_dataset:
+      return
+
+    csv_path = self.generate_final_series(
+      current_dataset,
+      structured_prompt_active,
+      final_model_path,
+    )
+
+    domain = structured_prompt_active.get("values", {}).get("dominio", "general")
+    run_numeric_pipeline(
+      csv_path=csv_path,
+      seed_dataset=current_dataset,
+      domain=domain,
+    )
+
+  def interpret_request(self, query: str) -> dict:
+    print(f"[{self.__class__.__name__}] Interpretando: '{query}'")
+    current_query = query
+    dialog_rounds = 0
+    max_dialog_rounds = 8
+
+    while dialog_rounds < max_dialog_rounds:
+      dialog_rounds += 1
+      prompt = self._interpretation_prompt(current_query)
+      response = self.llm.generate_json(prompt)
+
+      confidence = float(response.get("confidence", 0.0))
+      missing = response.get("missing_parameters") or []
+
+      if confidence >= Settings.MIN_CONFIDENCE_THRESHOLD and not missing:
+        break
+
+      if not missing and confidence < Settings.MIN_CONFIDENCE_THRESHOLD:
+        missing = ["detalles adicionales del requerimiento"]
+
+      print(f"\n[{self.__class__.__name__}] Información insuficiente (confianza={confidence:.2f}).")
+      print(f"Justificación: {response.get('justification', '')}")
+      for param in missing:
+        user_val = input(
+          f"[{self.__class__.__name__}] Aclara el parámetro '{param}': "
+        ).strip()
+        if user_val:
+          current_query += f". {param}: {user_val}"
+    else:
+      print(
+        f"[{self.__class__.__name__}] Máximo de rondas de diálogo alcanzado; "
+        "continuando con la mejor interpretación disponible."
+      )
+      if not response:
+        response = self.llm.generate_json(self._interpretation_prompt(current_query))
+
+    structured = {
+      "values": response.get("values", {}),
+      "missing_parameters": response.get("missing_parameters", []),
+      "pending_questions": response.get("pending_questions", missing),
+      "justification": response.get("justification", ""),
+      "suggested_search": response.get("suggested_search", ""),
+      "search_strategy": response.get(
+        "search_strategy", response.get("suggested_search", "")
+      ),
+      "confidence": confidence,
+    }
+    print(f"[{self.__class__.__name__}] Prompt estructurado:\n{json.dumps(structured, indent=2, ensure_ascii=False)}")
+    return structured
+
+  def _interpretation_prompt(self, query: str) -> str:
+    return f"""Eres el agente Estudiante (LLM liviano con razonamiento).
 Requerimiento del usuario: "{query}"
 
-Acciones a realizar obligatoriamente:
-1. Interpretación semántica activa: identifica sinónimos (ej. “calor” → dominio clima), detecta ambigüedades.
-2. Detección de parámetros faltantes y TIPO DE SERIE: analiza si la consulta proporciona variables, dominio, frecuencia, y localización.
-CRÍTICO: Debes razonar explícitamente si el usuario requiere una serie "univariada" (ej. solo temperatura) o "multivariada" (ej. temperatura, humedad, presión). Si es multivariada pero no especifica qué variables, agrégalo a missing_parameters.
-3. Justificación de inferencias: explica claramente por qué asumes ciertos valores y por qué determinaste el tipo_serie.
-4. Toma de decisiones: Evalúa tu confianza global. Si es mayor a 0.8, la consulta es suficiente. Si es menor, lista los parámetros faltantes.
+1. Interpretación semántica activa: sinónimos (ej. calor→clima) y ambigüedades.
+2. Detecta parámetros faltantes (variables, dominio, frecuencia, localización).
+   Si falta algo crítico, indícalo en missing_parameters para dialogar con el usuario.
+3. Justifica cada inferencia (ej. frecuencia diaria estándar en clima).
+4. Razona tipo_serie: univariada o multivariada.
+5. Si confidence >= {Settings.MIN_CONFIDENCE_THRESHOLD}, el requerimiento es suficiente.
 
-Devuelve tu respuesta ÚNICAMENTE en el siguiente formato JSON válido, sin texto adicional:
+Devuelve ÚNICAMENTE JSON:
 {{
-    "values": {{"dominio": "...", "localizacion": "...", "frecuencia": "...", "variables": "...", "tipo_serie": "univariada|multivariada"}},
-    "missing_parameters": ["param1"],
-    "justification": "Tu justificación de inferencias y del tipo de serie aquí",
-    "suggested_search": "Texto enriquecido sugerido para que el Maestro busque en el RAG",
-    "confidence": 0.9
+  "values": {{
+    "dominio": "...",
+    "localizacion": "...",
+    "frecuencia": "...",
+    "variables": "...",
+    "tipo_serie": "univariada|multivariada",
+    "num_series_configuradas": {self.num_series_target},
+    "puntos_por_serie_configurados": {self.points_per_series_target}
+  }},
+  "missing_parameters": [],
+  "pending_questions": [],
+  "justification": "...",
+  "suggested_search": "...",
+  "search_strategy": "...",
+  "confidence": 0.0
 }}
 """
-        response = self._call_llm_json(prompt)
-        
-        while response.get("confidence", 1.0) < 0.8 and response.get("missing_parameters"):
-            print(f"\n[{self.__class__.__name__}] He detectado información insuficiente.")
-            print(f"Justificación: {response.get('justification')}")
-            for missing in response.get("missing_parameters", []):
-                user_val = input(f"[{self.__class__.__name__}] Por favor, aclara el siguiente parámetro faltante '{missing}': ")
-                query += f". {missing}: {user_val}"
-            
-            prompt_retry = prompt.replace(f'Requerimiento del usuario: "{query}"', f'Requerimiento actualizado: "{query}"')
-            response = self._call_llm_json(prompt_retry)
 
-        print(f"[{self.__class__.__name__}] Prompt Estructurado Listo: {json.dumps(response, indent=2)}")
-        return response
+  def fine_tune(self, seed_dataset: List[dict], metadata_summary: dict) -> str:
+    print(f"\n[{self.__class__.__name__}] Destilación (LoRA) con {len(seed_dataset)} semillas...")
+    prompt = f"""Eres el Estudiante. Dataset semilla: {len(seed_dataset)} ejemplos.
+Metadatos: {json.dumps(metadata_summary, ensure_ascii=False)}
 
-    def fine_tune(self, seed_dataset, metadata_summary):
-        print(f"\n[{self.__class__.__name__}] Analizando estrategia de Destilación (Fine-Tuning)...")
-        prompt = f"""Eres un agente Estudiante. Recibiste un dataset semilla de {len(seed_dataset)} ejemplos para entrenar.
-Metadatos del dataset: {metadata_summary}
+Selecciona y justifica en modo verbose:
+- epochs (evitar sobreajuste si hay pocos datos)
+- batch_size
+- learning_rate
 
-Razona sobre cómo realizar el fine-tuning (destilación) para evitar el sobreajuste si hay pocos datos.
-Selecciona dinámicamente y justifica:
-1. Número de épocas (epochs).
-2. Tamaño de lote (batch size).
-3. Tasa de aprendizaje (learning rate).
-
-Explica en modo verbose tus decisiones de configuración.
+Incluye también JSON al final:
+{{"epochs": 3, "batch_size": 2, "learning_rate": 0.0002}}
 """
-        reasoning = self._call_llm_text(prompt)
-        print(f"[{self.__class__.__name__}] [VERBOSE] Decisiones de Fine-Tuning:\n{reasoning}")
-        print(f"[{self.__class__.__name__}] Ejecutando fine-tuning del modelo pequeño usando el dataset semilla (LoRA)...")
-        print(f"[{self.__class__.__name__}] Modelo resultante guardado.")
-        return "student_lora_model_v1"
+    reasoning = self.llm.generate_text(prompt, max_new_tokens=1024)
+    print(f"[{self.__class__.__name__}] [VERBOSE] Fine-tuning:\n{reasoning}")
 
-    def evaluate_quality_and_iterate(self, dataset, quality_summary) -> tuple[bool, str]:
-        print(f"\n[{self.__class__.__name__}] Evaluando calidad del ciclo de retroalimentación...")
-        prompt = f"""Eres un agente Estudiante. Acabas de ser entrenado.
-Resumen de calidad provisto por el Maestro: "{quality_summary}"
-Estrategias de iteración previas intentadas: {self.iteration_history}
-Tamaño del dataset semilla usado: {len(dataset)}
+    adapter_path = run_lora_fine_tune(self.llm.model, self.llm.tokenizer ,seed_dataset, metadata_summary, reasoning)
+    self.lora_adapter_path = adapter_path
 
-Decide si es necesario iterar:
-- Si la calidad es baja (ej. series muy similares entre sí), determina la causa: ¿faltan semillas diversas? ¿sobreajuste?
-- Toma una acción correctiva (ej. pedir al Maestro más semillas con características complementarias).
+    #try:
+    #  self.llm.load_adapter(adapter_path)
+    #except Exception as exc:
+    #  print(f"[{self.__class__.__name__}] Aviso: no se recargó adapter en memoria: {exc}")
 
-Devuelve tu decisión ÚNICAMENTE en el siguiente formato JSON válido:
+    print(f"[{self.__class__.__name__}] Modelo LoRA guardado en {adapter_path}")
+    return adapter_path
+
+  def evaluate_quality_and_iterate(
+    self,
+    dataset: List[dict],
+    quality_summary: str,
+    model_path: str,
+  ) -> Tuple[bool, str, dict]:
+    print(f"\n[{self.__class__.__name__}] Evaluación de retroalimentación...")
+    prompt = f"""Eres el Estudiante recién entrenado con LoRA.
+Resumen del Maestro: "{quality_summary}"
+Estrategias ya intentadas (no repetir): {json.dumps(self.iteration_history, ensure_ascii=False)}
+Semillas: {len(dataset)}
+
+Decide si iterar. Analiza: diversidad, sobreajuste, épocas insuficientes.
+Si falta una variable o frecuencia, indica feedback_to_teacher específico.
+
+JSON únicamente:
 {{
-    "quality_accepted": true/false,
-    "causal_analysis": "tu análisis de la causa raíz si la calidad es baja",
-    "feedback_to_teacher": "instrucción específica al Maestro indicando qué variables/frecuencias se necesitan"
+  "quality_accepted": true,
+  "causal_analysis": "...",
+  "feedback_to_teacher": "...",
+  "corrective_strategy": "ampliar_dominio|cambiar_frecuencia|mas_semillas|re_train",
+  "re_train_with_params": {{"epochs": 5, "batch_size": 2, "learning_rate": 0.0001}}
 }}
 """
-        response = self._call_llm_json(prompt)
-        accepted = response.get("quality_accepted", True)
-        feedback = response.get("feedback_to_teacher", "")
-        
-        if accepted:
-            print(f"[{self.__class__.__name__}] Calidad aceptada. No se requieren más iteraciones.")
-        else:
-            print(f"[{self.__class__.__name__}] Calidad baja detectada. Análisis: {response.get('causal_analysis')}")
-            print(f"[{self.__class__.__name__}] Acción correctiva solicitada al Maestro: {feedback}")
-            
-        return accepted, feedback
+    response = self.llm.generate_json(prompt)
+    accepted = bool(response.get("quality_accepted", False))
+    feedback = response.get("feedback_to_teacher", "")
+    payload = {
+      "feedback_to_teacher": feedback,
+      "causal_analysis": response.get("causal_analysis", ""),
+      "corrective_strategy": response.get("corrective_strategy", ""),
+      "re_train_with_params": response.get("re_train_with_params"),
+      "attempted_strategies": list(self.iteration_history),
+    }
 
-    def generate_final_series(self, dataset, prompt_info):
-        """
-        Utiliza el LLM Estudiante (supuestamente fine-tuneado) para generar numéricamente las series sintéticas.
-        """
-        print(f"\n[{self.__class__.__name__}] El Estudiante está conforme. Generando series sintéticas con el LLM...")
-        
-        # En una versión real, esto llamaría al self.llm o usaría el pipeline.
-        # Formulamos el prompt poderoso que exige la generación matemática/numérica:
-        tipo_serie = prompt_info["values"].get("tipo_serie", "univariada").lower()
-        
-        if "multi" in tipo_serie:
-            json_format = """{
-    "synthetic_series": [
-        {"temperatura (°C)": [22.1, 22.4...], "humedad (%)": [60.0, 62.0...]},
-        {"temperatura (°C)": [21.0, 21.3...], "humedad (%)": [55.0, 58.0...]}
-    ]
-}"""
-        else:
-            json_format = """{
-    "synthetic_series": [
-        [22.1, 22.4, 23.0, ...],
-        [21.0, 21.3, 21.8, ...]
-    ]
-}"""
+    if accepted:
+      print(f"[{self.__class__.__name__}] Calidad aceptada.")
+    else:
+      print(f"[{self.__class__.__name__}] Calidad insuficiente: {payload['causal_analysis']}")
 
-        generation_prompt = f"""Eres un agente Estudiante avanzado, recién entrenado en series temporales del dominio: {prompt_info["values"].get("dominio", "General")}.
-Tu objetivo ahora es generar nuevas series temporales sintéticas, realistas y numéricas que capturen las características aprendidas del dataset semilla.
+    return accepted, feedback, payload
 
-Características solicitadas (NOTA: La serie es {tipo_serie}):
-{json.dumps(prompt_info["values"])}
+  def generate_final_series(
+    self,
+    dataset: List[dict],
+    prompt_info: dict,
+    model_path: Optional[str],
+  ) -> str:
+    print(f"\n[{self.__class__.__name__}] Generación sintética final...")
+    tipo_serie = str(prompt_info.get("values", {}).get("tipo_serie", "univariada")).lower()
+    stats = seeds_statistics(dataset)
+    seed_preview = []
+    for s in dataset[:5]:
+      nums = extract_numeric_series(s)
+      seed_preview.append(nums[:30])
 
-Instrucciones de Generación:
-1. Genera exactamente 3 nuevas series temporales.
-2. Cada serie debe tener al menos 10 puntos numéricos (siempre como números flotantes, ej. 22.0) simulando variabilidad realista.
-3. Devuelve los resultados ÚNICAMENTE en formato JSON, utilizando EXACTAMENTE esta estructura. 
-IMPORTANTE: Si es multivariada, los nombres de las variables DEBEN incluir su unidad de medida entre paréntesis.
+    all_series: List[Any] = []
+    remaining = self.num_series_target
+    series_offset = 0
 
-{json_format}
+    while remaining > 0:
+      chunk_n = min(Settings.SYNTHETIC_CHUNK_SERIES, remaining)
+      chunk_points = min(Settings.SYNTHETIC_CHUNK_POINTS, self.points_per_series_target)
+      chunk = self._generate_chunk(
+        prompt_info, tipo_serie, chunk_n, chunk_points, stats, seed_preview, series_offset
+      )
+      all_series.extend(chunk)
+      remaining -= len(chunk)
+      series_offset += len(chunk)
+
+    all_series = self._normalize_series_length(all_series, tipo_serie)
+    output_file = self._series_to_csv(all_series, prompt_info, tipo_serie)
+    print(f"[{self.__class__.__name__}] CSV guardado: {output_file}")
+    print(
+      f"[{self.__class__.__name__}] Total: {len(all_series)} series, "
+      f"~{sum(self._series_len(s, tipo_serie) for s in all_series)} puntos"
+    )
+    return output_file
+
+  def _generate_chunk(
+    self,
+    prompt_info: dict,
+    tipo_serie: str,
+    num_series: int,
+    num_points: int,
+    stats: dict,
+    seed_preview: list,
+    series_offset: int,
+  ) -> List[Any]:
+    multivariate = "multi" in tipo_serie
+    example = (
+      '{"synthetic_series": [{"temperatura (°C)": [1.0, 2.0], "humedad (%)": [50.0, 51.0]}]}'
+      if multivariate
+      else '{"synthetic_series": [[1.0, 2.0, 3.0]]}'
+    )
+
+    prompt = f"""Eres el Estudiante fine-tuneado (LoRA). Genera series sintéticas numéricas.
+
+Dominio y requisitos:
+{json.dumps(prompt_info.get("values", {}), ensure_ascii=False)}
+
+Estadísticas de semillas TSQA: {json.dumps(stats)}
+Muestra de semillas (referencia): {json.dumps(seed_preview)[:3000]}
+
+Genera exactamente {num_series} series con exactamente {num_points} puntos cada una.
+Tipo: {"multivariada con unidades en los nombres" if multivariate else "univariada"}.
+Valores realistas, float, con variabilidad y estacionalidad plausible.
+ID base de series: {series_offset + 1}.
+
+Devuelve ÚNICAMENTE JSON con esta forma:
+{example}
 """
-        # Llamada simulada robusta
-        response = self._call_llm_json(generation_prompt)
-        synthetic_data = response.get("synthetic_series", [])
-        
-        os.makedirs(Settings.SYNTHETIC_DATA_DIR, exist_ok=True)
-        output_file = os.path.join(Settings.SYNTHETIC_DATA_DIR, "synthetic_series.csv")
-        
-        all_rows = []
-        for series_idx, series_data in enumerate(synthetic_data):
-            # Usar números simples para el ID en vez del prefijo "synthetic_"
-            series_id = series_idx + 1
-            
-            if "multi" in tipo_serie and isinstance(series_data, dict):
-                # Multivariada: dict de arrays
-                keys = list(series_data.keys())
-                if keys:
-                    length = len(series_data[keys[0]])
-                    for t in range(length):
-                        row = {"series_id": series_id, "time_step": t}
-                        for k in keys:
-                            try:
-                                row[k] = float(series_data[k][t])
-                            except (IndexError, ValueError, TypeError):
-                                row[k] = None
-                        all_rows.append(row)
-            else:
-                # Univariada: lista de números
-                var_name = prompt_info["values"].get("variables", "valor_generado")
-                # Si el LLM no le puso unidad al univariado, podemos intentar que sea general
-                if isinstance(series_data, list):
-                    for t, val in enumerate(series_data):
-                        try:
-                            f_val = float(val)
-                        except (ValueError, TypeError):
-                            f_val = None
-                            
-                        all_rows.append({
-                            "series_id": series_id,
-                            "time_step": t,
-                            var_name: f_val
-                        })
-            
-        df = pd.DataFrame(all_rows)
-        df.to_csv(output_file, index=False)
-        print(f"[{self.__class__.__name__}] Dataset estructurado (HuggingFace/RNN ready) guardado en: {output_file}")
+    response = self.llm.generate_json(prompt, max_new_tokens=Settings.LLM_MAX_NEW_TOKENS)
+    series = response.get("synthetic_series", [])
+    if not series:
+      series = self._fallback_series(num_series, num_points, stats, multivariate, prompt_info)
+    return series
 
-    # --- Métodos Auxiliares para LLM ---
-    def _extract_json_from_text(self, text: str) -> dict:
-        """Extrae de manera robusta un bloque JSON de la respuesta del LLM usando Expresiones Regulares."""
-        try:
-            match = re.search(r'\{.*\}', text, re.DOTALL)
-            if match:
-                json_str = match.group(0)
-                return json.loads(json_str)
-            else:
-                return json.loads(text)
-        except Exception as e:
-            print(f"[{self.__class__.__name__}] Error parseando JSON: {e}")
-            return {}
+  def _fallback_series(
+    self,
+    n: int,
+    points: int,
+    stats: dict,
+    multivariate: bool,
+    prompt_info: dict,
+  ) -> List[Any]:
+    rng = np.random.default_rng(42)
+    mean, std = stats["mean"], stats["std"]
+    out = []
+    for _ in range(n):
+      base = float(rng.normal(mean, std))
+      seq = extend_series(
+        [base + float(rng.normal(0, std * 0.1)) for _ in range(min(20, points))],
+        points,
+        rng,
+      )
+      if multivariate:
+        vars_ = prompt_info.get("values", {}).get("variables", ["v1", "v2"])
+        if isinstance(vars_, str):
+          vars_ = [vars_, "humedad (%)"]
+        out.append(
+          {
+            f"{vars_[0]} (°C)" if "(" not in str(vars_[0]) else str(vars_[0]): seq,
+            "humedad (%)": extend_series(
+              [50.0 + float(rng.normal(0, 3)) for _ in range(min(20, points))], points, rng
+            ),
+          }
+        )
+      else:
+        var = prompt_info.get("values", {}).get("variables", "valor")
+        out.append(seq)
+    return out
 
-    def _call_llm_json(self, prompt: str) -> dict:
-        if "Interpretación semántica activa" in prompt:
-            # Extraer solo la consulta del usuario (entre comillas después de "Requerimiento")
-            import re as _re
-            user_query_match = _re.search(r'Requerimiento del usuario: "(.+?)"', prompt)
-            user_query = user_query_match.group(1).lower() if user_query_match else ""
-            
-            if "multivariada" in user_query or (" y " in user_query and any(v in user_query for v in ["humedad", "presión", "viento"])):
-                simulated = '''{"values": {"dominio": "clima", "localizacion": "Mérida", "frecuencia": "diaria", "variables": ["temperatura", "humedad"], "tipo_serie": "multivariada"}, "missing_parameters": [], "justification": "Se menciona temperatura y humedad. Serie multivariada. Dominio inferido: clima.", "suggested_search": "series clima temperatura humedad multivariada", "confidence": 0.9}'''
-            else:
-                simulated = '''{"values": {"dominio": "clima", "localizacion": "Mérida", "frecuencia": "diaria", "variables": "temperatura", "tipo_serie": "univariada"}, "missing_parameters": [], "justification": "Se menciona temperatura, que es univariada. Dominio inferido: clima.", "suggested_search": "series clima temperatura Mérida univariada", "confidence": 0.9}'''
-            return self._extract_json_from_text(simulated)
-            
-        elif "Decide si es necesario iterar" in prompt:
-            if len(self.iteration_history) == 0:
-                simulated = '''{"quality_accepted": false, "causal_analysis": "Poca diversidad", "feedback_to_teacher": "Más anomalías por favor."}'''
-            else:
-                simulated = '''{"quality_accepted": true, "causal_analysis": "Adecuada", "feedback_to_teacher": ""}'''
-            return self._extract_json_from_text(simulated)
-            
-        elif "Instrucciones de Generación" in prompt:
-            if "La serie es multivariada" in prompt:
-                simulated = '''
-                {
-                    "synthetic_series": [
-                        {"temperatura (°C)": [22.1, 22.4, 23.0], "humedad (%)": [60.0, 62.0, 65.0]},
-                        {"temperatura (°C)": [21.0, 21.3, 21.8], "humedad (%)": [55.0, 58.0, 60.0]},
-                        {"temperatura (°C)": [23.5, 24.1, 23.9], "humedad (%)": [70.0, 72.0, 68.0]}
-                    ]
-                }
-                '''
-            else:
-                simulated = '''
-                {
-                    "synthetic_series": [
-                        [22.1, 22.4, 23.0, 21.5, 20.8, 22.2, 23.1, 24.5, 24.1, 23.8],
-                        [21.0, 21.3, 21.8, 20.9, 21.2, 22.5, 23.3, 23.0, 22.1, 21.9],
-                        [23.5, 24.1, 23.9, 22.8, 21.9, 21.5, 22.4, 23.6, 24.8, 25.0]
-                    ]
-                }
-                '''
-            return self._extract_json_from_text(simulated)
-            
-        return {}
+  def _normalize_series_length(self, series_list: List[Any], tipo_serie: str) -> List[Any]:
+    target = self.points_per_series_target
+    normalized = []
+    for s in series_list[: self.num_series_target]:
+      if "multi" in tipo_serie and isinstance(s, dict):
+        keys = list(s.keys())
+        if not keys:
+          continue
+        lengths = [len(s[k]) for k in keys if isinstance(s.get(k), list)]
+        cur_len = min(lengths) if lengths else 0
+        new_dict = {}
+        for k in keys:
+          vals = [float(x) for x in s[k][:cur_len]] if isinstance(s.get(k), list) else []
+          new_dict[k] = extend_series(vals, target)
+        normalized.append(new_dict)
+      elif isinstance(s, list):
+        vals = [float(x) for x in s]
+        normalized.append(extend_series(vals, target))
+    while len(normalized) < self.num_series_target:
+      normalized.extend(
+        self._fallback_series(
+          1,
+          target,
+          seeds_statistics([]) if not normalized else {"mean": 0, "std": 1, "min": 0, "max": 1},
+          "multi" in tipo_serie,
+          {"values": {"variables": "valor"}},
+        )
+      )
+    return normalized[: self.num_series_target]
 
-    def _call_llm_text(self, prompt: str) -> str:
-        return "Decido usar 5 epochs ya que el dataset es muy pequeño (menos de 10 ejemplos). El batch_size será 2 para tener actualizaciones frecuentes de pesos, y un learning rate de 2e-4 con LoRA (rank=8)."
+  def _series_len(self, s: Any, tipo_serie: str) -> int:
+    if "multi" in tipo_serie and isinstance(s, dict) and s:
+      k = next(iter(s))
+      return len(s[k]) if isinstance(s.get(k), list) else 0
+    return len(s) if isinstance(s, list) else 0
+
+  def _series_to_csv(self, series_list: List[Any], prompt_info: dict, tipo_serie: str) -> str:
+    os.makedirs(Settings.SYNTHETIC_DATA_DIR, exist_ok=True)
+    output_file = Settings.synthetic_csv_path()
+    rows = []
+
+    for series_idx, series_data in enumerate(series_list):
+      series_id = series_idx + 1
+      if "multi" in tipo_serie and isinstance(series_data, dict):
+        keys = list(series_data.keys())
+        if keys:
+          length = len(series_data[keys[0]])
+          for t in range(length):
+            row = {"series_id": series_id, "time_step": t}
+            for k in keys:
+              try:
+                row[k] = float(series_data[k][t])
+              except (IndexError, ValueError, TypeError):
+                row[k] = None
+            rows.append(row)
+      elif isinstance(series_data, list):
+        var_name = prompt_info.get("values", {}).get("variables", "valor_generado")
+        if isinstance(var_name, list):
+          var_name = var_name[0]
+        if "(" not in str(var_name) and "temperatura" in str(var_name).lower():
+          var_name = f"{var_name} (°C)"
+        for t, val in enumerate(series_data):
+          try:
+            f_val = float(val)
+          except (ValueError, TypeError):
+            f_val = None
+          rows.append({"series_id": series_id, "time_step": t, str(var_name): f_val})
+
+    pd.DataFrame(rows).to_csv(output_file, index=False)
+    return output_file
+
+  def _update_best_snapshot(
+    self,
+    dataset: List[dict],
+    teacher_response: dict,
+    model_path: Optional[str],
+    structured_prompt: dict,
+  ) -> None:
+    meta = teacher_response.get("metadata_summary", {})
+    score = float(meta.get("diversity_score", 0.5)) * len(dataset)
+    if score > self.best_score:
+      self.best_score = score
+      self.best_snapshot = {
+        "dataset": dataset,
+        "teacher_response": teacher_response,
+        "model_path": model_path,
+        "structured_prompt": structured_prompt,
+      }
+
+  def _ask_user_early_approval(self) -> bool:
+    try:
+      ans = input(
+        f"\n[{self.__class__.__name__}] ¿Dar visto bueno y pasar a generación sintética ahora? (s/n): "
+      ).strip().lower()
+    except EOFError:
+      return False
+    return ans in ("s", "si", "sí", "y", "yes")

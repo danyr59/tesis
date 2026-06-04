@@ -17,6 +17,7 @@ from typing import Any, Dict, List, Optional
 
 import numpy as np
 
+from ..config.pipeline_config import HallucinationConfig
 from ..utils.logger import get_logger
 from ..prediction.predictor import PredictionResult
 

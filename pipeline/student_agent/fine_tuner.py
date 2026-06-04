@@ -1,0 +1,133 @@
+"""Fine-tuning LoRA real del modelo Estudiante con dataset semilla."""
+
+from __future__ import annotations
+
+import json
+import re
+from pathlib import Path
+from typing import Any, Dict, List
+
+import torch
+from datasets import Dataset
+from peft import LoraConfig, get_peft_model
+from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments, Trainer
+
+from pipeline.config.settings import Settings
+from pipeline.utils.series_utils import extract_numeric_series
+
+
+def parse_hyperparams_from_text(text: str, n_samples: int) -> Dict[str, Any]:
+  epochs = 3 if n_samples < 10 else 5 if n_samples < 30 else 8
+  batch_size = 1 if n_samples < 6 else 2
+  lr = 2e-4
+
+  m = re.search(r"(\d+)\s*epochs?", text, re.I)
+  if m:
+    epochs = int(m.group(1))
+  m = re.search(r"batch[_\s-]*size[^\d]*(\d+)", text, re.I)
+  if m:
+    batch_size = int(m.group(1))
+  m = re.search(r"learning\s*rate[^\d]*([\d.eE+-]+)", text, re.I)
+  if m:
+    lr = float(m.group(1))
+
+  epochs = max(1, min(epochs, 15))
+  batch_size = max(1, min(batch_size, 8))
+  return {"epochs": epochs, "batch_size": batch_size, "learning_rate": lr}
+
+
+def _build_training_records(
+  seed_dataset: List[Dict[str, Any]],
+  metadata_summary: Dict[str, Any],
+) -> List[Dict[str, str]]:
+  records: List[Dict[str, str]] = []
+  domain = metadata_summary.get("domain", "general")
+  for seed in seed_dataset:
+    meta = seed.get("metadata", {})
+    series = extract_numeric_series(seed)
+    series_preview = series[:120]
+    text = (
+      f"Dominio: {meta.get('domain', domain)}. "
+      f"Tarea: {meta.get('task_type', 'forecast')}. "
+      f"Pregunta: {str(meta.get('question', ''))[:500]}. "
+      f"Serie numérica: {json.dumps(series_preview)}"
+    )
+    records.append({"text": text})
+  return records
+
+
+def run_lora_fine_tune(
+  model, 
+  tokenizer,
+  seed_dataset: List[Dict[str, Any]],
+  metadata_summary: Dict[str, Any],
+  reasoning_text: str,
+) -> str:
+  """Entrena adapter LoRA y devuelve la ruta guardada."""
+  if not seed_dataset:
+    raise ValueError("No hay semillas para fine-tuning.")
+
+  hp = parse_hyperparams_from_text(reasoning_text, len(seed_dataset))
+  records = _build_training_records(seed_dataset, metadata_summary)
+  if not records:
+    raise ValueError("No se pudieron construir ejemplos de entrenamiento.")
+
+  # model_path = Settings.get_student_model_path()
+  out_dir = Path(Settings.STUDENT_LORA_PATH)
+  out_dir.mkdir(parents=True, exist_ok=True)
+
+  # tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+  # if tokenizer.pad_token is None:
+  #   tokenizer.pad_token = tokenizer.eos_token
+
+  # model = AutoModelForCausalLM.from_pretrained(
+  #   model_path,
+  #   torch_dtype="auto",
+  #   device_map="auto",
+  #   trust_remote_code=True,
+  # )
+
+  lora_cfg = LoraConfig(
+    r=Settings.LORA_R,
+    lora_alpha=Settings.LORA_ALPHA,
+    lora_dropout=Settings.LORA_DROPOUT,
+    bias="none",
+    task_type="CAUSAL_LM",
+    target_modules=["q_proj", "v_proj", "k_proj", "o_proj"],
+  )
+  model = get_peft_model(model, lora_cfg)
+  model.print_trainable_parameters()
+
+  def tokenize(batch):
+    return tokenizer(
+      batch["text"],
+      truncation=True,
+      max_length=512,
+      padding="max_length",
+    )
+
+  ds = Dataset.from_list(records)
+  tokenized = ds.map(tokenize, batched=True, remove_columns=ds.column_names)
+ 
+
+  args = TrainingArguments(
+    output_dir=str(out_dir / "checkpoints"),
+    num_train_epochs=hp["epochs"],
+    per_device_train_batch_size=hp["batch_size"],
+    learning_rate=hp["learning_rate"],
+    logging_steps=5,
+    save_strategy="no",
+    report_to=[],
+    gradient_accumulation_steps=2,
+    warmup_ratio=0.05,
+    fp16=torch.cuda.is_available(),
+  )
+
+  trainer = Trainer(model=model, args=args, train_dataset=tokenized)
+  trainer.train()
+
+  adapter_path = str(out_dir / "adapter")
+  model.save_pretrained(adapter_path)
+  tokenizer.save_pretrained(adapter_path)
+  print(f"[FineTuner] Adapter LoRA guardado en {adapter_path}")
+  return adapter_path

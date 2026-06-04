@@ -40,6 +40,35 @@ Una vez el Estudiante está conforme, el LLM procede a generar numéricamente la
 - **Output Robusto:** Convierte los datos a un CSV de "formato largo" (long format tabular: `series_id`, `time_step`, `var1`, `var2`...).
 - Los datos se guardan en `data/synthetic/synthetic_series.csv` de manera independiente, dejándolos listos para que herramientas como Pandas, PyTorch o los siguientes módulos de la tesis los consuman directamente sin limpieza adicional.
 
+### 7–9. Pipeline numérico automático (M6 → M7 → M8)
+Tras generar el CSV, el pipeline continúa sin pasos manuales:
+- **M6:** entrena una RNN lineal (LSTM/GRU) con ventanas de 60 pasos.
+- **M7:** predice y reporta RMSE, MAE, MAPE y R².
+- **M8:** el Estudiante actúa como juez y detecta alucinaciones numéricas.
+
+**Volumen sintético (número fijo):** se define solo en `pipeline/config/settings.py` o en `.env` (no se deduce de la consulta del usuario):
+
+```python
+# pipeline/config/settings.py
+_DEFAULT_NUM_SERIES = 20
+_DEFAULT_POINTS_PER_SERIES = 400
+```
+
+```env
+SYNTHETIC_NUM_SERIES=20
+SYNTHETIC_POINTS_PER_SERIES=400
+```
+
+**Recomendado para entrenar la RNN (ventana = 60 pasos en M6):**
+
+| Perfil | Series | Puntos/serie | Filas CSV | Uso |
+|--------|--------|--------------|-----------|-----|
+| Mínimo | 15 | 300 | 4 500 | Pruebas rápidas |
+| **Por defecto** | **20** | **400** | **8 000** | Tesis / equilibrio |
+| Robusto | 30 | 500 | 15 000 | Mejor convergencia |
+
+Regla: `filas = SYNTHETIC_NUM_SERIES × SYNTHETIC_POINTS_PER_SERIES` — conviene **> 3 000** filas y muy por encima de la ventana de 60.
+
 ---
 
 ## 🛠 Modelos y Configuración Global
@@ -48,11 +77,18 @@ Una vez el Estudiante está conforme, el LLM procede a generar numéricamente la
 - La lógica no está atada a "Llama 1B" ni "Llama 3B". Los modelos (en función de $N$ y $n$ parámetros) se inyectan dinámicamente.
 - Todos los umbrales lógicos, iteraciones y rutas residen centralizados en `pipeline/config/settings.py`.
 
-El archivo `.env` debe configurarse de esta manera:
+El RAG en `rag/maestro` indexa el dataset **TSQA** (colección `time_series_generation`).
+
+El archivo `.env` debe configurarse así (rutas locales tras `scripts/setup_models.py`):
 ```env
 TEACHER_MODEL_ID=meta-llama/Llama-3.2-3B-Instruct
 STUDENT_MODEL_ID=meta-llama/Llama-3.2-1B-Instruct
 HF_TOKEN=tu_token_aqui
+TEACHER_MODEL_PATH=./models/profesor
+STUDENT_MODEL_PATH=./models/student
+STUDENT_LORA_PATH=./models/student_lora
+SYNTHETIC_NUM_SERIES=20
+SYNTHETIC_POINTS_PER_SERIES=400
 ```
 
 ---
@@ -89,9 +125,15 @@ Para iniciar el ciclo interactivo de agentes de forma autónoma:
 # 1. Instalar requerimientos y librerías clave
 pip install -r requirements.txt
 
-# 2. Ejecutar CLI de forma interactiva (Te preguntará qué necesitas)
+# 2. Descargar modelos (según IDs en .env)
+python scripts/setup_models.py
+
+# 3. Construir RAG TSQA (si aún no existe rag/maestro)
+python scripts/build_rag_from_jsonl.py
+
+# 4. Ejecutar CLI de forma interactiva (Te preguntará qué necesitas)
 python -m pipeline.main
 
-# 3. O ejecutar pasándole la consulta directo como parámetro
-python -m pipeline.main --query "necesito series temporales de temperatura para la ciudad de Mérida, Venezuela"
+# 5. O ejecutar pasándole la consulta directo como parámetro
+python -m pipeline.main --query "necesito series temporales de temperatura para Mérida, Venezuela"
 ```
