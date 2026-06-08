@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import gc
 import json
 import re
 from typing import Any, Dict, Optional
@@ -40,13 +41,48 @@ class LLMClient:
     self.tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
     if self.tokenizer.pad_token is None:
       self.tokenizer.pad_token = self.tokenizer.eos_token
-    self.model = AutoModelForCausalLM.from_pretrained(
+
+  # Cargamos el modelo base (sin adaptador) y lo guardamos aparte
+    self._base_model = AutoModelForCausalLM.from_pretrained(
       model_path,
       torch_dtype="auto",
       device_map ="mps", #device_map="auto", para despues ponerlo asi , mientras en "mps" para aprovechar metal de mac os
       trust_remote_code=True,
     )
-    self.model.eval()
+   
+    self._base_model.eval()
+    # El modelo activo comienza siendo el base
+    self.model = self._base_model
+  
+  def get_base_model(self):
+        """Retorna el modelo base limpio (sin adaptadores LoRA)."""
+        return self._base_model
+  
+  def load_adapter(self, adapter_path: str) -> None:
+        """Carga un adaptador LoRA sobre el modelo base. Si ya había adaptador, lo reemplaza."""
+        from peft import PeftModel
+
+        # Si el modelo activo no es el base (es decir, ya tenía adaptador), lo liberamos
+        if self.model is not self._base_model:
+            del self.model
+            gc.collect()
+            if torch.backends.mps.is_available():
+                torch.mps.empty_cache()
+            
+
+        print(f"[LLMClient] Cargando adapter LoRA: {adapter_path}")
+        self.model = PeftModel.from_pretrained(self._base_model, adapter_path)
+        self.model.eval()
+    
+  def unload_adapter(self):
+        """Descarga el adaptador y vuelve al modelo base."""
+        if self.model is not self._base_model:
+            del self.model
+            gc.collect()
+            if torch.backends.mps.is_available():
+                torch.mps.empty_cache()
+            self.model = self._base_model
+            print("[LLMClient] Adaptador descargado, modelo base restaurado.")
 
   def generate_text(
     self,
@@ -84,12 +120,7 @@ class LLMClient:
     new_tokens = output_ids[0, inputs["input_ids"].shape[1] :]
     return self.tokenizer.decode(new_tokens, skip_special_tokens=True).strip()
 
-  def load_adapter(self, adapter_path: str) -> None:
-    from peft import PeftModel
-
-    print(f"[LLMClient] Cargando adapter LoRA: {adapter_path}")
-    self.model = PeftModel.from_pretrained(self.model, adapter_path)
-    self.model.eval()
+  
 
   def generate_json(
     self,

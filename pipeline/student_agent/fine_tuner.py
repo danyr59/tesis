@@ -9,7 +9,8 @@ from typing import Any, Dict, List
 
 import torch
 from datasets import Dataset
-from peft import LoraConfig, get_peft_model
+from peft import LoraConfig, PeftModel, get_peft_model
+from typing import Optional
 from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments, Trainer
 
 from pipeline.config.settings import Settings
@@ -57,13 +58,23 @@ def _build_training_records(
 
 
 def run_lora_fine_tune(
-  model, 
-  tokenizer,
-  seed_dataset: List[Dict[str, Any]],
-  metadata_summary: Dict[str, Any],
-  reasoning_text: str,
+    base_model,
+    tokenizer,
+    seed_dataset: List[Dict[str, Any]],
+    metadata_summary: Dict[str, Any],
+    reasoning_text: str,
+    continue_from_adapter: Optional[str] = None,
 ) -> str:
-  """Entrena adapter LoRA y devuelve la ruta guardada."""
+  """Entrena adapter LoRA y devuelve la ruta guardada.
+
+    Args:
+        base_model: modelo base (sin adaptador)
+        tokenizer: tokenizador asociado
+        seed_dataset: lista de semillas
+        metadata_summary: metadatos
+        reasoning_text: texto con hiperparámetros
+        continue_from_adapter: ruta de un adaptador previo para continuar entrenando
+  """
   if not seed_dataset:
     raise ValueError("No hay semillas para fine-tuning.")
 
@@ -87,15 +98,30 @@ def run_lora_fine_tune(
   #   trust_remote_code=True,
   # )
 
-  lora_cfg = LoraConfig(
+  # lora_cfg = LoraConfig(
+  #   r=Settings.LORA_R,
+  #   lora_alpha=Settings.LORA_ALPHA,
+  #   lora_dropout=Settings.LORA_DROPOUT,
+  #   bias="none",
+  #   task_type="CAUSAL_LM",
+  #   target_modules=["q_proj", "v_proj", "k_proj", "o_proj"],
+  # )
+  # model = get_peft_model(model, lora_cfg)
+
+  # Si continuamos desde un adaptador, lo cargamos sobre el modelo base
+  if continue_from_adapter is not None:
+    print(f"[FineTuner] Cargando adaptador previo desde {continue_from_adapter}")
+    model = PeftModel.from_pretrained(base_model, continue_from_adapter)
+  else:
+    lora_cfg = LoraConfig(
     r=Settings.LORA_R,
     lora_alpha=Settings.LORA_ALPHA,
     lora_dropout=Settings.LORA_DROPOUT,
     bias="none",
     task_type="CAUSAL_LM",
     target_modules=["q_proj", "v_proj", "k_proj", "o_proj"],
-  )
-  model = get_peft_model(model, lora_cfg)
+    )
+    model = get_peft_model(base_model, lora_cfg)
   model.print_trainable_parameters()
 
   def tokenize(batch):
