@@ -125,12 +125,14 @@ def run_lora_fine_tune(
   model.print_trainable_parameters()
 
   def tokenize(batch):
-    return tokenizer(
+    tokenized = tokenizer(
       batch["text"],
       truncation=True,
       max_length=512,
       padding="max_length",
     )
+    tokenized["labels"] = tokenized["input_ids"].copy()
+    return tokenized
 
   ds = Dataset.from_list(records)
   tokenized = ds.map(tokenize, batched=True, remove_columns=ds.column_names)
