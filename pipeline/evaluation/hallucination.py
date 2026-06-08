@@ -209,8 +209,8 @@ class HallucinationDetector:
         """
         hallucinations: List[Hallucination] = []
         stats = self._reference_stats
-
-        for j in range(min(preds.shape[1], len(names))):
+        #for j in range(min(preds.shape[1], len(names))):
+        for j in range(min(preds.shape[1], len(names), len(stats["means"]))):
             mean = stats["means"][j]
             std = max(stats["stds"][j], 1e-8)
             fmin = stats["mins"][j]
@@ -253,7 +253,7 @@ class HallucinationDetector:
         diffs = np.abs(np.diff(preds, axis=0))
         max_change_pct = self.config.max_step_change_pct / 100.0
 
-        for j in range(min(preds.shape[1], len(names))):
+        for j in range(min(preds.shape[1], len(names), len(stats["means"]))):
             ref_mean = max(abs(stats["means"][j]), 1e-8)
 
             for i in range(len(diffs)):
