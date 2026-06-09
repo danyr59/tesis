@@ -109,14 +109,27 @@ class LLMClient:
     inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
     max_new = max_new_tokens or Settings.LLM_MAX_NEW_TOKENS
     with torch.no_grad():
-      output_ids = self.model.generate(
-        **inputs,
-        max_new_tokens=max_new,
-        do_sample=temperature > 0,
-        temperature=temperature if temperature > 0 else None,
-        pad_token_id=self.tokenizer.pad_token_id,
-        eos_token_id=self.tokenizer.eos_token_id,
-      )
+      try:
+        output_ids = self.model.generate(
+          **inputs,
+          max_new_tokens=max_new,
+          do_sample=temperature > 0,
+          temperature=temperature if temperature > 0 else None,
+          pad_token_id=self.tokenizer.pad_token_id,
+          eos_token_id=self.tokenizer.eos_token_id,
+        )
+      except RuntimeError as e:
+        if "probability tensor" in str(e).lower() or "nan" in str(e).lower():
+          print(f"[LLMClient] Aviso: Error numérico en sampling (MPS). Usando greedy decoding como fallback.")
+          output_ids = self.model.generate(
+            **inputs,
+            max_new_tokens=max_new,
+            do_sample=False,
+            pad_token_id=self.tokenizer.pad_token_id,
+            eos_token_id=self.tokenizer.eos_token_id,
+          )
+        else:
+          raise
     new_tokens = output_ids[0, inputs["input_ids"].shape[1] :]
     return self.tokenizer.decode(new_tokens, skip_special_tokens=True).strip()
 

@@ -30,7 +30,10 @@ def parse_hyperparams_from_text(text: str, n_samples: int) -> Dict[str, Any]:
     batch_size = int(m.group(1))
   m = re.search(r"learning\s*rate[^\d]*([\d.eE+-]+)", text, re.I)
   if m:
-    lr = float(m.group(1))
+    try:
+      lr = float(m.group(1).rstrip('.'))
+    except ValueError:
+      lr = 2e-4
 
   epochs = max(1, min(epochs, 15))
   batch_size = max(1, min(batch_size, 8))
@@ -141,15 +144,20 @@ def run_lora_fine_tune(
   args = TrainingArguments(
     output_dir=str(out_dir / "checkpoints"),
     num_train_epochs=hp["epochs"],
-    per_device_train_batch_size=hp["batch_size"],
+    per_device_train_batch_size=1,  # Forzar a 1 para evitar OOM antes hp["batch_size"],
     learning_rate=hp["learning_rate"],
     logging_steps=5,
     save_strategy="no",
     report_to=[],
-    gradient_accumulation_steps=2,
+    gradient_accumulation_steps=4,  # Compensar el batch size 1  antes 2
     warmup_ratio=0.05,
     fp16=torch.cuda.is_available(),
+    gradient_checkpointing=True,  # ESTO SALVA MUCHA MEMORIA
   )
+
+  # Habilitar checkpointing en el modelo base si es posible
+  if hasattr(model, "enable_input_require_grads"):
+      model.enable_input_require_grads()
 
   trainer = Trainer(model=model, args=args, train_dataset=tokenized)
   trainer.train()
