@@ -123,18 +123,18 @@ Analiza el prompt estructurado del Estudiante:
     values = student_prompt.get("values", {})
     target_domain = values.get("dominio", "")
     target_loc = values.get("localizacion", "")
-    target_freq = values.get("frecuencia", "")
+    target_freq = values.get("frecuencia", "") # falta variables y tipo de serie
 
     compact = []
     for i, meta in enumerate(rag_results["metadatas"][0]):
       domain = meta.get("domain", "")
-      stext = str(meta.get("search_text", ""))[:120]
+      stext = str(meta.get("search_text", ""))[:120] #sin tamano fijo
       compact.append(
         {
           "idx": i,
           "domain": domain,
           "task_type": meta.get("task_type", ""),
-          "length": series_length_from_metadata(meta),
+          "length": series_length_from_metadata(meta), #falta question, response, similitud(distancia), time_series
           "location_hint": target_loc.lower() in stext.lower() if target_loc else None,
           "frequency_hint": target_freq.lower() in stext.lower() if target_freq else None,
           "domain_match": target_domain.lower() in domain.lower() if target_domain else None,
@@ -153,7 +153,7 @@ Solicitud del Estudiante:
 {json.dumps(student_prompt, ensure_ascii=False)}
 
 Recuperaste {n_docs} documentos. Metadatos resumidos:
-{json.dumps(metadata_compact[:200], ensure_ascii=False)}
+{json.dumps(metadata_compact[:200], ensure_ascii=False)} #corregir la longitud de metadatos, ya que si modifico a mas documentos deberia funcionar
 
 Analiza: similitud semántica, dominio, frecuencia, localización, longitud y diversidad.
 Puedes aceptar series cortas (<{Settings.MIN_SERIES_LENGTH} puntos) si aportan conocimiento.

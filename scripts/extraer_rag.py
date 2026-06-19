@@ -16,7 +16,7 @@ def consultar_maestro(consulta_usuario, top_k=3):
 
 if __name__ == "__main__":
     # Simula lo que llegaría del estudiante
-    consulta = "Necesito series temporales de temperatura en Mérida, Venezuela, dominio clima, frecuencia diaria, para detección de anomalías"
+    consulta = "series temporales de temperatura y humedad diarias en Mérida, Venezuela"
     resultados = consultar_maestro(consulta, top_k=200)
     
     print("El maestro ha encontrado estas series semilla:\n")
