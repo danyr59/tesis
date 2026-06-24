@@ -118,66 +118,84 @@ Analiza el prompt estructurado del Estudiante:
     )
 
   def _build_metadata_compact(
-    self, rag_results: dict, student_prompt: dict
+    self, rag_results: dict,  student_prompt: dict
   ) -> List[dict]:
     values = student_prompt.get("values", {})
     target_domain = values.get("dominio", "")
     target_loc = values.get("localizacion", "")
     target_freq = values.get("frecuencia", "") # falta variables y tipo de serie
+    variables = values.get("variables", "")
+    tipo_serie = values.get("tipo_serie", "")
 
     compact = []
     for i, meta in enumerate(rag_results["metadatas"][0]):
       domain = meta.get("domain", "")
+      question = meta.get("question", "")
+      answer = meta.get("answer", "")
+      task_type = meta.get("task_type", "")
+      time_series = meta.get("time_series", "")
+
+      
       stext = str(meta.get("search_text", ""))[:120] #sin tamano fijo
       compact.append(
         {
           "idx": i,
           "domain": domain,
-          "task_type": meta.get("task_type", ""),
-          "length": series_length_from_metadata(meta), #falta question, response, similitud(distancia), time_series
-          "location_hint": target_loc.lower() in stext.lower() if target_loc else None,
-          "frequency_hint": target_freq.lower() in stext.lower() if target_freq else None,
-          "domain_match": target_domain.lower() in domain.lower() if target_domain else None,
+          "question": question,
+          "answer": answer,
+          "task_type": task_type,
+          "time_series": time_series,
+       
         }
       )
     return compact
 
   def _filter_and_reason(
     self, rag_results: dict, student_prompt: dict
-  ) -> Tuple[List[dict], str, bool]:
+  ) -> List[Tuple[List[dict], str, bool]]:
+    responses = []
     metadata_compact = self._build_metadata_compact(rag_results, student_prompt)
     n_docs = len(rag_results["ids"][0])
 
-    prompt = f"""Eres el Maestro, experto en series temporales (RAG {Settings.RAG_DATASET_NAME}).
-Solicitud del Estudiante:
-{json.dumps(student_prompt, ensure_ascii=False)}
+    BATCH_SIZE= 10
+    
+    for i in range(0, n_docs, BATCH_SIZE):
+      prompt = f"""Eres el Maestro, experto en series temporales (RAG {Settings.RAG_DATASET_NAME}).
+  Solicitud del Estudiante:
+  {json.dumps(student_prompt, ensure_ascii=False)}
 
-Recuperaste {n_docs} documentos. Metadatos resumidos:
-{json.dumps(metadata_compact[:200], ensure_ascii=False)} #corregir la longitud de metadatos, ya que si modifico a mas documentos deberia funcionar
+  Recuperaste {n_docs} documentos. De los cuales vamos a ir en intervalos de {BATCH_SIZE}:
+  Intervalo actual: {i}-{i+BATCH_SIZE}
+  {json.dumps(metadata_compact[i:i+BATCH_SIZE], ensure_ascii=False)} #corregir la longitud de metadatos, ya que si modifico a mas documentos deberia funcionar
 
-Analiza: similitud semántica, dominio, frecuencia, localización, longitud y diversidad.
-Puedes aceptar series cortas (<{Settings.MIN_SERIES_LENGTH} puntos) si aportan conocimiento.
-Evalúa coherencia con el requerimiento.
+  Analiza: similitud semántica, dominio, frecuencia, localización, longitud y diversidad.
+  Puedes aceptar series cortas (<{Settings.MIN_SERIES_LENGTH} puntos) si aportan conocimiento.
+  Evalúa coherencia con el requerimiento.
 
-Devuelve ÚNICAMENTE JSON:
-{{
-  "accepted_indexes": [0, 2],
-  "needs_refinement": false,
-  "quality_summary": "justificación de selección, diversidad y uso de series cortas",
-  "complement_needed": false
-}}
-"""
-    response = self.llm.generate_json(prompt, max_new_tokens=1536)
-    accepted_indexes = response.get("accepted_indexes", [])
-    if not accepted_indexes and n_docs:
-      accepted_indexes = list(range(min(8, n_docs)))
+  Devuelve ÚNICAMENTE JSON:
+  {{
+    "accepted_indexes": [0, 2],
+    "needs_refinement": false,
+    "quality_summary": "justificación de selección, diversidad y uso de series cortas",
+    "complement_needed": false
+  }}
+  """
+      response = self.llm.generate_json(prompt, max_new_tokens=1536)
+      accepted_indexes = response.get("accepted_indexes", [])
+      if not accepted_indexes and n_docs:
+        #accepted_indexes = list(range(min(8, n_docs)))
+        continue
 
-    filtered_seeds = self._indexes_to_seeds(accepted_indexes, rag_results)
-    return (
-      filtered_seeds,
-      response.get("quality_summary", "Calidad moderada."),
-      bool(response.get("needs_refinement", False)),
-    )
+      filtered_seeds = self._indexes_to_seeds(accepted_indexes, rag_results)
+      filter = (
+        filtered_seeds,
+        response.get("quality_summary", "Calidad moderada."),
+        bool(response.get("needs_refinement", False)),
+      )
+
+      responses.append(filter)
+      
+    return responses
 
   def _indexes_to_seeds(self, indexes: List[int], rag_results: dict) -> List[dict]:
     filtered = []
