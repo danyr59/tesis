@@ -72,71 +72,71 @@ class StudentAgent:
         current_teacher_response: Optional[dict] = None
         structured_prompt_active = structured_prompt
 
-        while iteration < Settings.MAX_ITERATIONS and not quality_accepted:
-            iteration += 1
-            print(f"\n--- Iteración {iteration}/{Settings.MAX_ITERATIONS} ---")
+       # while iteration < Settings.MAX_ITERATIONS and not quality_accepted:
+        # iteration += 1
+        print(f"\n--- Iteración {iteration}/{Settings.MAX_ITERATIONS} ---")
 
-            teacher = self._get_teacher()
-            teacher_response = self.teacher.process_request(
-                structured_prompt_active)
-            self._release_teacher()
+        teacher = self._get_teacher()
+        teacher_response = self.teacher.process_request(
+             structured_prompt_active)
+        self._release_teacher()
 
-            current_dataset = teacher_response.get("seed_dataset", [])
-            current_teacher_response = teacher_response
-
-            if not current_dataset:
-                print(
-                    f"[{self.__class__.__name__}] El Maestro no encontró datos semilla. "
-                    "Finalizando ejecución."
-                )
-                return
-
-            self._update_best_snapshot(
-                current_dataset, teacher_response, final_model_path, structured_prompt_active
-            )
-
-            final_model_path = self.fine_tune(
-                current_dataset, teacher_response.get(
-                    "metadata_summary", {}), iteration
-            )
-
-            quality_accepted, feedback, eval_payload = self.evaluate_quality_and_iterate(
-                current_dataset,
-                teacher_response.get("quality_summary", ""),
-                final_model_path,
-            )
-
-            if self._ask_user_early_approval():
-                quality_accepted = True
-                print(
-                    f"[{self.__class__.__name__}] Visto bueno del usuario recibido.")
-                break
-
-            if not quality_accepted:
-                self.iteration_history.append(eval_payload)
-                extra = feedback or eval_payload.get("feedback_to_teacher", "")
-                structured_prompt_active["suggested_search"] = (
-                    f"{structured_prompt_active.get('suggested_search', '')}. {extra}"
-                ).strip()
-                if eval_payload.get("re_train_with_params"):
-                    structured_prompt_active["re_train_hint"] = eval_payload["re_train_with_params"]
-                print(f"[{self.__class__.__name__}] Acción correctiva: {extra}")
-
-        if not quality_accepted and self.best_snapshot:
-            print(
-                f"[{self.__class__.__name__}] Máximo de iteraciones sin calidad plena; "
-                "usando el mejor conjunto obtenido hasta el momento."
-            )
-            current_dataset = self.best_snapshot["dataset"]
-            current_teacher_response = self.best_snapshot["teacher_response"]
-            final_model_path = self.best_snapshot.get(
-                "model_path") or final_model_path
-            structured_prompt_active = self.best_snapshot.get(
-                "structured_prompt", structured_prompt_active
-            )
+        current_dataset = teacher_response.get("seed_dataset", [])
 
         if not current_dataset:
+            print(
+                f"[{self.__class__.__name__}] El Maestro no encontró datos semilla. "
+                    "Finalizando ejecución."
+                )
             return
+        
+         
+
+        self._update_best_snapshot(
+            current_dataset, teacher_response, final_model_path, structured_prompt_active
+        )
+
+        final_model_path = self.fine_tune(
+            current_dataset, teacher_response.get(
+                    "metadata_summary", {}), iteration
+        )
+
+            # quality_accepted, feedback, eval_payload = self.evaluate_quality_and_iterate(
+            #    current_dataset,
+            #    teacher_response.get("quality_summary", ""),
+            #    final_model_path,
+            # )
+
+            # if self._ask_user_early_approval():
+            #     quality_accepted = True
+            #     print(
+            #         f"[{self.__class__.__name__}] Visto bueno del usuario recibido.")
+            #     break
+
+            # if not quality_accepted:
+            #     self.iteration_history.append(eval_payload)
+            #     extra = feedback or eval_payload.get("feedback_to_teacher", "")
+            #     structured_prompt_active["suggested_search"] = (
+            #         f"{structured_prompt_active.get('suggested_search', '')}. {extra}"
+            #     ).strip()
+            #     if eval_payload.get("re_train_with_params"):
+            #         structured_prompt_active["re_train_hint"] = eval_payload["re_train_with_params"]
+            #     print(f"[{self.__class__.__name__}] Acción correctiva: {extra}")
+
+        # if not quality_accepted and self.best_snapshot:
+        #     print(
+        #         f"[{self.__class__.__name__}] Máximo de iteraciones sin calidad plena; "
+        #         "usando el mejor conjunto obtenido hasta el momento."
+        #     )
+        #     current_dataset = self.best_snapshot["dataset"]
+        #     current_teacher_response = self.best_snapshot["teacher_response"]
+        #     final_model_path = self.best_snapshot.get(
+        #         "model_path") or final_model_path
+        #     structured_prompt_active = self.best_snapshot.get(
+        #         "structured_prompt", structured_prompt_active
+        #     )
+
+       
 
         csv_path = self.generate_final_series(
             current_dataset,
@@ -146,6 +146,7 @@ class StudentAgent:
 
         domain = structured_prompt_active.get(
             "values", {}).get("dominio", "general")
+        
         run_numeric_pipeline(
             csv_path=csv_path,
             seed_dataset=current_dataset,
@@ -211,15 +212,16 @@ Requerimiento del usuario: "{query}"
 1. Interpretación semántica activa: sinónimos (ej. calor→clima) y ambigüedades.
 2. Detecta parámetros faltantes (variables, dominio, frecuencia, localización).
    Si falta algo crítico, indícalo en missing_parameters para dialogar con el usuario.
-3. Justifica cada inferencia (ej. frecuencia diaria estándar en clima).
+3. Justifica cada inferencia (ej. frecuencia diaria estándar en por ejemplo: clima).
 4. Razona tipo_serie: univariada o multivariada.
 5. Si confidence >= {Settings.MIN_CONFIDENCE_THRESHOLD}, el requerimiento es suficiente.
 
 Devuelve ÚNICAMENTE JSON:
 {{
   "values": {{
-    "dominio": "...",
-    "localizacion": "...",
+    "tema": "..."
+    "dominio": "Identifica el tema, dependiendo de las variables determinar el tema",
+    "localizacion": "LUGAR DONDE APLICA(si es que aplica)",
     "frecuencia": "...",
     "variables": "...",
     "tipo_serie": "univariada|multivariada",
@@ -231,7 +233,7 @@ Devuelve ÚNICAMENTE JSON:
   "justification": "...",
   "suggested_search": "...",
   "search_strategy": "...",
-  "confidence": 0.0
+  "confidence": 0.0 //no olvidar este valor
 }}
 """
 

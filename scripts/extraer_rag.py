@@ -16,8 +16,10 @@ def consultar_maestro(consulta_usuario, top_k=3):
 
 if __name__ == "__main__":
     # Simula lo que llegaría del estudiante
-    consulta = "series temporales de temperatura y humedad diarias en Mérida, Venezuela"
-    resultados = consultar_maestro(consulta, top_k=200)
+    #consulta = "series temporales de temperatura y humedad diarias en Mérida, Venezuela"
+    #consulta = "Buscando información sobre series temporales en Mérida, Venezuela"
+    consulta = "multivariadas con datos sobre temperaturas y humedad diarias en Mérida, Venezuela."
+    resultados = consultar_maestro(consulta, top_k=50)
     
     print("El maestro ha encontrado estas series semilla:\n")
     for i, (id_, metadata, distance) in enumerate(zip(resultados['ids'][0], 
@@ -30,6 +32,6 @@ if __name__ == "__main__":
         print(f"   response: {metadata['response']}")
         
         print(f"   Similitud (distancia): {distance:.4f}")
-        print(f"   Fragmento: {metadata['search_text']}")
+        #print(f"   Fragmento: {metadata['search_text']}")
         print(f"   Time series: {metadata['time_series']}")
         print()

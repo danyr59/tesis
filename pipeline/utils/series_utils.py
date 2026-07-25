@@ -8,6 +8,14 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 
 
+def parser_search_query(value: str) -> str:
+  palabras = ["series temporales", "time serie","serie", "series", "temporal", "temporales", "time", "series" ]
+
+  for palabra in palabras:
+    value = value.replace(palabra,"")
+
+  return value  
+
 def parse_time_series_metadata(meta_value: Any) -> Any:
   if meta_value is None:
     return {}
@@ -22,7 +30,7 @@ def parse_time_series_metadata(meta_value: Any) -> Any:
 
 
 def series_length_from_metadata(meta: Dict[str, Any]) -> int:
-  ts = parse_time_series_metadata(meta.get("time_series"))
+  ts = parse_time_series_metadata(meta.get("series"))
   if isinstance(ts, dict):
     lengths: List[int] = []
     for block_key in ("input", "output"):
@@ -30,9 +38,9 @@ def series_length_from_metadata(meta: Dict[str, Any]) -> int:
       if isinstance(block, list):
         for item in block:
           if isinstance(item, dict) and "serie" in item:
-            serie = item["serie"]
-            if isinstance(serie, list):
-              lengths.append(len(serie))
+            serie_lenght = item["longitud_puntos"]
+            if isinstance(serie_lenght, int):
+              lengths.append(serie_lenght)
     return max(lengths) if lengths else 0
   if isinstance(ts, list):
     return len(ts)
@@ -66,15 +74,31 @@ def extract_numeric_series(seed_entry: Dict[str, Any]) -> List[float]:
 
 
 def diversity_score(seeds: List[Dict[str, Any]]) -> float:
-  if len(seeds) <= 1:
-    return 0.0
-  domains = {
-    s.get("metadata", {}).get("domain", "unknown") for s in seeds
-  }
-  lengths = [series_length_from_metadata(s.get("metadata", {})) for s in seeds]
-  length_var = float(np.std(lengths)) if lengths else 0.0
-  domain_div = len(domains) / len(seeds)
-  return min(1.0, 0.5 * domain_div + 0.5 * min(1.0, length_var / 50.0))
+    if len(seeds) <= 1:
+        return 0.0
+    
+    # 1. Diversidad de dominios (ignorando "unknown")
+    domains = {
+        s.get("metadata", {}).get("domain") 
+        for s in seeds 
+        if s.get("metadata", {}).get("domain")  # Filtra None/unknown
+    }
+    domain_div = len(domains) / len(seeds) if domains else 0.0
+    
+    # 2. Variabilidad de longitudes (con manejo de errores)
+    lengths = [
+        series_length_from_metadata(s) 
+        for s in seeds
+    ]
+    
+    
+    # Normalización más robusta (usando max-min en lugar de 50 fijo)
+    max_len = max(lengths) if lengths else 1
+    min_len = min(lengths) if lengths else 0
+    range_normalized = (max_len - min_len) / max_len if max_len > 0 else 0
+    
+    # Score final
+    return min(1.0, 0.5 * domain_div + 0.5 * range_normalized)
 
 
 def extend_series(
