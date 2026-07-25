@@ -100,42 +100,6 @@ class StudentAgent:
             current_dataset, teacher_response.get(
                     "metadata_summary", {}), iteration
         )
-
-            # quality_accepted, feedback, eval_payload = self.evaluate_quality_and_iterate(
-            #    current_dataset,
-            #    teacher_response.get("quality_summary", ""),
-            #    final_model_path,
-            # )
-
-            # if self._ask_user_early_approval():
-            #     quality_accepted = True
-            #     print(
-            #         f"[{self.__class__.__name__}] Visto bueno del usuario recibido.")
-            #     break
-
-            # if not quality_accepted:
-            #     self.iteration_history.append(eval_payload)
-            #     extra = feedback or eval_payload.get("feedback_to_teacher", "")
-            #     structured_prompt_active["suggested_search"] = (
-            #         f"{structured_prompt_active.get('suggested_search', '')}. {extra}"
-            #     ).strip()
-            #     if eval_payload.get("re_train_with_params"):
-            #         structured_prompt_active["re_train_hint"] = eval_payload["re_train_with_params"]
-            #     print(f"[{self.__class__.__name__}] Acción correctiva: {extra}")
-
-        # if not quality_accepted and self.best_snapshot:
-        #     print(
-        #         f"[{self.__class__.__name__}] Máximo de iteraciones sin calidad plena; "
-        #         "usando el mejor conjunto obtenido hasta el momento."
-        #     )
-        #     current_dataset = self.best_snapshot["dataset"]
-        #     current_teacher_response = self.best_snapshot["teacher_response"]
-        #     final_model_path = self.best_snapshot.get(
-        #         "model_path") or final_model_path
-        #     structured_prompt_active = self.best_snapshot.get(
-        #         "structured_prompt", structured_prompt_active
-        #     )
-
        
 
         csv_path = self.generate_final_series(
