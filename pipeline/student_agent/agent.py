@@ -12,7 +12,7 @@ from pipeline.config.settings import Settings
 from pipeline.numeric_pipeline import run_numeric_pipeline
 from pipeline.student_agent.fine_tuner import run_lora_fine_tune
 from pipeline.teacher_agent.agent import TeacherAgent
-from pipeline.utils.llm_client import LLMClient
+from pipeline.utils.llm_client import LLMClient, extract_json_from_text
 from pipeline.utils.series_utils import (
     extend_series,
     extract_numeric_series,
@@ -178,10 +178,12 @@ Requerimiento del usuario: "{query}"
    Si falta algo crítico, indícalo en missing_parameters para dialogar con el usuario.
 3. Justifica cada inferencia (ej. frecuencia diaria estándar en por ejemplo: clima).
 4. Razona tipo_serie: univariada o multivariada.
-5. Si confidence >= {Settings.MIN_CONFIDENCE_THRESHOLD}, el requerimiento es suficiente.
+5. Tienes que dar un puntaje a que tan bueno es el requerimiento ej. ("confidence" : 0.9)
+
 
 Devuelve ÚNICAMENTE JSON:
 {{
+  "confidence": 0.5, //valor de puntuacion del requerimiento
   "values": {{
     "tema": "..."
     "dominio": "Identifica el tema, dependiendo de las variables determinar el tema",
@@ -196,8 +198,8 @@ Devuelve ÚNICAMENTE JSON:
   "pending_questions": [],
   "justification": "...",
   "suggested_search": "...",
-  "search_strategy": "...",
-  "confidence": 0.0 //no olvidar este valor
+  "search_strategy": "..."
+  
 }}
 """
 
@@ -207,15 +209,31 @@ Devuelve ÚNICAMENTE JSON:
         prompt = f"""Eres el Estudiante. Dataset semilla: {len(seed_dataset)} ejemplos.
 Metadatos: {json.dumps(metadata_summary, ensure_ascii=False)}
 
-Selecciona y justifica en modo verbose:
+Selecciona los valores adecuados y justifica en modo verbose:
 - epochs (evitar sobreajuste si hay pocos datos)
 - batch_size
 - learning_rate
 
-Incluye también JSON al final:
-{{"epochs": 3, "batch_size": 2, "learning_rate": 0.0002}}
+RECUERDA PONER LOS VALORES
+
 """
         reasoning = self.llm.generate_text(prompt, max_new_tokens=1024)
+        
+        prompt_json = f"""Vas a analizar el siguiente razonamiento:
+        {reasoning} 
+        luego vas a hacer lo siguiente:
+        1) Seleccionar los valores del analisis
+        2) construir un json con esos valores de la siguiente forma:
+        Devuelve ÚNICAMENTE JSON:
+        {{"epochs": 3, "batch_size": 2, "learning_rate": 0.0002}}
+        Nota: SOLO COMO RESPUESTA DEBES ENTREGAR EL JSON, SEGUIR EL FORMATO, sin cosas adicionales
+
+""" 
+        values_json = self.llm.generate_text(prompt_json, max_new_tokens=1024)
+
+        values = extract_json_from_text(values_json)
+
+
         print(f"[{self.__class__.__name__}] [VERBOSE] Fine-tuning:\n{reasoning}")
         # Usamos el modelo base (limpio) que nos da el LLMClient
         base_model = self.llm.get_base_model()
@@ -226,6 +244,7 @@ Incluye también JSON al final:
             metadata_summary=metadata_summary,
             reasoning_text=reasoning,
             continue_from_adapter=self.lora_adapter_path if iteration > 1 else None,
+            hyperparams_json=values,
         )
         self.lora_adapter_path = adapter_path
 
@@ -300,7 +319,7 @@ JSON únicamente:
         seed_preview = []
         for s in dataset[:5]:
             nums = extract_numeric_series(s)
-            seed_preview.append(nums[:30])
+            seed_preview.append(nums)
 
         all_series: List[Any] = []
         remaining = self.num_series_target

@@ -54,7 +54,7 @@ def extract_numeric_series(seed_entry: Dict[str, Any]) -> List[float]:
     return [float(x) for x in raw]
 
   meta = seed_entry.get("metadata", {})
-  ts = parse_time_series_metadata(meta.get("time_series"))
+  ts = parse_time_series_metadata(seed_entry.get("series"))
   if isinstance(ts, dict):
     for block_key in ("output", "input"):
       block = ts.get(block_key, [])

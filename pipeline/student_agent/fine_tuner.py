@@ -17,7 +17,7 @@ from pipeline.config.settings import Settings
 from pipeline.utils.series_utils import extract_numeric_series
 
 
-def parse_hyperparams_from_text(text: str, n_samples: int) -> Dict[str, Any]:
+def parse_hyperparams_from_text(text: str, n_samples: int, hyperparams_json: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
   epochs = 3 if n_samples < 10 else 5 if n_samples < 30 else 8
   batch_size = 1 if n_samples < 6 else 2
   lr = 2e-4
@@ -34,6 +34,17 @@ def parse_hyperparams_from_text(text: str, n_samples: int) -> Dict[str, Any]:
       lr = float(m.group(1).rstrip('.'))
     except ValueError:
       lr = 2e-4
+
+  if hyperparams_json:
+    try:
+      if "epochs" in hyperparams_json and hyperparams_json["epochs"] is not None:
+        epochs = int(hyperparams_json["epochs"])
+      if "batch_size" in hyperparams_json and hyperparams_json["batch_size"] is not None:
+        batch_size = int(hyperparams_json["batch_size"])
+      if "learning_rate" in hyperparams_json and hyperparams_json["learning_rate"] is not None:
+        lr = float(hyperparams_json["learning_rate"])
+    except (ValueError, TypeError) as e:
+      print(f"[FineTuner] Error parsing JSON hyperparameters ({e}), fallback to text parsing.")
 
   epochs = max(1, min(epochs, 15))
   batch_size = max(1, min(batch_size, 8))
@@ -54,6 +65,7 @@ def _build_training_records(
       f"Dominio: {meta.get('domain', domain)}. "
       f"Tarea: {meta.get('task_type', 'forecast')}. "
       f"Pregunta: {str(meta.get('question', ''))[:500]}. "
+      f"respuesta: {str(meta.get('response',''))}"
       f"Serie numérica: {json.dumps(series_preview)}"
     )
     records.append({"text": text})
@@ -67,6 +79,7 @@ def run_lora_fine_tune(
     metadata_summary: Dict[str, Any],
     reasoning_text: str,
     continue_from_adapter: Optional[str] = None,
+    hyperparams_json: Optional[Dict[str, Any]] = None,
 ) -> str:
   """Entrena adapter LoRA y devuelve la ruta guardada.
 
@@ -77,11 +90,12 @@ def run_lora_fine_tune(
         metadata_summary: metadatos
         reasoning_text: texto con hiperparámetros
         continue_from_adapter: ruta de un adaptador previo para continuar entrenando
+        hyperparams_json: parámetros extraídos en JSON (opcional)
   """
   if not seed_dataset:
     raise ValueError("No hay semillas para fine-tuning.")
 
-  hp = parse_hyperparams_from_text(reasoning_text, len(seed_dataset))
+  hp = parse_hyperparams_from_text(reasoning_text, len(seed_dataset), hyperparams_json)
   records = _build_training_records(seed_dataset, metadata_summary)
   if not records:
     raise ValueError("No se pudieron construir ejemplos de entrenamiento.")
