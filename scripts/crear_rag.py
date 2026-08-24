@@ -7,7 +7,7 @@ Original file is located at
     https://colab.research.google.com/drive/1zM_RMjr6y095ucTmPq_xTB6zRVX_MgmV
 """
 
-!pip install chromadb sentence-transformers psutil
+#!pip install chromadb sentence-transformers psutil
 
 import json
 import re
@@ -17,10 +17,12 @@ import chromadb
 import torch
 
 # Configuración
-JSONL_PATH = "time_series_generation.jsonl"
-CHROMA_DB_PATH = "./memoria_maestro"
+# JSONL_PATH = "time_series_generation.jsonl"
+# CHROMA_DB_PATH = "./memoria_maestro"
+# COLLECTION_NAME = "time_series_generation"
+JSONL_PATH = "./../data/time_series_generation.jsonl"
+CHROMA_DB_PATH = "./../rag/maestro"
 COLLECTION_NAME = "time_series_generation"
-
 
 
 # Compilar regex una sola vez (más rápido)
@@ -237,15 +239,15 @@ flush_batch()
 
 print(f"Índice construido con {collection.count()} documentos en {CHROMA_DB_PATH}")
 
-import shutil
-import os
+# import shutil
+# import os
 
-# Define the directory to be zipped and the output zip file name
-directory_to_zip = CHROMA_DB_PATH
-output_zip_file = f"{directory_to_zip}_batch.zip"
+# # Define the directory to be zipped and the output zip file name
+# directory_to_zip = CHROMA_DB_PATH
+# output_zip_file = f"{directory_to_zip}_batch.zip"
 
-# Create the zip archive
-shutil.make_archive(directory_to_zip, 'zip', directory_to_zip)
+# # Create the zip archive
+# shutil.make_archive(directory_to_zip, 'zip', directory_to_zip)
 
-print(f"Successfully created {output_zip_file}")
-print(f"You can download it from the file browser.")
+# print(f"Successfully created {output_zip_file}")
+# print(f"You can download it from the file browser.")
