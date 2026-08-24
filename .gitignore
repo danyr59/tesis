@@ -64,3 +64,5 @@ Thumbs.db
 # Cualquier archivo temporal
 *.tmp
 *.temp
+
+externo/
