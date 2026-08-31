@@ -79,3 +79,6 @@ class Settings:
       f"{cls.SYNTHETIC_NUM_SERIES} series × {cls.SYNTHETIC_POINTS_PER_SERIES} puntos "
       f"= {total} filas CSV"
     )
+  @classmethod
+  def get_teacher_model_path_adapter(cls) -> str:
+    return os.getenv("TEACHER_MODEL_PATH_ADAPTERS", "./models/teacher_adapters")

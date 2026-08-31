@@ -36,6 +36,7 @@ class TeacherAgent:
       Settings.get_teacher_model_path(),
       role_name="Maestro experto en series temporales",
     )
+    self.llm.load_adapter(Settings.get_teacher_model_path_adapter())
     self.refinements_history: List[str] = []
 
 
