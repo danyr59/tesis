@@ -181,9 +181,7 @@ Analiza el prompt estructurado del Estudiante:
             m = metadata_compact[g_idx]
             accepted_summary.append({
                 "domain": m.get("domain"),
-                
                 "time_series": m.get("time_series", ""),
-                
             })
 
         # --- Prompt mejorado (ejemplo de salida más claro) ---

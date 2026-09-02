@@ -18,6 +18,7 @@ from pipeline.utils.series_utils import (
     extract_numeric_series,
     seeds_statistics,
 )
+from pipeline.config.profiles import get_profile
 
 
 class StudentAgent:
@@ -37,19 +38,35 @@ class StudentAgent:
         self.points_per_series_target = Settings.SYNTHETIC_POINTS_PER_SERIES
 
     def _get_teacher(self):
-        """Crea el TeacherAgent solo si no existe."""
+        """Crea el TeacherAgent solo si no existe y libera el modelo del estudiante."""
+        if hasattr(self, 'llm') and self.llm is not None:
+            print(f"[{self.__class__.__name__}] Descargando LLM del Estudiante para hacer espacio al Maestro...")
+            del self.llm
+            self.llm = None
+            gc.collect()
+            if torch.backends.mps.is_available():
+                torch.mps.empty_cache()
+                
         if self.teacher is None:
             self.teacher = TeacherAgent()
         return self.teacher
 
     def _release_teacher(self):
-        """Libera el TeacherAgent y limpia memoria."""
+        """Libera el TeacherAgent y limpia memoria, luego recarga el Estudiante."""
         if self.teacher is not None:
             del self.teacher
             self.teacher = None
             gc.collect()
             if torch.backends.mps.is_available():
                 torch.mps.empty_cache()
+                
+        if getattr(self, 'llm', None) is None:
+            print(f"[{self.__class__.__name__}] Recargando LLM del Estudiante...")
+            from pipeline.utils.llm_client import LLMClient
+            self.llm = LLMClient(
+                Settings.get_student_model_path(),
+                role_name="Estudiante (agente liviano con razonamiento)",
+            )
 
     def run_pipeline(self, initial_query: str) -> None:
         self.user_query = initial_query
@@ -128,8 +145,11 @@ class StudentAgent:
             prompt = self._interpretation_prompt(current_query)
             response = self.llm.generate_json(prompt)
 
-            confidence = float(response.get("confidence", 0.0))
+            # Si el LLM omite 'confidence' pero no reporta 'missing_parameters',
+            # asumimos que está confiado (1.0). Si reporta missing, asumimos 0.0.
             missing = response.get("missing_parameters") or []
+            default_conf = 1.0 if not missing else 0.0
+            confidence = float(response.get("confidence", default_conf))
 
             if confidence >= Settings.MIN_CONFIDENCE_THRESHOLD and not missing:
                 break
@@ -141,9 +161,8 @@ class StudentAgent:
                 f"\n[{self.__class__.__name__}] Información insuficiente (confianza={confidence:.2f}).")
             print(f"Justificación: {response.get('justification', '')}")
             for param in missing:
-                user_val = input(
-                    f"[{self.__class__.__name__}] Aclara el parámetro '{param}': "
-                ).strip()
+                print(f"[{self.__class__.__name__}] Aclara el parámetro '{param}': (Auto-respondiendo: ninguno)")
+                user_val = "ninguno"
                 if user_val:
                     current_query += f". {param}: {user_val}"
         else:
@@ -176,21 +195,26 @@ Requerimiento del usuario: "{query}"
 1. Interpretación semántica activa: sinónimos (ej. calor→clima) y ambigüedades.
 2. Detecta parámetros faltantes (variables, dominio, frecuencia, localización).
    Si falta algo crítico, indícalo en missing_parameters para dialogar con el usuario.
-3. Justifica cada inferencia (ej. frecuencia diaria estándar en por ejemplo: clima).
+3. Justifica cada inferencia.
 4. Razona tipo_serie: univariada o multivariada.
-5. Tienes que dar un puntaje a que tan bueno es el requerimiento ej. ("confidence" : 0.9)
-
+5. Selecciona el 'profile_id' que mejor describa el comportamiento esperado en este dominio. 
+   Opciones: P1_ESTABLE, P2_ESTACIONAL, P3_TENDENCIA_ESTACIONAL, P4_TENDENCIA_RUIDO, P5_COMPLEJO.
+   Ejemplo: Ventas/Clima -> P2_ESTACIONAL o P3_TENDENCIA_ESTACIONAL. Finanzas -> P4_TENDENCIA_RUIDO.
+6. Infiere un 'start_date' lógico (ej. "2024-01-01") si no se especifica.
+7. OBLIGATORIO: Debes asignar un puntaje de confianza ("confidence") entre 0.0 y 1.0 sobre qué tan claro y completo es el requerimiento. Si falta información crucial, asigna 0.0.
 
 Devuelve ÚNICAMENTE JSON:
 {{
-  "confidence": 0.5, //valor de puntuacion del requerimiento
+  "confidence": 0.5,
   "values": {{
-    "tema": "..."
+    "tema": "...",
     "dominio": "Identifica el tema, dependiendo de las variables determinar el tema",
     "localizacion": "LUGAR DONDE APLICA(si es que aplica)",
-    "frecuencia": "...",
+    "frecuencia": "D",
+    "start_date": "2024-01-01",
     "variables": "...",
     "tipo_serie": "univariada|multivariada",
+    "profile_id": "P2_ESTACIONAL",
     "num_series_configuradas": {self.num_series_target},
     "puntos_por_serie_configurados": {self.points_per_series_target}
   }},
@@ -199,7 +223,6 @@ Devuelve ÚNICAMENTE JSON:
   "justification": "...",
   "suggested_search": "...",
   "search_strategy": "..."
-  
 }}
 """
 
@@ -356,26 +379,55 @@ JSON únicamente:
         series_offset: int,
     ) -> List[Any]:
         multivariate = "multi" in tipo_serie
-        example = (
-            '{"synthetic_series": [{"temperatura (°C)": [1.0, 2.0], "humedad (%)": [50.0, 51.0]}]}'
-            if multivariate
-            else '{"synthetic_series": [[1.0, 2.0, 3.0]]}'
-        )
+        
+        # Obtener el perfil asignado por el interprete (o fallback)
+        profile_id = prompt_info.get("values", {}).get("profile_id", "P1_ESTABLE")
+        profile = get_profile(profile_id)
+        
+        # Construir ejemplos EPIC estáticos para guiar el comportamiento
+        epic_examples = f"""
+### EJEMPLOS DE COMPORTAMIENTO (EPIC)
+- Ejemplo de Tendencia Creciente: [100.1, 105.3, 110.2, 115.8, 122.4]
+- Ejemplo de Estacionalidad Semanal (Sube fines de semana): [50, 52, 51, 53, 55, 80, 85, 52, 51]
+- Ejemplo de Ruido Medio: [10.1, 8.5, 12.3, 9.8, 11.2, 10.5]
+- Ejemplo de Anomalía (Pico): [20.1, 20.5, 21.0, 95.8, 20.9, 21.1]
 
-        prompt = f"""Eres el Estudiante fine-tuneado (LoRA). Genera series sintéticas numéricas.
+NO COPIES ESTOS EJEMPLOS. Úsalos como inspiración para el comportamiento de la curva.
+"""
 
-Dominio y requisitos:
-{json.dumps(prompt_info.get("values", {}), ensure_ascii=False)}
+        if multivariate:
+            variables = prompt_info.get("values", {}).get("variables", "var1, var2")
+            example = '{{"synthetic_series": [{{"var1": [1.2, 1.3, 1.4], "var2": [5.1, 5.2, 5.0]}}]}}'
+        else:
+            example = '{{"synthetic_series": [[1.2, 1.3, 1.4]]}}'
 
-Estadísticas de semillas TSQA: {json.dumps(stats)}
-Muestra de semillas (referencia): {json.dumps(seed_preview)[:3000]}
+        prompt = f"""Eres un motor experto en la generación de series temporales de alta fidelidad. 
+Tu tarea es generar la secuencia de valores numéricos de una serie temporal basándote en el perfil solicitado y el dominio del RAG.
 
-Genera exactamente {num_series} series con exactamente {num_points} puntos cada una.
-Tipo: {"multivariada con unidades en los nombres" if multivariate else "univariada"}.
-Valores realistas, float, con variabilidad y estacionalidad plausible.
-ID base de series: {series_offset + 1}.
+[PERFIL TEMPORAL OBJETIVO: {profile_id}]
+- Descripción: {profile['description']}
+- Longitud exacta esperada: {num_points} observaciones por serie.
+- Cantidad de series a generar: {num_series} series.
+- Tendencia global: {profile['trend_expected']}
+- Estacionalidad: {profile['seasonality_expected']}
+- Anomalías esperadas: {profile['expected_anomalies']}
+- Nivel de ruido: {profile['noise_expected']}
 
-Devuelve ÚNICAMENTE JSON con esta forma:
+[DOMINIO (Extraído de RAG)]
+Tema: {prompt_info.get('values', {}).get('tema', 'General')}
+Estadísticas de referencia (Semillas): Min={stats.get('min', 0):.2f}, Max={stats.get('max', 100):.2f}, Media={stats.get('mean', 50):.2f}
+Muestra de semillas: {json.dumps(seed_preview)[:500]}
+
+{epic_examples}
+
+[REGLAS DE FORMATO ESTRICTAS - VALUE ONLY]
+1. Genera ÚNICAMENTE un JSON válido que contenga listas de números flotantes.
+2. NO incluyas fechas ni marcas de tiempo en el JSON.
+3. NO envuelvas la respuesta en bloques de código markdown (```json).
+4. NO escribas texto introductorio, explicaciones, ni comentarios. 
+5. Si es univariada, devuelve las series como un arreglo plano. Si es multivariada, como un diccionario plano de arreglos.
+
+Devuelve ÚNICAMENTE el JSON con esta estructura exacta:
 {example}
 """
         response = self.llm.generate_json(
@@ -467,6 +519,15 @@ Devuelve ÚNICAMENTE JSON con esta forma:
         os.makedirs(Settings.SYNTHETIC_DATA_DIR, exist_ok=True)
         output_file = Settings.synthetic_csv_path()
         rows = []
+        
+        start_date = prompt_info.get("values", {}).get("start_date", "2024-01-01")
+        freq = prompt_info.get("values", {}).get("frecuencia", "D")
+        
+        max_len = max([self._series_len(s, tipo_serie) for s in series_list] + [1])
+        try:
+            date_range = pd.date_range(start=start_date, periods=max_len, freq=freq)
+        except Exception:
+            date_range = pd.date_range(start="2024-01-01", periods=max_len, freq="D")
 
         for series_idx, series_data in enumerate(series_list):
             series_id = series_idx + 1
@@ -475,7 +536,8 @@ Devuelve ÚNICAMENTE JSON con esta forma:
                 if keys:
                     length = len(series_data[keys[0]])
                     for t in range(length):
-                        row = {"series_id": series_id, "time_step": t}
+                        timestamp = date_range[t].strftime('%Y-%m-%d %H:%M:%S')
+                        row = {"series_id": series_id, "timestamp": timestamp}
                         for k in keys:
                             try:
                                 row[k] = float(series_data[k][t])
@@ -490,12 +552,13 @@ Devuelve ÚNICAMENTE JSON con esta forma:
                 if "(" not in str(var_name) and "temperatura" in str(var_name).lower():
                     var_name = f"{var_name} (°C)"
                 for t, val in enumerate(series_data):
+                    timestamp = date_range[t].strftime('%Y-%m-%d %H:%M:%S')
                     try:
                         f_val = float(val)
                     except (ValueError, TypeError):
                         f_val = None
                     rows.append({"series_id": series_id,
-                                "time_step": t, str(var_name): f_val})
+                                "timestamp": timestamp, str(var_name): f_val})
 
         pd.DataFrame(rows).to_csv(output_file, index=False)
         return output_file
