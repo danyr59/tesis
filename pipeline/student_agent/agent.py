@@ -161,9 +161,9 @@ class StudentAgent:
                 f"\n[{self.__class__.__name__}] Información insuficiente (confianza={confidence:.2f}).")
             print(f"Justificación: {response.get('justification', '')}")
             for param in missing:
-                print(f"[{self.__class__.__name__}] Aclara el parámetro '{param}': (Auto-respondiendo: ninguno)")
-                user_val = "ninguno"
-                if user_val:
+                # Permitir al usuario escribir la respuesta en la terminal
+                user_val = input(f"[{self.__class__.__name__}] Aclara el parámetro '{param}' (o deja en blanco para ignorar): ")
+                if user_val.strip():
                     current_query += f". {param}: {user_val}"
         else:
             print(
