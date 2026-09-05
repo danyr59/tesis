@@ -22,13 +22,13 @@ logger = get_logger("numeric_pipeline")
 
 def load_synthetic_matrix(csv_path: str) -> Tuple[np.ndarray, List[str]]:
   df = pd.read_csv(csv_path)
-  feature_cols = [c for c in df.columns if c not in ("series_id", "time_step")]
+  feature_cols = [c for c in df.columns if c not in ("series_id", "timestamp")]
   if not feature_cols:
     raise ValueError("El CSV sintético no tiene columnas de variables.")
 
   blocks = []
   for _, group in df.groupby("series_id", sort=True):
-    sub = group.sort_values("time_step")
+    sub = group.sort_values("timestamp")
     blocks.append(sub[feature_cols].astype(float).values)
 
   data = np.vstack(blocks)

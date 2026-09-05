@@ -41,6 +41,10 @@ class StudentAgent:
         """Crea el TeacherAgent solo si no existe y libera el modelo del estudiante."""
         if hasattr(self, 'llm') and self.llm is not None:
             print(f"[{self.__class__.__name__}] Descargando LLM del Estudiante para hacer espacio al Maestro...")
+            if hasattr(self.llm, 'model'):
+                del self.llm.model
+            if hasattr(self.llm, '_base_model'):
+                del self.llm._base_model
             del self.llm
             self.llm = None
             gc.collect()
@@ -54,10 +58,17 @@ class StudentAgent:
     def _release_teacher(self):
         """Libera el TeacherAgent y limpia memoria, luego recarga el Estudiante."""
         if self.teacher is not None:
+            if hasattr(self.teacher, 'llm') and self.teacher.llm is not None:
+                if hasattr(self.teacher.llm, 'model'):
+                    del self.teacher.llm.model
+                if hasattr(self.teacher.llm, '_base_model'):
+                    del self.teacher.llm._base_model
+                del self.teacher.llm
             del self.teacher
             self.teacher = None
             gc.collect()
             if torch.backends.mps.is_available():
+                torch.mps.empty_cache()
                 torch.mps.empty_cache()
                 
         if getattr(self, 'llm', None) is None:
@@ -160,11 +171,18 @@ class StudentAgent:
             print(
                 f"\n[{self.__class__.__name__}] Información insuficiente (confianza={confidence:.2f}).")
             print(f"Justificación: {response.get('justification', '')}")
+            
+            query_changed = False
             for param in missing:
                 # Permitir al usuario escribir la respuesta en la terminal
                 user_val = input(f"[{self.__class__.__name__}] Aclara el parámetro '{param}' (o deja en blanco para ignorar): ")
                 if user_val.strip():
                     current_query += f". {param}: {user_val}"
+                    query_changed = True
+            
+            if not query_changed:
+                print(f"[{self.__class__.__name__}] No se agregaron aclaraciones. Forzando continuación...")
+                break
         else:
             print(
                 f"[{self.__class__.__name__}] Máximo de rondas de diálogo alcanzado; "
@@ -548,7 +566,11 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta:
                 var_name = prompt_info.get("values", {}).get(
                     "variables", "valor_generado")
                 if isinstance(var_name, list):
-                    var_name = var_name[0]
+                    # Filtrar palabras que representen tiempo para quedarnos con la variable de valor real
+                    filtro_tiempo = ["fecha", "mes", "anio", "año", "date", "time", "year", "month", "day", "timestamp"]
+                    vars_validas = [v for v in var_name if str(v).lower() not in filtro_tiempo]
+                    var_name = vars_validas[0] if vars_validas else var_name[-1]
+                
                 if "(" not in str(var_name) and "temperatura" in str(var_name).lower():
                     var_name = f"{var_name} (°C)"
                 for t, val in enumerate(series_data):

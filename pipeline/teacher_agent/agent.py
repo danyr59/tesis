@@ -136,16 +136,34 @@ Analiza el prompt estructurado del Estudiante:
     )
 
   def _build_metadata_compact(self, rag_results: dict, student_prompt: dict) -> List[dict]:
+    import re
     compact = []
     for i, meta in enumerate(rag_results["metadatas"][0]):
+        # Las bases de datos TSQA a veces incrustan los números crudos dentro de 'question' o 'response'.
+        # Usamos regex para eliminar arreglos gigantes de números (ej. "[1.2, 3.4, ...]") que causan OOM.
+        q_text = str(meta.get("question", ""))
+        a_text = str(meta.get("response", ""))
+        q_clean = re.sub(r'\[\s*[-\d.,\s]+\]', '[ARREGLO DE NUMEROS REMOVIDO]', q_text)
+        a_clean = re.sub(r'\[\s*[-\d.,\s]+\]', '[ARREGLO DE NUMEROS REMOVIDO]', a_text)
+        
+        # TRUNCADO ABSOLUTO DE SEGURIDAD
+        if len(q_clean) > 2000:
+            q_clean = q_clean[:2000] + "... [TRUNCADO POR SEGURIDAD]"
+        if len(a_clean) > 2000:
+            a_clean = a_clean[:2000] + "... [TRUNCADO POR SEGURIDAD]"
+            
+        # FIX: También truncar la serie temporal aquí de forma global para que no reviente el historial de 'aceptados'
+        ts_clean = str(meta.get("time_series", ""))
+        if len(ts_clean) > 2000:
+            ts_clean = ts_clean[:2000] + "... [TRUNCADO POR SEGURIDAD]"
         
         compact.append({
             "idx": i,
             "domain": meta.get("domain", ""),
-            "question": meta.get("question", ""),
-            "answer": meta.get("response", ""),
+            "question": q_clean,
+            "answer": a_clean,
             "task_type": meta.get("task_type", ""),
-            "time_series": meta.get("time_series", "")#,"frecuencia": frecuencia,
+            "time_series": ts_clean
         })
     return compact
 
@@ -158,7 +176,7 @@ Analiza el prompt estructurado del Estudiante:
     metadata_compact = self._build_metadata_compact(rag_results, student_prompt)
     n_docs = len(rag_results["ids"][0])
 
-    BATCH_SIZE = 10
+    BATCH_SIZE = 3
     accepted_indexes_global = []
     quality_summary_acum = "No hay selecciones previas."
     refinement_votes = []
@@ -173,15 +191,26 @@ Analiza el prompt estructurado del Estudiante:
         for rel_idx, global_idx in enumerate(batch_indices):
             meta_copy = metadata_compact[global_idx].copy()
             meta_copy["idx"] = rel_idx
+            
+            # TRUNCAR time_series para evitar el error de 78 GB OOM!
+            ts_str = str(meta_copy.get("time_series", ""))
+            if len(ts_str) > 2000:
+                meta_copy["time_series"] = ts_str[:2000] + "... (truncado)"
+            
             batch_metadata.append(meta_copy)
 
         # --- Resumen de los últimos 5 aceptados (incluye frecuencia) ---
         accepted_summary = []
         for g_idx in accepted_indexes_global[-5:]:
             m = metadata_compact[g_idx]
+            
+            ts_str_acc = str(m.get("time_series", ""))
+            if len(ts_str_acc) > 2000:
+                ts_str_acc = ts_str_acc[:2000] + "... (truncado)"
+                
             accepted_summary.append({
                 "domain": m.get("domain"),
-                "time_series": m.get("time_series", ""),
+                "time_series": ts_str_acc,
             })
 
         # --- Prompt mejorado (ejemplo de salida más claro) ---
@@ -209,7 +238,9 @@ Devuelve ÚNICAMENTE JSON con los índices relativos REALES que seleccionas (NO 
   "quality_summary": "Justifica tu selección y cómo complementa lo anterior. Si rechazas todo, explica por qué."
 }}
 """
-        response = self.llm.generate_json(prompt, max_new_tokens=1536)
+        print(f"[{self.__class__.__name__}] Evaluando lote de {len(batch_metadata)} documentos con el LLM (esto puede tardar unos segundos)...")
+        # FIX: Reducimos max_new_tokens a 300. Si el modelo alucina o escribe basura, lo cortamos rápido para no saturar la RAM
+        response = self.llm.generate_json(prompt, max_new_tokens=300)
         relative_accepted = response.get("accepted_relative_indexes", [])
 
         # Mapear índices relativos a globales
