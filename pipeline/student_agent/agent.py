@@ -207,40 +207,42 @@ class StudentAgent:
         return structured
 
     def _interpretation_prompt(self, query: str) -> str:
-        return f"""Eres el agente Estudiante (LLM liviano con razonamiento).
+        return f"""Eres un agente experto en extracción de datos estructurados para series temporales.
 Requerimiento del usuario: "{query}"
 
-1. Interpretación semántica activa: sinónimos (ej. calor→clima) y ambigüedades.
-2. Detecta parámetros faltantes (variables, dominio, frecuencia, localización).
-   Si falta algo crítico, indícalo en missing_parameters para dialogar con el usuario.
-3. Justifica cada inferencia.
-4. Razona tipo_serie: univariada o multivariada.
-5. Selecciona el 'profile_id' que mejor describa el comportamiento esperado en este dominio. 
-   Opciones: P1_ESTABLE, P2_ESTACIONAL, P3_TENDENCIA_ESTACIONAL, P4_TENDENCIA_RUIDO, P5_COMPLEJO.
-   Ejemplo: Ventas/Clima -> P2_ESTACIONAL o P3_TENDENCIA_ESTACIONAL. Finanzas -> P4_TENDENCIA_RUIDO.
-6. Infiere un 'start_date' lógico (ej. "2024-01-01") si no se especifica.
-7. OBLIGATORIO: Debes asignar un puntaje de confianza ("confidence") entre 0.0 y 1.0 sobre qué tan claro y completo es el requerimiento. Si falta información crucial, asigna 0.0.
+INSTRUCCIONES ESTRICTAS:
+1. Extrae el nombre exacto de la(s) variable(s) que el usuario quiere medir.
+   REGLA DE ORO: Las variables NUNCA son conceptos de tiempo (Fecha, Día, Mes, Hora, Año). Si el usuario pide "Pasajeros diarios", la variable es SOLO "Pasajeros".
+2. Identifica el dominio (ej. Transporte, Finanzas, Clima).
+3. Selecciona el 'profile_id' exacto:
+   - P1_ESTABLE: Valores constantes, poco ruido (ej. voltaje, reposo).
+   - P2_ESTACIONAL: Patrones cíclicos repetitivos puros (ej. pasajeros metro, clima).
+   - P3_TENDENCIA_ESTACIONAL: Ciclos que además suben o bajan con el tiempo (ej. ventas).
+   - P4_TENDENCIA_RUIDO: Tendencia con alta volatilidad caótica (ej. bolsa de valores, cripto).
+   - P5_COMPLEJO: Cambios de régimen drásticos (ej. ejercicio físico).
+4. El campo "profile_id" DEBE ser reemplazado exactamente por uno de los 5 IDs de arriba.
+5. El campo "variables" DEBE ser una lista de strings (ej. ["Pasajeros"]).
 
-Devuelve ÚNICAMENTE JSON:
+Devuelve ÚNICAMENTE el siguiente JSON válido (sin formato markdown ```):
 {{
-  "confidence": 0.5,
+  "confidence": 0.9,
   "values": {{
-    "tema": "...",
-    "dominio": "Identifica el tema, dependiendo de las variables determinar el tema",
-    "localizacion": "LUGAR DONDE APLICA(si es que aplica)",
-    "frecuencia": "D",
+    "tema": "Tema principal corto",
+    "dominio": "Dominio principal",
+    "localizacion": "Lugar (si aplica)",
+    "frecuencia": "Diaria/Mensual/etc",
     "start_date": "2024-01-01",
-    "variables": "...",
-    "tipo_serie": "univariada|multivariada",
-    "profile_id": "P2_ESTACIONAL",
+    "variables": ["Voltaje"],
+    "tipo_serie": "univariada",
+    "profile_id": "P1_ESTABLE",
     "num_series_configuradas": {self.num_series_target},
     "puntos_por_serie_configurados": {self.points_per_series_target}
   }},
   "missing_parameters": [],
   "pending_questions": [],
-  "justification": "...",
-  "suggested_search": "...",
-  "search_strategy": "..."
+  "justification": "Razonamiento corto.",
+  "suggested_search": "Busqueda corta",
+  "search_strategy": "Estrategia"
 }}
 """
 
@@ -377,7 +379,7 @@ JSON únicamente:
             remaining -= len(chunk)
             series_offset += len(chunk)
 
-        all_series = self._normalize_series_length(all_series, tipo_serie)
+        all_series = self._normalize_series_length(all_series, tipo_serie, prompt_info)
         output_file = self._series_to_csv(all_series, prompt_info, tipo_serie)
         print(f"[{self.__class__.__name__}] CSV guardado: {output_file}")
         print(
@@ -469,11 +471,13 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta:
         out = []
         for _ in range(n):
             base = float(rng.normal(mean, std))
+            profile_id = prompt_info.get("values", {}).get("profile_id", "P1_ESTABLE")
             seq = extend_series(
                 [base + float(rng.normal(0, std * 0.1))
                  for _ in range(min(20, points))],
                 points,
                 rng,
+                profile_id
             )
             if multivariate:
                 vars_ = prompt_info.get("values", {}).get(
@@ -485,7 +489,7 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta:
                         f"{vars_[0]} (°C)" if "(" not in str(vars_[0]) else str(vars_[0]): seq,
                         "humedad (%)": extend_series(
                             [50.0 + float(rng.normal(0, 3))
-                             for _ in range(min(20, points))], points, rng
+                             for _ in range(min(20, points))], points, rng, profile_id
                         ),
                     }
                 )
@@ -494,9 +498,10 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta:
                 out.append(seq)
         return out
 
-    def _normalize_series_length(self, series_list: List[Any], tipo_serie: str) -> List[Any]:
+    def _normalize_series_length(self, series_list: List[Any], tipo_serie: str, prompt_info: dict) -> List[Any]:
         target = self.points_per_series_target
         normalized = []
+        profile_id = prompt_info.get("values", {}).get("profile_id", "P1_ESTABLE")
         for s in series_list[: self.num_series_target]:
             if "multi" in tipo_serie and isinstance(s, dict):
                 keys = list(s.keys())
@@ -509,11 +514,11 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta:
                 for k in keys:
                     vals = [float(x) for x in s[k][:cur_len]] if isinstance(
                         s.get(k), list) else []
-                    new_dict[k] = extend_series(vals, target)
+                    new_dict[k] = extend_series(vals, target, None, profile_id)
                 normalized.append(new_dict)
             elif isinstance(s, list):
                 vals = [float(x) for x in s]
-                normalized.append(extend_series(vals, target))
+                normalized.append(extend_series(vals, target, None, profile_id))
         while len(normalized) < self.num_series_target:
             normalized.extend(
                 self._fallback_series(

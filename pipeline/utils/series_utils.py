@@ -105,17 +105,56 @@ def extend_series(
   values: List[float],
   target_len: int,
   rng: Optional[np.random.Generator] = None,
+  profile_id: str = "P1_ESTABLE"
 ) -> List[float]:
-  """Extiende una serie hasta target_len con continuidad suave + ruido leve."""
+  """Extiende una serie hasta target_len aplicando el comportamiento matemático del profile_id."""
   if not values:
     return [0.0] * target_len
   rng = rng or np.random.default_rng(42)
   out = list(values)
+  
+  base_val = out[-1]
+  t = len(out)
+  
   while len(out) < target_len:
-    window = out[-min(12, len(out)) :]
-    delta = float(np.mean(np.diff(window))) if len(window) > 1 else 0.0
-    noise = float(rng.normal(0, max(0.01, np.std(window) * 0.05)))
-    out.append(out[-1] + delta + noise)
+    noise_std = max(0.1, np.std(values) if len(values) > 1 else 1.0)
+    noise = float(rng.normal(0, noise_std * 0.1))
+    
+    if profile_id == "P1_ESTABLE":
+        val = base_val + noise
+        
+    elif profile_id == "P2_ESTACIONAL":
+        period = 7.0
+        amplitude = max(5.0, np.mean(np.abs(values)) * 0.2)
+        val = base_val + amplitude * np.sin(2 * np.pi * t / period) + noise
+        
+    elif profile_id == "P3_TENDENCIA_ESTACIONAL":
+        period = 12.0
+        amplitude = max(5.0, np.mean(np.abs(values)) * 0.2)
+        trend = 0.05 * t
+        val = base_val + trend + amplitude * np.sin(2 * np.pi * t / period) + noise
+        
+    elif profile_id == "P4_TENDENCIA_RUIDO":
+        trend = -0.05 * t
+        heavy_noise = float(rng.normal(0, noise_std * 2.0 + 2.0))
+        val = base_val + trend + heavy_noise
+        
+    elif profile_id == "P5_COMPLEJO":
+        if t < target_len * 0.33:
+            val = base_val + noise
+        elif t < target_len * 0.66:
+            val = out[-1] + 0.5 + float(rng.normal(0, noise_std * 0.5))
+        else:
+            val = out[-1] + float(rng.normal(0, noise_std * 3.0))
+            
+    else:
+        window = out[-min(12, len(out)) :]
+        delta = float(np.mean(np.diff(window))) if len(window) > 1 else 0.0
+        val = out[-1] + delta + noise
+        
+    out.append(float(val))
+    t += 1
+    
   return out[:target_len]
 
 
