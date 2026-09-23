@@ -20,6 +20,9 @@ def extract_json_from_text(text: str) -> dict:
   fenced = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", cleaned, re.DOTALL)
   if fenced:
     cleaned = fenced.group(1)
+  # FIX: Reparar errores comunes de LLMs pequeños (comillas simples al final de un string o saltos de línea crudos)
+  cleaned = re.sub(r"'(\s*\n?\s*\})", r'"\1', cleaned)
+  cleaned = cleaned.replace("'\n}", "\"\n}")
   try:
     return json.loads(cleaned)
   except json.JSONDecodeError:
@@ -28,8 +31,11 @@ def extract_json_from_text(text: str) -> dict:
   if match:
     try:
       return json.loads(match.group(0))
-    except json.JSONDecodeError:
+    except json.JSONDecodeError as e:
+      print(f"\n[DEBUG LLMClient] JSON Parse Error in extracted block: {e}\n--- RAW LLM OUTPUT ---\n{cleaned}\n----------------------\n")
       return {}
+      
+  print(f"\n[DEBUG LLMClient] No JSON object could be extracted.\n--- RAW LLM OUTPUT ---\n{cleaned}\n----------------------\n")
   return {}
 
 

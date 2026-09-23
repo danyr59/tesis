@@ -110,7 +110,7 @@ Analiza el prompt estructurado del Estudiante:
 {{
   "plan": "descripción corta del plan",
   "search_query": "palabras clave exactas para el motor vectorial, incluye el dominio (IMPORTANTE), las variables sobre las cual se quiere informacion, y el lugar a operar. Se conciso ",
-  "strategy": "ESCOGER UNO DE LAS SIGUIENTES OPCIONES {json.dumps(TeacherAgent.REFINEMENT_STRATEGIES)}" 
+  "strategy": "Escoge una de: {', '.join(TeacherAgent.REFINEMENT_STRATEGIES)}" 
 }}
 """
     response = self.llm.generate_json(prompt)
@@ -151,8 +151,7 @@ Analiza el prompt estructurado del Estudiante:
             q_clean = q_clean[:2000] + "... [TRUNCADO POR SEGURIDAD]"
         if len(a_clean) > 2000:
             a_clean = a_clean[:2000] + "... [TRUNCADO POR SEGURIDAD]"
-            
-        # FIX: También truncar la serie temporal aquí de forma global para que no reviente el historial de 'aceptados'
+        
         ts_clean = str(meta.get("time_series", ""))
         if len(ts_clean) > 2000:
             ts_clean = ts_clean[:2000] + "... [TRUNCADO POR SEGURIDAD]"
@@ -231,14 +230,15 @@ Analiza: similitud semántica, dominio, frecuencia, diversidad con lo ya aceptad
 Puedes aceptar series cortas (<{Settings.MIN_SERIES_LENGTH} puntos) si aportan conocimiento nuevo.
 Si este lote aporta poco o es redundante respecto al resumen anterior, puedes rechazarlo entero (lista vacía).
 
-Devuelve ÚNICAMENTE JSON con los índices relativos REALES que seleccionas (NO copies el ejemplo, analiza los documentos):
+Devuelve ÚNICAMENTE JSON. En "accepted_relative_indexes" con los índices relativos REALES que seleccionas (NO copies el ejemplo, analiza los documentos) debes REEMPLAZAR el arreglo de ejemplo [0, 1] por los números enteros "idx" de los documentos que decidas aceptar (o déjalo vacío [] si rechazas todos):
 {{
-  "accepted_relative_indexes": [...],   // <--- SOLO EJEMPLO, reemplázalo con los índices que elijas
+  "accepted_relative_indexes": [0, 1],
   "needs_refinement": false,
-  "quality_summary": "Justifica tu selección y cómo complementa lo anterior. Si rechazas todo, explica por qué."
+  "quality_summary": "Justifica tu selección en UNA SOLA ORACIÓN CORTA. (Debe terminar con comillas dobles)"
 }}
 """
         print(f"[{self.__class__.__name__}] Evaluando lote de {len(batch_metadata)} documentos con el LLM (esto puede tardar unos segundos)...")
+        print("\n[DEBUG PROMPT MAESTRO]\n" + prompt[:1500] + "\n...\n")
         # FIX: Reducimos max_new_tokens a 300. Si el modelo alucina o escribe basura, lo cortamos rápido para no saturar la RAM
         response = self.llm.generate_json(prompt, max_new_tokens=300)
         relative_accepted = response.get("accepted_relative_indexes", [])

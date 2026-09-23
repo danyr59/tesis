@@ -221,16 +221,16 @@ INSTRUCCIONES ESTRICTAS:
    - P4_TENDENCIA_RUIDO: Tendencia con alta volatilidad caótica (ej. bolsa de valores, cripto).
    - P5_COMPLEJO: Cambios de régimen drásticos (ej. ejercicio físico).
 4. El campo "profile_id" DEBE ser reemplazado exactamente por uno de los 5 IDs de arriba.
-5. El campo "variables" DEBE ser una lista de strings (ej. ["Pasajeros"]).
+5. DEBES reemplazar todo lo que esté entre corchetes [...] por tu propio análisis.
 
 Devuelve ÚNICAMENTE el siguiente JSON válido (sin formato markdown ```):
 {{
   "confidence": 0.9,
   "values": {{
-    "tema": "Tema principal corto",
-    "dominio": "Dominio principal",
-    "localizacion": "Lugar (si aplica)",
-    "frecuencia": "Diaria/Mensual/etc",
+    "tema": "[Extrae el tema principal de la consulta]",
+    "dominio": "[Extrae el dominio (ej. electronica, salud, finanzas)]",
+    "localizacion": "[Extrae el lugar o pon null si no aplica]",
+    "frecuencia": "[Diaria, Mensual, Minuto, etc.]",
     "start_date": "2024-01-01",
     "variables": ["Voltaje"],
     "tipo_serie": "univariada",
@@ -240,9 +240,9 @@ Devuelve ÚNICAMENTE el siguiente JSON válido (sin formato markdown ```):
   }},
   "missing_parameters": [],
   "pending_questions": [],
-  "justification": "Razonamiento corto.",
-  "suggested_search": "Busqueda corta",
-  "search_strategy": "Estrategia"
+  "justification": "[Escribe aquí por qué elegiste este perfil y dominio]",
+  "suggested_search": "[Escribe una búsqueda técnica relacionada]",
+  "search_strategy": "[Escribe una estrategia de búsqueda]"
 }}
 """
 
