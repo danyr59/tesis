@@ -153,8 +153,8 @@ Analiza el prompt estructurado del Estudiante:
             a_clean = a_clean[:2000] + "... [TRUNCADO POR SEGURIDAD]"
         
         ts_clean = str(meta.get("time_series", ""))
-        if len(ts_clean) > 2000:
-            ts_clean = ts_clean[:2000] + "... [TRUNCADO POR SEGURIDAD]"
+        # if len(ts_clean) > 2000:
+        #     ts_clean = ts_clean[:2000] + "... [TRUNCADO POR SEGURIDAD]"
         
         compact.append({
             "idx": i,
@@ -166,8 +166,56 @@ Analiza el prompt estructurado del Estudiante:
         })
     return compact
 
+  def _summarize_time_series(self, ts_str: str) -> dict:
+      try:
+          import json
+          import numpy as np
+          import ast
+          
+          try:
+              data = json.loads(ts_str)
+          except Exception:
+              try:
+                  data = ast.literal_eval(ts_str)
+              except Exception:
+                  return {"raw_preview": ts_str[:100] + "..."}
+                  
+          series = []
+          if isinstance(data, dict):
+              if "input" in data and isinstance(data["input"], list) and len(data["input"]) > 0:
+                  first_input = data["input"][0]
+                  if "serie" in first_input:
+                      series = first_input["serie"]
+          elif isinstance(data, list):
+              series = data
+              
+          if not series or not isinstance(series, list):
+              return {"raw_preview": ts_str[:100] + "..."}
+              
+          floats = [float(x) for x in series]
+          if not floats:
+              return {"raw_preview": "empty"}
+              
+          arr = np.array(floats)
+          stats = {
+              "length": len(floats),
+              "min": round(float(np.min(arr)), 4),
+              "max": round(float(np.max(arr)), 4),
+              "mean": round(float(np.mean(arr)), 4)
+          }
+          
+          if len(floats) > 10:
+              indices = np.linspace(0, len(floats) - 1, 10, dtype=int)
+              downsampled = [round(floats[i], 4) for i in indices]
+          else:
+              downsampled = [round(x, 4) for x in floats]
+              
+          stats["downsampled_10_pts"] = downsampled
+          return stats
+      except Exception:
+          return {"raw_preview": ts_str[:100] + "..."}
 
-  
+
 
   def _filter_and_reason(
     self, rag_results: dict, student_prompt: dict
@@ -175,7 +223,7 @@ Analiza el prompt estructurado del Estudiante:
     metadata_compact = self._build_metadata_compact(rag_results, student_prompt)
     n_docs = len(rag_results["ids"][0])
 
-    BATCH_SIZE = 3
+    BATCH_SIZE = 1
     accepted_indexes_global = []
     quality_summary_acum = "No hay selecciones previas."
     refinement_votes = []
@@ -191,25 +239,36 @@ Analiza el prompt estructurado del Estudiante:
             meta_copy = metadata_compact[global_idx].copy()
             meta_copy["idx"] = rel_idx
             
-            # TRUNCAR time_series para evitar el error de 78 GB OOM!
+            # TRUNCAR time_series fuertemente
             ts_str = str(meta_copy.get("time_series", ""))
-            if len(ts_str) > 2000:
-                meta_copy["time_series"] = ts_str[:2000] + "... (truncado)"
+            
+            # 1. Agregar el resumen matemático y downsampling
+            meta_copy["time_series_math_summary"] = self._summarize_time_series(ts_str)
+            
+            # 2. Mantener la serie cruda truncada como pidió el usuario (para el lote actual)
+            if len(ts_str) > 4000:
+                meta_copy["time_series_raw_truncated"] = ts_str[:4000] + "... (truncado)"
+            else:
+                meta_copy["time_series_raw_truncated"] = ts_str
+                
+            # Eliminamos el viejo key largo para evitar duplicación
+            if "time_series" in meta_copy:
+                del meta_copy["time_series"]
+            
             
             batch_metadata.append(meta_copy)
 
-        # --- Resumen de los últimos 5 aceptados (incluye frecuencia) ---
+        # --- Resumen de los últimos 5 aceptados (SOLO resumen matemático, SIN crudos) ---
         accepted_summary = []
         for g_idx in accepted_indexes_global[-5:]:
             m = metadata_compact[g_idx]
             
             ts_str_acc = str(m.get("time_series", ""))
-            if len(ts_str_acc) > 2000:
-                ts_str_acc = ts_str_acc[:2000] + "... (truncado)"
+            math_summary = self._summarize_time_series(ts_str_acc)
                 
             accepted_summary.append({
                 "domain": m.get("domain"),
-                "time_series": ts_str_acc,
+                "time_series_math_summary": math_summary,
             })
 
         # --- Prompt mejorado (ejemplo de salida más claro) ---
@@ -230,9 +289,9 @@ Analiza: similitud semántica, dominio, frecuencia, diversidad con lo ya aceptad
 Puedes aceptar series cortas (<{Settings.MIN_SERIES_LENGTH} puntos) si aportan conocimiento nuevo.
 Si este lote aporta poco o es redundante respecto al resumen anterior, puedes rechazarlo entero (lista vacía).
 
-Devuelve ÚNICAMENTE JSON. En "accepted_relative_indexes" con los índices relativos REALES que seleccionas (NO copies el ejemplo, analiza los documentos) debes REEMPLAZAR el arreglo de ejemplo [0, 1] por los números enteros "idx" de los documentos que decidas aceptar (o déjalo vacío [] si rechazas todos):
+Devuelve ÚNICAMENTE JSON. Indica con `true` o `false` en "accept_document" si decides aceptar el documento actual para tu investigación:
 {{
-  "accepted_relative_indexes": [0, 1],
+  "accept_document": true,
   "needs_refinement": false,
   "quality_summary": "Justifica tu selección en UNA SOLA ORACIÓN CORTA. (Debe terminar con comillas dobles)"
 }}
@@ -240,20 +299,18 @@ Devuelve ÚNICAMENTE JSON. En "accepted_relative_indexes" con los índices relat
         print(f"[{self.__class__.__name__}] Evaluando lote de {len(batch_metadata)} documentos con el LLM (esto puede tardar unos segundos)...")
         print("\n[DEBUG PROMPT MAESTRO]\n" + prompt[:1500] + "\n...\n")
         # FIX: Reducimos max_new_tokens a 300. Si el modelo alucina o escribe basura, lo cortamos rápido para no saturar la RAM
-        response = self.llm.generate_json(prompt, max_new_tokens=300)
-        relative_accepted = response.get("accepted_relative_indexes", [])
-
-        # Mapear índices relativos a globales
-        if isinstance(relative_accepted, list):
-            for rel_idx in relative_accepted:
-                try:
-                    rel_idx = int(rel_idx)
-                    if 0 <= rel_idx < len(batch_indices):
-                        global_idx = batch_indices[rel_idx]
-                        if global_idx not in accepted_indexes_global:
-                            accepted_indexes_global.append(global_idx)
-                except (ValueError, TypeError):
-                    continue
+        #response = self.llm.generate_json(prompt, max_new_tokens=300)
+        response = self.llm.generate_json(prompt, max_new_tokens=1048)
+        
+        accept_doc = response.get("accept_document", False)
+        # Soportamos múltiples formas de decir "sí" por si el modelo alucina un string
+        if str(accept_doc).strip().lower() in ["true", "si", "sí", "yes", "1", "verdadero", "aceptar"]:
+            accept_doc = True
+            
+        if accept_doc and len(batch_indices) > 0:
+            global_idx = batch_indices[0]
+            if global_idx not in accepted_indexes_global:
+                accepted_indexes_global.append(global_idx)
 
         # Actualizar resumen acumulado (siempre que se genere uno nuevo)
         new_summary = response.get("quality_summary", "")
@@ -278,7 +335,7 @@ Devuelve ÚNICAMENTE JSON. En "accepted_relative_indexes" con los índices relat
     if total_lotes > 0:
         true_votes = sum(refinement_votes)
         vote_ratio = true_votes / total_lotes
-        needs_refinement_by_vote = vote_ratio <= 0.4
+        needs_refinement_by_vote = vote_ratio >= 0.8
     else:
         needs_refinement_by_vote = False
 

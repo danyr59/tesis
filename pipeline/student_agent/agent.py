@@ -447,7 +447,7 @@ Muestra de semillas: {json.dumps(seed_preview)[:500]}
 4. NO escribas texto introductorio, explicaciones, ni comentarios. 
 5. Si es univariada, devuelve las series como un arreglo plano. Si es multivariada, como un diccionario plano de arreglos.
 
-Devuelve ÚNICAMENTE el JSON con esta estructura exacta:
+Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, RECUERDA DEBES CAMBIARLO CON EL INDICADO, SOLO ES UNA GUIA LO QUE SE MUESTRA):
 {example}
 """
         response = self.llm.generate_json(
