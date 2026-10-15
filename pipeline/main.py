@@ -26,9 +26,42 @@ def main():
         print("Consulta vacía. Saliendo...")
         return
         
-    # Inicializar el Estudiante y arrancar el pipeline
+    # 1. Fase del Maestro (Razonamiento y Recolección)
+    from pipeline.teacher_agent.agent import TeacherAgent
+    import gc
+    import torch
+
+    teacher = TeacherAgent()
+    structured_prompt = teacher.interpret_request(query)
+    teacher_response = teacher.process_request(structured_prompt)
+
+    # 2. Limpieza de Memoria
+    print("\n[Main] Liberando memoria del Maestro...")
+    
+    # Liberar Embedder (SentenceTransformer) si existe
+    if hasattr(teacher, 'embedder'):
+        del teacher.embedder
+        
+    # Liberar LLM y sus componentes
+    if hasattr(teacher, 'llm') and teacher.llm is not None:
+        if hasattr(teacher.llm, 'model'):
+            del teacher.llm.model
+        if hasattr(teacher.llm, '_base_model'):
+            del teacher.llm._base_model
+        if hasattr(teacher.llm, 'tokenizer'):
+            del teacher.llm.tokenizer
+        del teacher.llm
+        
+    del teacher
+    gc.collect()
+    if torch.backends.mps.is_available():
+        torch.mps.empty_cache()
+        torch.mps.empty_cache()
+
+    # 3. Fase del Estudiante (Destilación y Generación)
+    from pipeline.student_agent.agent import StudentAgent
     student = StudentAgent()
-    student.run_pipeline(query)
+    student.run_generation(structured_prompt, teacher_response)
 
 if __name__ == "__main__":
     main()

@@ -38,13 +38,106 @@ class TeacherAgent:
     )
     self.llm.load_adapter(Settings.get_teacher_model_path_adapter())
     self.refinements_history: List[str] = []
+    self.num_series_target = Settings.SYNTHETIC_NUM_SERIES
+    self.points_per_series_target = Settings.SYNTHETIC_POINTS_PER_SERIES
 
 
   
 
+  def interpret_request(self, query: str) -> dict:
+    print(f"\n[{self.__class__.__name__}] Interpretando requerimiento: '{query}'")
+    current_query = query
+    dialog_rounds = 0
+    max_dialog_rounds = 8
+
+    while dialog_rounds < max_dialog_rounds:
+        dialog_rounds += 1
+        prompt = self._interpretation_prompt(current_query)
+        response = self.llm.generate_json(prompt)
+
+        missing = response.get("missing_parameters") or []
+        default_conf = 1.0 if not missing else 0.0
+        confidence = float(response.get("confidence", default_conf))
+
+        if confidence >= Settings.MIN_CONFIDENCE_THRESHOLD and not missing:
+            break
+
+        if not missing and confidence < Settings.MIN_CONFIDENCE_THRESHOLD:
+            missing = ["detalles adicionales del requerimiento"]
+
+        print(f"\n[{self.__class__.__name__}] Información insuficiente (confianza={confidence:.2f}).")
+        print(f"Justificación: {response.get('justification', '')}")
+        
+        query_changed = False
+        for param in missing:
+            user_val = input(f"[{self.__class__.__name__}] Aclara el parámetro '{param}' (o deja en blanco para ignorar): ")
+            if user_val.strip():
+                current_query += f". {param}: {user_val}"
+                query_changed = True
+        
+        if not query_changed:
+            print(f"[{self.__class__.__name__}] No se agregaron aclaraciones. Forzando continuación...")
+            break
+    else:
+        print(f"[{self.__class__.__name__}] Máximo de rondas de diálogo alcanzado; continuando con la mejor interpretación disponible.")
+        if not response:
+            response = self.llm.generate_json(self._interpretation_prompt(current_query))
+
+    structured = {
+        "values": response.get("values", {}),
+        "missing_parameters": response.get("missing_parameters", []),
+        "pending_questions": response.get("pending_questions", missing),
+        "justification": response.get("justification", ""),
+        "suggested_search": response.get("suggested_search", ""),
+        "search_strategy": response.get("search_strategy", response.get("suggested_search", "")),
+        "confidence": confidence,
+    }
+    print(f"[{self.__class__.__name__}] Prompt estructurado:\n{json.dumps(structured, indent=2, ensure_ascii=False)}")
+    return structured
+
+  def _interpretation_prompt(self, query: str) -> str:
+    return f"""Eres un agente experto en extracción de datos estructurados para series temporales.
+Requerimiento del usuario: "{query}"
+
+INSTRUCCIONES ESTRICTAS:
+1. Extrae el nombre exacto de la(s) variable(s) que el usuario quiere medir.
+   REGLA DE ORO: Las variables NUNCA son conceptos de tiempo (Fecha, Día, Mes, Hora, Año). Si el usuario pide "Pasajeros diarios", la variable es SOLO "Pasajeros".
+2. Identifica el dominio (ej. Transporte, Finanzas, Clima).
+3. Selecciona el 'profile_id' exacto:
+   - P1_ESTABLE: Valores constantes, poco ruido (ej. voltaje, reposo).
+   - P2_ESTACIONAL: Patrones cíclicos repetitivos puros (ej. pasajeros metro, clima).
+   - P3_TENDENCIA_ESTACIONAL: Ciclos que además suben o bajan con el tiempo (ej. ventas).
+   - P4_TENDENCIA_RUIDO: Tendencia con alta volatilidad caótica (ej. bolsa de valores, cripto).
+   - P5_COMPLEJO: Cambios de régimen drásticos (ej. ejercicio físico).
+4. El campo "profile_id" DEBE ser reemplazado exactamente por uno de los 5 IDs de arriba.
+5. DEBES reemplazar todo lo que esté entre corchetes [...] por tu propio análisis.
+
+Devuelve ÚNICAMENTE el siguiente JSON válido (sin formato markdown ```):
+{{
+  "confidence": 0.9,
+  "values": {{
+    "tema": "[Extrae el tema principal de la consulta]",
+    "dominio": "[Extrae el dominio (ej. electronica, salud, finanzas)]",
+    "localizacion": "[Extrae el lugar o pon null si no aplica]",
+    "frecuencia": "[Diaria, Mensual, Minuto, etc.]",
+    "start_date": "2024-01-01",
+    "variables": ["Voltaje"],
+    "tipo_serie": "univariada",
+    "profile_id": "P1_ESTABLE",
+    "num_series_configuradas": {self.num_series_target},
+    "puntos_por_serie_configurados": {self.points_per_series_target}
+  }},
+  "missing_parameters": [],
+  "pending_questions": [],
+  "justification": "[Escribe aquí por qué elegiste este perfil y dominio]",
+  "suggested_search": "[Escribe una búsqueda técnica relacionada]",
+  "search_strategy": "[Escribe una estrategia de búsqueda]"
+}}
+"""
+
   def process_request(self, student_prompt: dict) -> dict:
     print(
-        f"\n[{self.__class__.__name__}] Analizando prompt estructurado del estudiante...")
+        f"\n[{self.__class__.__name__}] Analizando prompt estructurado del usuario...")
 
     plan, query_text, strategy = self._plan_search(student_prompt)
 
@@ -101,7 +194,7 @@ class TeacherAgent:
 
   def _plan_search(self, student_prompt: dict) -> tuple[str, str, str]:
     prompt = f"""Eres el Maestro, experto en series temporales con acceso al RAG del dataset {Settings.RAG_DATASET_NAME}.
-Analiza el prompt estructurado del Estudiante:
+Analiza el prompt estructurado del Usuario:
 {json.dumps(student_prompt, ensure_ascii=False)}
 
 1. Revisa la estrategia de búsqueda sugerida (suggested_search).
@@ -112,8 +205,9 @@ Analiza el prompt estructurado del Estudiante:
   "search_query": "palabras clave exactas para el motor vectorial, incluye el dominio (IMPORTANTE), las variables sobre las cual se quiere informacion, y el lugar a operar. Se conciso ",
   "strategy": "Escoge una de: {', '.join(TeacherAgent.REFINEMENT_STRATEGIES)}" 
 }}
+```json
 """
-    response = self.llm.generate_json(prompt)
+    response = self.llm.generate_json(prompt, max_new_tokens=2048)
     plan = response.get("plan", "")
     if plan:
       print(f"[{self.__class__.__name__}] Plan: {plan}")
@@ -225,7 +319,7 @@ Analiza el prompt estructurado del Estudiante:
 
     BATCH_SIZE = 1
     accepted_indexes_global = []
-    quality_summary_acum = "No hay selecciones previas."
+    quality_summary_list = []
     refinement_votes = []
 
     for i in range(0, n_docs, BATCH_SIZE):
@@ -271,16 +365,21 @@ Analiza el prompt estructurado del Estudiante:
                 "time_series_math_summary": math_summary,
             })
 
+        if not quality_summary_list:
+            quality_summary_str = "No hay selecciones previas."
+        else:
+            quality_summary_str = " ---- ".join(quality_summary_list[-5:])
+
         # --- Prompt mejorado (ejemplo de salida más claro) ---
         prompt = f"""Eres el Maestro, experto en series temporales (RAG {Settings.RAG_DATASET_NAME}).
-Solicitud del Estudiante:
+Solicitud del Usuario:
 {json.dumps(student_prompt, ensure_ascii=False)}
 
 Ya has aceptado previamente {len(accepted_indexes_global)} documentos.
 Ejemplos de los últimos aceptados (para evaluar diversidad):
 {json.dumps(accepted_summary, ensure_ascii=False) if accepted_summary else 'Ninguno aún'}.
 
-Resumen de calidad de lo aceptado hasta ahora: {quality_summary_acum}
+Resumen de calidad de lo aceptado hasta ahora: {quality_summary_str}
 
 Ahora evalúa EXCLUSIVAMENTE este nuevo lote de {len(batch_metadata)} documentos (usa los valores "idx" relativos proporcionados abajo):
 {json.dumps(batch_metadata, ensure_ascii=False)}
@@ -315,7 +414,7 @@ Devuelve ÚNICAMENTE JSON. Indica con `true` o `false` en "accept_document" si d
         # Actualizar resumen acumulado (siempre que se genere uno nuevo)
         new_summary = response.get("quality_summary", "")
         if new_summary:
-            quality_summary_acum += "----" + new_summary
+            quality_summary_list.append(new_summary)
 
         # Registrar voto de refinamiento
         needs_ref = response.get("needs_refinement", False)
@@ -342,17 +441,15 @@ Devuelve ÚNICAMENTE JSON. Indica con `true` o `false` en "accept_document" si d
     # Evaluar calidad de las semillas seleccionadas  
     filtered_seeds = self._indexes_to_seeds(accepted_indexes_global, rag_results)
     quality_ok = self._validate_seed_quality(filtered_seeds)
-    diversity_ok = diversity_score(filtered_seeds) >= 0.2 if filtered_seeds else False
 
-    # Combinar: refinar si votación lo pide O si la calidad final es insuficiente
+    # Combinar: refinar si votación lo pide O si la calidad/cantidad final es insuficiente
     needs_refinement_global = (
         needs_refinement_by_vote or
         not quality_ok or
-        (not diversity_ok and len(filtered_seeds) > 0) or
         len(filtered_seeds) < Settings.MIN_SEED_EXAMPLES
     )
-
-    return filtered_seeds, quality_summary_acum, needs_refinement_global
+    final_summary = " ---- ".join(quality_summary_list) if quality_summary_list else "No hay selecciones previas."
+    return filtered_seeds, final_summary, needs_refinement_global
 
   def _indexes_to_seeds(self, indexes: List[int], rag_results: dict) -> List[dict]:
     filtered = []

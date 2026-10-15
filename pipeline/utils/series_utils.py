@@ -117,33 +117,46 @@ def extend_series(
   t = len(out)
   
   while len(out) < target_len:
-    noise_std = max(0.1, np.std(values) if len(values) > 1 else 1.0)
-    noise = float(rng.normal(0, noise_std * 0.1))
+    base_mean = np.mean(np.abs(values)) if values else 1.0
+    raw_std = np.std(values) if len(values) > 1 else 1.0
+    
+    if profile_id == "P1_ESTABLE":
+        # Para P1, el ruido no debería exceder el 2% de la media
+        noise_std = min(raw_std, base_mean * 0.02)
+    elif profile_id in ["P2_ESTACIONAL", "P3_TENDENCIA_ESTACIONAL"]:
+        # Para estacionales, ruido moderado (hasta 5%)
+        noise_std = min(raw_std, base_mean * 0.05)
+    else:
+        # Para ruidosos o complejos, permitir más variabilidad (hasta 15%)
+        noise_std = min(raw_std, base_mean * 0.15)
+        
+    noise_std = max(0.1, noise_std)
+    noise = float(rng.normal(0, noise_std))
     
     if profile_id == "P1_ESTABLE":
         val = base_val + noise
         
     elif profile_id == "P2_ESTACIONAL":
         period = 7.0
-        amplitude = max(5.0, np.mean(np.abs(values)) * 0.2)
+        amplitude = max(2.0, base_mean * 0.1)
         val = base_val + amplitude * np.sin(2 * np.pi * t / period) + noise
         
     elif profile_id == "P3_TENDENCIA_ESTACIONAL":
         period = 12.0
-        amplitude = max(5.0, np.mean(np.abs(values)) * 0.2)
+        amplitude = max(2.0, base_mean * 0.1)
         trend = 0.05 * t
         val = base_val + trend + amplitude * np.sin(2 * np.pi * t / period) + noise
         
     elif profile_id == "P4_TENDENCIA_RUIDO":
         trend = -0.05 * t
-        heavy_noise = float(rng.normal(0, noise_std * 2.0 + 2.0))
+        heavy_noise = float(rng.normal(0, noise_std * 2.0))
         val = base_val + trend + heavy_noise
         
     elif profile_id == "P5_COMPLEJO":
         if t < target_len * 0.33:
             val = base_val + noise
         elif t < target_len * 0.66:
-            val = out[-1] + 0.5 + float(rng.normal(0, noise_std * 0.5))
+            val = out[-1] + (base_mean * 0.05) + float(rng.normal(0, noise_std * 1.5))
         else:
             val = out[-1] + float(rng.normal(0, noise_std * 3.0))
             

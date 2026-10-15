@@ -37,77 +37,24 @@ class StudentAgent:
         self.num_series_target = Settings.SYNTHETIC_NUM_SERIES
         self.points_per_series_target = Settings.SYNTHETIC_POINTS_PER_SERIES
 
-    def _get_teacher(self):
-        """Crea el TeacherAgent solo si no existe y libera el modelo del estudiante."""
-        if hasattr(self, 'llm') and self.llm is not None:
-            print(f"[{self.__class__.__name__}] Descargando LLM del Estudiante para hacer espacio al Maestro...")
-            if hasattr(self.llm, 'model'):
-                del self.llm.model
-            if hasattr(self.llm, '_base_model'):
-                del self.llm._base_model
-            del self.llm
-            self.llm = None
-            gc.collect()
-            if torch.backends.mps.is_available():
-                torch.mps.empty_cache()
-                
-        if self.teacher is None:
-            self.teacher = TeacherAgent()
-        return self.teacher
 
-    def _release_teacher(self):
-        """Libera el TeacherAgent y limpia memoria, luego recarga el Estudiante."""
-        if self.teacher is not None:
-            if hasattr(self.teacher, 'llm') and self.teacher.llm is not None:
-                if hasattr(self.teacher.llm, 'model'):
-                    del self.teacher.llm.model
-                if hasattr(self.teacher.llm, '_base_model'):
-                    del self.teacher.llm._base_model
-                del self.teacher.llm
-            del self.teacher
-            self.teacher = None
-            gc.collect()
-            if torch.backends.mps.is_available():
-                torch.mps.empty_cache()
-                torch.mps.empty_cache()
-                
-        if getattr(self, 'llm', None) is None:
-            print(f"[{self.__class__.__name__}] Recargando LLM del Estudiante...")
-            from pipeline.utils.llm_client import LLMClient
-            self.llm = LLMClient(
-                Settings.get_student_model_path(),
-                role_name="Estudiante (agente liviano con razonamiento)",
-            )
 
-    def run_pipeline(self, initial_query: str) -> None:
-        self.user_query = initial_query
-        # Volumen fijo desde Settings (.env o pipeline/config/settings.py)
+    def run_generation(self, structured_prompt: dict, teacher_response: dict) -> None:
         self.num_series_target = Settings.SYNTHETIC_NUM_SERIES
         self.points_per_series_target = Settings.SYNTHETIC_POINTS_PER_SERIES
 
-        print(f"\n--- Iniciando Flujo Maestro-Estudiante ---")
+        print(f"\n--- Iniciando Flujo Estudiante ---")
         print(
             f"[{self.__class__.__name__}] Generación sintética (fija): "
             f"{Settings.synthetic_generation_summary()}"
         )
 
-        structured_prompt = self.interpret_request(initial_query)
-
         iteration = 0
-        quality_accepted = False
         final_model_path: Optional[str] = None
         current_dataset: Optional[List[dict]] = None
-        current_teacher_response: Optional[dict] = None
         structured_prompt_active = structured_prompt
 
-       # while iteration < Settings.MAX_ITERATIONS and not quality_accepted:
-        # iteration += 1
         print(f"\n--- Iteración {iteration}/{Settings.MAX_ITERATIONS} ---")
-
-        teacher = self._get_teacher()
-        teacher_response = self.teacher.process_request(
-             structured_prompt_active)
-        self._release_teacher()
 
         current_dataset = teacher_response.get("seed_dataset", [])
 
@@ -117,8 +64,6 @@ class StudentAgent:
                     "Finalizando ejecución."
                 )
             return
-        
-         
 
         self._update_best_snapshot(
             current_dataset, teacher_response, final_model_path, structured_prompt_active
@@ -128,7 +73,6 @@ class StudentAgent:
             current_dataset, teacher_response.get(
                     "metadata_summary", {}), iteration
         )
-       
 
         csv_path = self.generate_final_series(
             current_dataset,
@@ -173,78 +117,7 @@ class StudentAgent:
             print(f"Justificación: {response.get('justification', '')}")
             
             query_changed = False
-            for param in missing:
-                # Permitir al usuario escribir la respuesta en la terminal
-                user_val = input(f"[{self.__class__.__name__}] Aclara el parámetro '{param}' (o deja en blanco para ignorar): ")
-                if user_val.strip():
-                    current_query += f". {param}: {user_val}"
-                    query_changed = True
-            
-            if not query_changed:
-                print(f"[{self.__class__.__name__}] No se agregaron aclaraciones. Forzando continuación...")
-                break
-        else:
-            print(
-                f"[{self.__class__.__name__}] Máximo de rondas de diálogo alcanzado; "
-                "continuando con la mejor interpretación disponible."
-            )
-            if not response:
-                response = self.llm.generate_json(
-                    self._interpretation_prompt(current_query))
 
-        structured = {
-            "values": response.get("values", {}),
-            "missing_parameters": response.get("missing_parameters", []),
-            "pending_questions": response.get("pending_questions", missing),
-            "justification": response.get("justification", ""),
-            "suggested_search": response.get("suggested_search", ""),
-            "search_strategy": response.get(
-                "search_strategy", response.get("suggested_search", "")
-            ),
-            "confidence": confidence,
-        }
-        print(f"[{self.__class__.__name__}] Prompt estructurado:\n{json.dumps(structured, indent=2, ensure_ascii=False)}")
-        return structured
-
-    def _interpretation_prompt(self, query: str) -> str:
-        return f"""Eres un agente experto en extracción de datos estructurados para series temporales.
-Requerimiento del usuario: "{query}"
-
-INSTRUCCIONES ESTRICTAS:
-1. Extrae el nombre exacto de la(s) variable(s) que el usuario quiere medir.
-   REGLA DE ORO: Las variables NUNCA son conceptos de tiempo (Fecha, Día, Mes, Hora, Año). Si el usuario pide "Pasajeros diarios", la variable es SOLO "Pasajeros".
-2. Identifica el dominio (ej. Transporte, Finanzas, Clima).
-3. Selecciona el 'profile_id' exacto:
-   - P1_ESTABLE: Valores constantes, poco ruido (ej. voltaje, reposo).
-   - P2_ESTACIONAL: Patrones cíclicos repetitivos puros (ej. pasajeros metro, clima).
-   - P3_TENDENCIA_ESTACIONAL: Ciclos que además suben o bajan con el tiempo (ej. ventas).
-   - P4_TENDENCIA_RUIDO: Tendencia con alta volatilidad caótica (ej. bolsa de valores, cripto).
-   - P5_COMPLEJO: Cambios de régimen drásticos (ej. ejercicio físico).
-4. El campo "profile_id" DEBE ser reemplazado exactamente por uno de los 5 IDs de arriba.
-5. DEBES reemplazar todo lo que esté entre corchetes [...] por tu propio análisis.
-
-Devuelve ÚNICAMENTE el siguiente JSON válido (sin formato markdown ```):
-{{
-  "confidence": 0.9,
-  "values": {{
-    "tema": "[Extrae el tema principal de la consulta]",
-    "dominio": "[Extrae el dominio (ej. electronica, salud, finanzas)]",
-    "localizacion": "[Extrae el lugar o pon null si no aplica]",
-    "frecuencia": "[Diaria, Mensual, Minuto, etc.]",
-    "start_date": "2024-01-01",
-    "variables": ["Voltaje"],
-    "tipo_serie": "univariada",
-    "profile_id": "P1_ESTABLE",
-    "num_series_configuradas": {self.num_series_target},
-    "puntos_por_serie_configurados": {self.points_per_series_target}
-  }},
-  "missing_parameters": [],
-  "pending_questions": [],
-  "justification": "[Escribe aquí por qué elegiste este perfil y dominio]",
-  "suggested_search": "[Escribe una búsqueda técnica relacionada]",
-  "search_strategy": "[Escribe una estrategia de búsqueda]"
-}}
-"""
 
     def fine_tune(self, seed_dataset: List[dict], metadata_summary: dict,  iteration: int) -> str:
         print(
@@ -422,11 +295,11 @@ NO COPIES ESTOS EJEMPLOS. Úsalos como inspiración para el comportamiento de la
             example = '{{"synthetic_series": [[1.2, 1.3, 1.4]]}}'
 
         prompt = f"""Eres un motor experto en la generación de series temporales de alta fidelidad. 
-Tu tarea es generar la secuencia de valores numéricos de una serie temporal basándote en el perfil solicitado y el dominio del RAG.
+Tu tarea es generar los primeros 10 valores (semilla) de una serie temporal basándote en el perfil solicitado y el dominio del RAG. El sistema se encargará de extrapolar el resto matemáticamente.
 
 [PERFIL TEMPORAL OBJETIVO: {profile_id}]
 - Descripción: {profile['description']}
-- Longitud exacta esperada: {num_points} observaciones por serie.
+- Longitud exacta esperada: SOLO DEBES GENERAR 10 OBSERVACIONES por serie (Semilla inicial).
 - Cantidad de series a generar: {num_series} series.
 - Tendencia global: {profile['trend_expected']}
 - Estacionalidad: {profile['seasonality_expected']}
@@ -442,17 +315,35 @@ Muestra de semillas: {json.dumps(seed_preview)[:500]}
 
 [REGLAS DE FORMATO ESTRICTAS - VALUE ONLY]
 1. Genera ÚNICAMENTE un JSON válido que contenga listas de números flotantes.
-2. NO incluyas fechas ni marcas de tiempo en el JSON.
+2. Cada lista DEBE tener exactamente 10 números.
 3. NO envuelvas la respuesta en bloques de código markdown (```json).
 4. NO escribas texto introductorio, explicaciones, ni comentarios. 
 5. Si es univariada, devuelve las series como un arreglo plano. Si es multivariada, como un diccionario plano de arreglos.
 
-Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, RECUERDA DEBES CAMBIARLO CON EL INDICADO, SOLO ES UNA GUIA LO QUE SE MUESTRA):
+Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, RECUERDA DEBES CAMBIARLO CON EL INDICADO):
 {example}
+```json
 """
-        response = self.llm.generate_json(
-            prompt, max_new_tokens=Settings.LLM_MAX_NEW_TOKENS)
+        # Usamos un max_new_tokens bajo porque solo debe generar 10 puntos por serie (ej. 200 tokens total)
+        response = self.llm.generate_json(prompt, max_new_tokens=1024)
         series = response.get("synthetic_series", [])
+        
+        if series:
+            # Extrapolar las semillas generadas por el LLM a su longitud final
+            from pipeline.utils.series_utils import extend_series
+            extended_series = []
+            
+            if multivariate:
+                for s_dict in series:
+                    ext_dict = {}
+                    for var, vals in s_dict.items():
+                        ext_dict[var] = extend_series(vals, num_points, profile_id=profile_id)
+                    extended_series.append(ext_dict)
+            else:
+                for s_arr in series:
+                    extended_series.append(extend_series(s_arr, num_points, profile_id=profile_id))
+            series = extended_series
+
         if not series:
             series = self._fallback_series(
                 num_series, num_points, stats, multivariate, prompt_info)
