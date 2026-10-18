@@ -276,6 +276,27 @@ JSON únicamente:
         # Obtener el perfil asignado por el interprete (o fallback)
         profile_id = prompt_info.get("values", {}).get("profile_id", "P1_ESTABLE")
         profile = get_profile(profile_id)
+
+        # Extraer el valor objetivo / magnitud deseada por el usuario (Desacoplamiento de Escala)
+        target_value = prompt_info.get("values", {}).get("target_value")
+        if target_value is None:
+            for mp in prompt_info.get("missing_parameters", []):
+                if isinstance(mp, dict) and "expected_value" in mp:
+                    try:
+                        target_value = float(mp["expected_value"])
+                        break
+                    except (ValueError, TypeError):
+                        pass
+
+        scale_guideline = ""
+        if target_value is not None:
+            scale_guideline = f"""
+[ESCALA OBJETIVO PRIORITARIA DEL USUARIO: {target_value}]
+- REGLA ESTRICTA DE DESACOPLAMIENTO DE FORMA Y ESCALA:
+  Las semillas del RAG sirven ÚNICAMENTE como referencia para la dinámica temporal (tipo de variaciones, autocorrelación y ruido).
+  Tus 10 valores DEBEN generarse estrictamente en la escala del usuario (alrededor de {target_value}).
+  NUNCA copies magnitudes numéricas del RAG que difieran de {target_value}.
+"""
         
         # Construir ejemplos EPIC estáticos para guiar el comportamiento
         epic_examples = f"""
@@ -306,6 +327,7 @@ Tu tarea es generar los primeros 10 valores (semilla) de una serie temporal bas�
 - Anomalías esperadas: {profile['expected_anomalies']}
 - Nivel de ruido: {profile['noise_expected']}
 
+{scale_guideline}
 [DOMINIO (Extraído de RAG)]
 Tema: {prompt_info.get('values', {}).get('tema', 'General')}
 Estadísticas de referencia (Semillas): Min={stats.get('min', 0):.2f}, Max={stats.get('max', 100):.2f}, Media={stats.get('mean', 50):.2f}
@@ -337,11 +359,11 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
                 for s_dict in series:
                     ext_dict = {}
                     for var, vals in s_dict.items():
-                        ext_dict[var] = extend_series(vals, num_points, profile_id=profile_id)
+                        ext_dict[var] = extend_series(vals, num_points, profile_id=profile_id, target_mean=target_value)
                     extended_series.append(ext_dict)
             else:
                 for s_arr in series:
-                    extended_series.append(extend_series(s_arr, num_points, profile_id=profile_id))
+                    extended_series.append(extend_series(s_arr, num_points, profile_id=profile_id, target_mean=target_value))
             series = extended_series
 
         if not series:
@@ -393,6 +415,7 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
         target = self.points_per_series_target
         normalized = []
         profile_id = prompt_info.get("values", {}).get("profile_id", "P1_ESTABLE")
+        target_value = prompt_info.get("values", {}).get("target_value")
         for s in series_list[: self.num_series_target]:
             if "multi" in tipo_serie and isinstance(s, dict):
                 keys = list(s.keys())
@@ -405,11 +428,11 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
                 for k in keys:
                     vals = [float(x) for x in s[k][:cur_len]] if isinstance(
                         s.get(k), list) else []
-                    new_dict[k] = extend_series(vals, target, None, profile_id)
+                    new_dict[k] = extend_series(vals, target, None, profile_id, target_mean=target_value)
                 normalized.append(new_dict)
             elif isinstance(s, list):
                 vals = [float(x) for x in s]
-                normalized.append(extend_series(vals, target, None, profile_id))
+                normalized.append(extend_series(vals, target, None, profile_id, target_mean=target_value))
         while len(normalized) < self.num_series_target:
             normalized.extend(
                 self._fallback_series(

@@ -1,4 +1,5 @@
 import json
+import re
 from typing import Any, Dict, List, Optional, Tuple
 
 import chromadb
@@ -83,6 +84,41 @@ class TeacherAgent:
         if not response:
             response = self.llm.generate_json(self._interpretation_prompt(current_query))
 
+    # Regla de consistencia: si el usuario pide explícitamente "estable" o "constante", asegurar P1_ESTABLE
+    q_lower = current_query.lower()
+    vals = response.get("values", {})
+    if ("estable" in q_lower or "constante" in q_lower) and vals.get("profile_id") != "P1_ESTABLE":
+        vals["profile_id"] = "P1_ESTABLE"
+
+    # Extraer y sanear target_value (Desacoplamiento de escala)
+    tv = vals.get("target_value")
+    if isinstance(tv, list) and len(tv) > 0:
+        try:
+            vals["target_value"] = float(tv[0])
+        except (ValueError, TypeError):
+            vals["target_value"] = None
+    elif tv is not None:
+        try:
+            vals["target_value"] = float(tv)
+        except (ValueError, TypeError):
+            vals["target_value"] = None
+
+    if vals.get("target_value") is None:
+        for mp in response.get("missing_parameters", []):
+            if isinstance(mp, dict) and "expected_value" in mp:
+                try:
+                    vals["target_value"] = float(mp["expected_value"])
+                    break
+                except (ValueError, TypeError):
+                    pass
+    if vals.get("target_value") is None:
+        m_val = re.search(r'(?:alrededor\s+de\s+|cerca\s+de\s+|en\s+)?(\d+(?:\.\d+)?)\s*(?:v\b|voltios|voltaje|°c|c\b)', q_lower)
+        if m_val:
+            try:
+                vals["target_value"] = float(m_val.group(1))
+            except (ValueError, TypeError):
+                pass
+
     structured = {
         "values": response.get("values", {}),
         "missing_parameters": response.get("missing_parameters", []),
@@ -102,15 +138,17 @@ Requerimiento del usuario: "{query}"
 INSTRUCCIONES ESTRICTAS:
 1. Extrae el nombre exacto de la(s) variable(s) que el usuario quiere medir.
    REGLA DE ORO: Las variables NUNCA son conceptos de tiempo (Fecha, Día, Mes, Hora, Año). Si el usuario pide "Pasajeros diarios", la variable es SOLO "Pasajeros".
-2. Identifica el dominio (ej. Transporte, Finanzas, Clima).
+2. Identifica el dominio (ej. Transporte, Finanzas, Clima, Electrónica).
 3. Selecciona el 'profile_id' exacto:
-   - P1_ESTABLE: Valores constantes, poco ruido (ej. voltaje, reposo).
-   - P2_ESTACIONAL: Patrones cíclicos repetitivos puros (ej. pasajeros metro, clima).
+   - P1_ESTABLE: Valores constantes, poco ruido (ej. voltaje, reposo, consumo constante).
+     * REGLA ESTRICTA: Si el usuario pide que sea 'estable', 'constante', 'fijo' o indica un nivel de operación estable (ej. 220V constante), el profile_id DEBE ser P1_ESTABLE (NUNCA P2_ESTACIONAL).
+   - P2_ESTACIONAL: Patrones cíclicos repetitivos puros (ej. pasajeros metro, estacionalidad climática).
    - P3_TENDENCIA_ESTACIONAL: Ciclos que además suben o bajan con el tiempo (ej. ventas).
    - P4_TENDENCIA_RUIDO: Tendencia con alta volatilidad caótica (ej. bolsa de valores, cripto).
    - P5_COMPLEJO: Cambios de régimen drásticos (ej. ejercicio físico).
-4. El campo "profile_id" DEBE ser reemplazado exactamente por uno de los 5 IDs de arriba.
-5. DEBES reemplazar todo lo que esté entre corchetes [...] por tu propio análisis.
+4. Extrae 'target_value': el valor numérico objetivo si el usuario lo menciona (ej. 220.0). Debe ser un único número float o null (NUNCA una lista, NUNCA agregues comentarios // en el JSON). Si no especifica ninguno, pon null.
+5. El campo "profile_id" DEBE ser reemplazado exactamente por uno de los 5 IDs de arriba.
+6. DEBES reemplazar todo lo que esté entre corchetes [...] por tu propio análisis.
 
 Devuelve ÚNICAMENTE el siguiente JSON válido (sin formato markdown ```):
 {{
@@ -122,6 +160,7 @@ Devuelve ÚNICAMENTE el siguiente JSON válido (sin formato markdown ```):
     "frecuencia": "[Diaria, Mensual, Minuto, etc.]",
     "start_date": "2024-01-01",
     "variables": ["Voltaje"],
+    "target_value": null,
     "tipo_serie": "univariada",
     "profile_id": "P1_ESTABLE",
     "num_series_configuradas": {self.num_series_target},

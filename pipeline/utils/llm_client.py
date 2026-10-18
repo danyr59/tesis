@@ -59,6 +59,47 @@ def fix_premature_root_closing(text: str) -> str:
   return "".join(out)
 
 
+def strip_json_comments(text: str) -> str:
+  """Elimina comentarios tipo JavaScript (// y /* ... */) fuera de cadenas de texto."""
+  out = []
+  in_str = False
+  escape = False
+  i = 0
+  n = len(text)
+  while i < n:
+    c = text[i]
+    if escape:
+      escape = False
+      out.append(c)
+      i += 1
+      continue
+    if c == "\\":
+      escape = True
+      out.append(c)
+      i += 1
+      continue
+    if c == '"':
+      in_str = not in_str
+      out.append(c)
+      i += 1
+      continue
+    if not in_str:
+      if c == '/' and i + 1 < n and text[i + 1] == '/':
+        i += 2
+        while i < n and text[i] != '\n':
+          i += 1
+        continue
+      elif c == '/' and i + 1 < n and text[i + 1] == '*':
+        i += 2
+        while i + 1 < n and not (text[i] == '*' and text[i + 1] == '/'):
+          i += 1
+        i += 2
+        continue
+    out.append(c)
+    i += 1
+  return "".join(out)
+
+
 def extract_json_from_text(text: str) -> dict:
   if not text or not text.strip():
     return {}
@@ -71,10 +112,13 @@ def extract_json_from_text(text: str) -> dict:
     if match:
       cleaned = match.group(0)
 
-  # 1. Reparar cierres prematuros de la raíz (ej. '... "justification": "..." }, "suggested_search": ... }')
+  # 1. Eliminar comentarios JS (// o /* */) que el LLM suele insertar
+  cleaned = strip_json_comments(cleaned)
+
+  # 2. Reparar cierres prematuros de la raíz (ej. '... "justification": "..." }, "suggested_search": ... }')
   cleaned = fix_premature_root_closing(cleaned)
 
-  # 2. Reparar comillas simples o mixtas al final de strings o antes de saltos de línea/llaves
+  # 3. Reparar comillas simples o mixtas al final de strings o antes de saltos de línea/llaves
   cleaned = re.sub(r"'\s*\n\s*\"", '"', cleaned)
   cleaned = re.sub(r"'(\s*\n?\s*\})", r'"\1', cleaned)
   cleaned = cleaned.replace("'\n}", "\"\n}")

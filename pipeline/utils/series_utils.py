@@ -105,24 +105,45 @@ def extend_series(
   values: List[float],
   target_len: int,
   rng: Optional[np.random.Generator] = None,
-  profile_id: str = "P1_ESTABLE"
+  profile_id: str = "P1_ESTABLE",
+  target_mean: Optional[float] = None,
 ) -> List[float]:
-  """Extiende una serie hasta target_len aplicando el comportamiento matemático del profile_id."""
+  """Extiende una serie hasta target_len aplicando el comportamiento matemático del profile_id.
+  
+  Soporta Desacoplamiento Morfológico-Escalar: si se pasa target_mean (ej. 220.0),
+  las semillas se re-escalan preservando su dinámica/forma pero ancladas a la magnitud solicitada.
+  """
   if not values:
-    return [0.0] * target_len
+    val = target_mean if target_mean is not None else 0.0
+    return [float(val)] * target_len
   rng = rng or np.random.default_rng(42)
-  out = list(values)
-  
-  base_val = out[-1]
+  out = [float(x) for x in values]
+
+  # Desacoplamiento Morfológico-Escalar:
+  # Si la media de las semillas difiere sustancialmente del objetivo del usuario (>15%),
+  # normalizamos la forma (Z-score) y la proyectamos sobre la escala objetivo.
+  if target_mean is not None and len(out) > 0:
+    vals_arr = np.array(out, dtype=float)
+    current_mean = float(np.mean(vals_arr))
+    current_std = float(np.std(vals_arr))
+    if abs(current_mean - target_mean) > 0.15 * max(abs(target_mean), 1.0):
+      s_std = current_std if current_std > 1e-4 else (abs(target_mean) * 0.02)
+      target_std = min(s_std, abs(target_mean) * (0.02 if profile_id == "P1_ESTABLE" else 0.05))
+      target_std = max(0.1, target_std)
+      normalized_seed = (vals_arr - current_mean) / (current_std if current_std > 1e-4 else 1.0)
+      rescaled_seed = target_mean + (normalized_seed * target_std)
+      out = [float(x) for x in rescaled_seed]
+
+  base_val = target_mean if target_mean is not None else out[-1]
   t = len(out)
-  
+
   while len(out) < target_len:
-    base_mean = np.mean(np.abs(values)) if values else 1.0
-    raw_std = np.std(values) if len(values) > 1 else 1.0
-    
+    base_mean = abs(target_mean) if target_mean is not None else (np.mean(np.abs(out)) if out else 1.0)
+    raw_std = np.std(out) if len(out) > 1 else 1.0
+
     if profile_id == "P1_ESTABLE":
-        # Para P1, el ruido no debería exceder el 2% de la media
-        noise_std = min(raw_std, base_mean * 0.02)
+      # Para P1, el ruido no debería exceder el 2% de la media
+      noise_std = min(raw_std, base_mean * 0.02)
     elif profile_id in ["P2_ESTACIONAL", "P3_TENDENCIA_ESTACIONAL"]:
         # Para estacionales, ruido moderado (hasta 5%)
         noise_std = min(raw_std, base_mean * 0.05)
