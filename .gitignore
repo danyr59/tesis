@@ -47,7 +47,7 @@ logs/
 
 # Notebooks (si usas Jupyter)
 .ipynb_checkpoints/
-*.ipynb
+
 
 # Archivos de sistema
 .DS_Store
@@ -66,3 +66,7 @@ Thumbs.db
 *.temp
 
 externo/
+
+
+/tesis
+tesis.zip
