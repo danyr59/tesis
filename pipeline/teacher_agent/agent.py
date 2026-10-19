@@ -54,7 +54,7 @@ class TeacherAgent:
     while dialog_rounds < max_dialog_rounds:
         dialog_rounds += 1
         prompt = self._interpretation_prompt(current_query)
-        response = self.llm.generate_json(prompt)
+        response = self.llm.generate_json(prompt, max_new_tokens=400)
 
         missing = response.get("missing_parameters") or []
         default_conf = 1.0 if not missing else 0.0
@@ -82,13 +82,29 @@ class TeacherAgent:
     else:
         print(f"[{self.__class__.__name__}] Máximo de rondas de diálogo alcanzado; continuando con la mejor interpretación disponible.")
         if not response:
-            response = self.llm.generate_json(self._interpretation_prompt(current_query))
+            response = self.llm.generate_json(self._interpretation_prompt(current_query), max_new_tokens=400)
 
-    # Regla de consistencia: si el usuario pide explícitamente "estable" o "constante", asegurar P1_ESTABLE
+    # Regla de consistencia: si el usuario especifica explícitamente un perfil (ej. P3_TENDENCIA_ESTACIONAL), respetarlo
     q_lower = current_query.lower()
     vals = response.get("values", {})
-    if ("estable" in q_lower or "constante" in q_lower) and vals.get("profile_id") != "P1_ESTABLE":
+    m_profile = re.search(r"\b(P[1-5]_[A-Z_]+)\b", current_query, re.IGNORECASE)
+    if m_profile:
+        vals["profile_id"] = m_profile.group(1).upper()
+    elif ("estable" in q_lower or "constante" in q_lower) and vals.get("profile_id") != "P1_ESTABLE":
         vals["profile_id"] = "P1_ESTABLE"
+
+    # Regla de consistencia: si el usuario especifica variables estrictas o únicas, respetarlas sin alucinar
+    m_strict_var = re.search(r"(?:variables?\s+estrictas?|únicamente)\s*:?\s*(?:únicamente\s*)?['\"]?([a-zA-Z0-9_]+)['\"]?", current_query, re.IGNORECASE)
+    if m_strict_var:
+        vals["variables"] = [m_strict_var.group(1)]
+
+    # Regla de consistencia: tipo_serie debe ser coherente con la cantidad de variables
+    var_list = vals.get("variables", [])
+    if isinstance(var_list, list):
+        if len(var_list) <= 1:
+            vals["tipo_serie"] = "univariada"
+        elif "multi" not in vals.get("tipo_serie", "").lower():
+            vals["tipo_serie"] = "multivariada"
 
     # Extraer y sanear target_value (Desacoplamiento de escala)
     tv = vals.get("target_value")
@@ -112,12 +128,19 @@ class TeacherAgent:
                 except (ValueError, TypeError):
                     pass
     if vals.get("target_value") is None:
-        m_val = re.search(r'(?:alrededor\s+de\s+|cerca\s+de\s+|en\s+)?(\d+(?:\.\d+)?)\s*(?:v\b|voltios|voltaje|°c|c\b)', q_lower)
-        if m_val:
-            try:
-                vals["target_value"] = float(m_val.group(1))
-            except (ValueError, TypeError):
-                pass
+        # Búsqueda universal de escala, promedio, magnitud o nivel en el texto del requerimiento
+        patterns = [
+            r'(?:escala(?:\s+inicial)?|promedio|media|alrededor|cerca|nivel(?:\s+medio)?)\s*(?:es|de|en|:)?\s*(?:promedio\s+de\s+|alrededor\s+de\s+|nivel\s+medio\s+en\s+|los\s+)?(\d+(?:[.,]\d+)?)',
+            r'(\d+(?:[.,]\d+)?)\s*(?:v\b|voltios|voltaje|°c|c\b|lpm\b|latidos|pasajeros|ventas|dolares|usd|\bpor\s+ciento|%)',
+        ]
+        for pat in patterns:
+            m_val = re.search(pat, q_lower)
+            if m_val:
+                try:
+                    vals["target_value"] = float(m_val.group(1).replace(",", "."))
+                    break
+                except (ValueError, TypeError):
+                    pass
 
     structured = {
         "values": response.get("values", {}),
@@ -146,7 +169,7 @@ INSTRUCCIONES ESTRICTAS:
    - P3_TENDENCIA_ESTACIONAL: Ciclos que además suben o bajan con el tiempo (ej. ventas).
    - P4_TENDENCIA_RUIDO: Tendencia con alta volatilidad caótica (ej. bolsa de valores, cripto).
    - P5_COMPLEJO: Cambios de régimen drásticos (ej. ejercicio físico).
-4. Extrae 'target_value': el valor numérico objetivo si el usuario lo menciona (ej. 220.0). Debe ser un único número float o null (NUNCA una lista, NUNCA agregues comentarios // en el JSON). Si no especifica ninguno, pon null.
+4. Extrae 'target_value': el valor numérico objetivo, escala o promedio deseado si el usuario lo menciona (ej. 220.0, 15000.0, 70.0). Debe ser un único número float o null (NUNCA una lista, NUNCA agregues comentarios // en el JSON). Si no especifica ninguno, pon null.
 5. El campo "profile_id" DEBE ser reemplazado exactamente por uno de los 5 IDs de arriba.
 6. DEBES reemplazar todo lo que esté entre corchetes [...] por tu propio análisis.
 
@@ -246,7 +269,7 @@ Analiza el prompt estructurado del Usuario:
 }}
 ```json
 """
-    response = self.llm.generate_json(prompt, max_new_tokens=2048)
+    response = self.llm.generate_json(prompt, max_new_tokens=300)
     plan = response.get("plan", "")
     if plan:
       print(f"[{self.__class__.__name__}] Plan: {plan}")
@@ -436,9 +459,7 @@ Devuelve ÚNICAMENTE JSON. Indica con `true` o `false` en "accept_document" si d
 """
         print(f"[{self.__class__.__name__}] Evaluando lote de {len(batch_metadata)} documentos con el LLM (esto puede tardar unos segundos)...")
         print("\n[DEBUG PROMPT MAESTRO]\n" + prompt[:1500] + "\n...\n")
-        # FIX: Reducimos max_new_tokens a 300. Si el modelo alucina o escribe basura, lo cortamos rápido para no saturar la RAM
-        #response = self.llm.generate_json(prompt, max_new_tokens=300)
-        response = self.llm.generate_json(prompt, max_new_tokens=1048)
+        response = self.llm.generate_json(prompt, max_new_tokens=300)
         
         accept_doc = response.get("accept_document", False)
         # Soportamos múltiples formas de decir "sí" por si el modelo alucina un string

@@ -108,34 +108,43 @@ def extract_json_from_text(text: str) -> dict:
   if fenced:
     cleaned = fenced.group(1)
   else:
+    # Si viene con bloques de código pero sin cerrar las llaves correctamente
+    cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
+    cleaned = re.sub(r"\s*```$", "", cleaned)
     match = re.search(r"\{.*\}", cleaned, re.DOTALL)
     if match:
       cleaned = match.group(0)
+    elif "{" in cleaned:
+      cleaned = cleaned[cleaned.find("{") :]
 
   # 1. Eliminar comentarios JS (// o /* */) que el LLM suele insertar
   cleaned = strip_json_comments(cleaned)
 
-  # 2. Reparar cierres prematuros de la raíz (ej. '... "justification": "..." }, "suggested_search": ... }')
+  # 2. Reparar cierres con paréntesis en lugar de llaves (ej. '[[1, 2]])' -> '[[1, 2]]}')
+  cleaned = re.sub(r"\)\s*$", "}", cleaned)
+  cleaned = re.sub(r"\]\s*\)\s*$", "]}}", cleaned)
+
+  # 3. Reparar cierres prematuros de la raíz (ej. '... "justification": "..." }, "suggested_search": ... }')
   cleaned = fix_premature_root_closing(cleaned)
 
-  # 3. Reparar comillas simples o mixtas al final de strings o antes de saltos de línea/llaves
+  # 4. Reparar comillas simples o mixtas al final de strings o antes de saltos de línea/llaves
   cleaned = re.sub(r"'\s*\n\s*\"", '"', cleaned)
   cleaned = re.sub(r"'(\s*\n?\s*\})", r'"\1', cleaned)
   cleaned = cleaned.replace("'\n}", "\"\n}")
 
-  # 3. Reparar comas faltantes entre campos (ej. "valor" \n "otro_campo" -> "valor", \n "otro_campo")
+  # 5. Reparar comas faltantes entre campos (ej. "valor" \n "otro_campo" -> "valor", \n "otro_campo")
   cleaned = re.sub(r'"(\s*\n\s*)"', r'",\1"', cleaned)
 
-  # 4. Reparar comas sobrantes antes de cerrar llaves/corchetes (ej. [1, 2, ])
+  # 6. Reparar comas sobrantes antes de cerrar llaves/corchetes (ej. [1, 2, ])
   cleaned = re.sub(r",\s*([\}\]])", r"\1", cleaned)
 
-  # 5. Intentar parseo estándar con strict=False (acepta saltos de línea crudos en cadenas)
+  # 7. Intentar parseo estándar con strict=False (acepta saltos de línea crudos en cadenas)
   try:
     return json.loads(cleaned, strict=False)
   except json.JSONDecodeError:
     pass
 
-  # 6. Fallback: Intentar rescatar al menos el bloque "values" si está presente
+  # 8. Fallback: Intentar rescatar al menos el bloque "values" si está presente
   values_match = re.search(
     r'"values"\s*:\s*(\{[^{}]*\}|\{(?:[^{}]*|\{[^{}]*\})*\})',
     cleaned,
@@ -150,20 +159,24 @@ def extract_json_from_text(text: str) -> dict:
     except Exception:
       pass
 
-  # 7. Fallback: Usar raw_decode para ignorar caracteres sobrantes al final
+  # 9. Fallback: Usar raw_decode para ignorar caracteres sobrantes al final
   try:
     decoder = json.JSONDecoder(strict=False)
     obj, _ = decoder.raw_decode(cleaned)
     if isinstance(obj, dict):
       return obj
-  except Exception as e:
-    print(
-      f"\n[DEBUG LLMClient] JSON Parse Error in extracted block: {e}\n--- RAW LLM OUTPUT ---\n{cleaned}\n----------------------\n"
-    )
-    return {}
+  except Exception:
+    pass
+
+  # 10. Fallback para series sintéticas: rescatar números si el LLM se truncó por tokens
+  if "synthetic_series" in text:
+    nums = re.findall(r"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?", text)
+    floats = [float(x) for x in nums if x != ""]
+    if len(floats) >= 10:
+      return {"synthetic_series": [floats[:10]]}
 
   print(
-    f"\n[DEBUG LLMClient] No JSON object could be extracted.\n--- RAW LLM OUTPUT ---\n{cleaned}\n----------------------\n"
+    f"\n[DEBUG LLMClient] JSON Parse Error in extracted block\n--- RAW LLM OUTPUT ---\n{cleaned}\n----------------------\n"
   )
   return {}
 

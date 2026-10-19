@@ -84,16 +84,9 @@ def run_numeric_pipeline(
   judgment = judge.evaluate(result, ground_truth=data, feature_names=feature_names)
 
   detector = HallucinationDetector(config=cfg.hallucination)
-  if seed_dataset:
-    ref_vals = []
-    for s in seed_dataset:
-      from pipeline.utils.series_utils import extract_numeric_series
-      ref_vals.extend(extract_numeric_series(s))
-    if ref_vals:
-      ref_arr = np.array(ref_vals, dtype=float).reshape(-1, 1)
-      detector.set_reference(ref_arr, feature_names=[feature_names[0]])
-  else:
-    detector.set_reference(data, feature_names=feature_names)
+  # Usar los datos de la serie (ground truth) como referencia estadística para evitar
+  # falsos positivos causados por discrepancia de escala con las semillas crudas del RAG
+  detector.set_reference(data, feature_names=feature_names)
 
   hall_report = detector.detect(result.predictions, feature_names=feature_names)
 

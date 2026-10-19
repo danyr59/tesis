@@ -107,16 +107,19 @@ def extend_series(
   rng: Optional[np.random.Generator] = None,
   profile_id: str = "P1_ESTABLE",
   target_mean: Optional[float] = None,
+  series_seed: Optional[int] = None,
 ) -> List[float]:
   """Extiende una serie hasta target_len aplicando el comportamiento matemático del profile_id.
   
   Soporta Desacoplamiento Morfológico-Escalar: si se pasa target_mean (ej. 220.0),
   las semillas se re-escalan preservando su dinámica/forma pero ancladas a la magnitud solicitada.
+  Soporta diferenciación estocástica por serie vía series_seed.
   """
   if not values:
     val = target_mean if target_mean is not None else 0.0
     return [float(val)] * target_len
-  rng = rng or np.random.default_rng(42)
+  if rng is None:
+    rng = np.random.default_rng(series_seed if series_seed is not None else 42)
   out = [float(x) for x in values]
 
   # Desacoplamiento Morfológico-Escalar:
@@ -132,9 +135,18 @@ def extend_series(
       target_std = max(0.1, target_std)
       normalized_seed = (vals_arr - current_mean) / (current_std if current_std > 1e-4 else 1.0)
       rescaled_seed = target_mean + (normalized_seed * target_std)
+      if target_mean > 0:
+        rescaled_seed = [max(0.0, float(x)) for x in rescaled_seed]
       out = [float(x) for x in rescaled_seed]
 
-  base_val = target_mean if target_mean is not None else out[-1]
+    # Variación sutil inter-serie / inter-sujeto si se especifica una semilla de serie
+    if series_seed is not None and series_seed != 42:
+      subject_shift = float(rng.normal(0, min(0.15, abs(target_mean) * 0.003)))
+      out = [float(x + subject_shift) for x in out]
+      if target_mean > 0:
+        out = [max(0.0, float(x)) for x in out]
+
+  base_val = float(np.mean(out)) if out else (target_mean if target_mean is not None else 0.0)
   t = len(out)
 
   while len(out) < target_len:
@@ -186,6 +198,8 @@ def extend_series(
         delta = float(np.mean(np.diff(window))) if len(window) > 1 else 0.0
         val = out[-1] + delta + noise
         
+    if target_mean is not None and target_mean > 0:
+        val = max(0.0, float(val))
     out.append(float(val))
     t += 1
     

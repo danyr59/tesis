@@ -322,6 +322,7 @@ Tu tarea es generar los primeros 10 valores (semilla) de una serie temporal bas�
 - Descripción: {profile['description']}
 - Longitud exacta esperada: SOLO DEBES GENERAR 10 OBSERVACIONES por serie (Semilla inicial).
 - Cantidad de series a generar: {num_series} series.
+- Rango de series a generar: Serie #{series_offset + 1} a #{series_offset + num_series}.
 - Tendencia global: {profile['trend_expected']}
 - Estacionalidad: {profile['seasonality_expected']}
 - Anomalías esperadas: {profile['expected_anomalies']}
@@ -346,8 +347,8 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
 {example}
 ```json
 """
-        # Usamos un max_new_tokens bajo porque solo debe generar 10 puntos por serie (ej. 200 tokens total)
-        response = self.llm.generate_json(prompt, max_new_tokens=1024)
+        # Usamos 500 tokens: el modelo termina naturalmente en ~320 tokens y se detiene solo vía EOS
+        response = self.llm.generate_json(prompt, max_new_tokens=500)
         series = response.get("synthetic_series", [])
         
         if series:
@@ -356,19 +357,34 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
             extended_series = []
             
             if multivariate:
-                for s_dict in series:
-                    ext_dict = {}
-                    for var, vals in s_dict.items():
-                        ext_dict[var] = extend_series(vals, num_points, profile_id=profile_id, target_mean=target_value)
-                    extended_series.append(ext_dict)
+                for idx, s_item in enumerate(series):
+                    s_seed = 42 + series_offset + idx
+                    s_rng = np.random.default_rng(s_seed)
+                    if isinstance(s_item, dict):
+                        ext_dict = {}
+                        for var, vals in s_item.items():
+                            ext_dict[var] = extend_series(vals, num_points, rng=s_rng, profile_id=profile_id, target_mean=target_value, series_seed=s_seed)
+                        extended_series.append(ext_dict)
+                    elif isinstance(s_item, list):
+                        v_name = prompt_info.get("values", {}).get("variables", ["value"])
+                        v_key = str(v_name[0]) if isinstance(v_name, list) and v_name else str(v_name)
+                        extended_series.append({
+                            v_key: extend_series(s_item, num_points, rng=s_rng, profile_id=profile_id, target_mean=target_value, series_seed=s_seed)
+                        })
             else:
-                for s_arr in series:
-                    extended_series.append(extend_series(s_arr, num_points, profile_id=profile_id, target_mean=target_value))
+                for idx, s_arr in enumerate(series):
+                    s_seed = 42 + series_offset + idx
+                    s_rng = np.random.default_rng(s_seed)
+                    if isinstance(s_arr, list):
+                        extended_series.append(extend_series(s_arr, num_points, rng=s_rng, profile_id=profile_id, target_mean=target_value, series_seed=s_seed))
+                    elif isinstance(s_arr, dict):
+                        vals = next(iter(s_arr.values())) if s_arr else []
+                        extended_series.append(extend_series(vals, num_points, rng=s_rng, profile_id=profile_id, target_mean=target_value, series_seed=s_seed))
             series = extended_series
 
         if not series:
             series = self._fallback_series(
-                num_series, num_points, stats, multivariate, prompt_info)
+                num_series, num_points, stats, multivariate, prompt_info, series_seed=42 + series_offset)
         return series
 
     def _fallback_series(
@@ -378,19 +394,25 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
         stats: dict,
         multivariate: bool,
         prompt_info: dict,
+        series_seed: Optional[int] = None,
     ) -> List[Any]:
-        rng = np.random.default_rng(42)
-        mean, std = stats["mean"], stats["std"]
+        target_value = prompt_info.get("values", {}).get("target_value")
+        mean = float(target_value) if target_value is not None else stats.get("mean", 50.0)
+        std = stats.get("std", 1.0)
         out = []
-        for _ in range(n):
-            base = float(rng.normal(mean, std))
+        for i in range(n):
+            s_seed = (series_seed if series_seed is not None else 42) + i
+            s_rng = np.random.default_rng(s_seed)
+            base = float(s_rng.normal(mean, std))
             profile_id = prompt_info.get("values", {}).get("profile_id", "P1_ESTABLE")
             seq = extend_series(
-                [base + float(rng.normal(0, std * 0.1))
+                [base + float(s_rng.normal(0, std * 0.1))
                  for _ in range(min(20, points))],
                 points,
-                rng,
-                profile_id
+                rng=s_rng,
+                profile_id=profile_id,
+                target_mean=target_value,
+                series_seed=s_seed,
             )
             if multivariate:
                 vars_ = prompt_info.get("values", {}).get(
@@ -401,8 +423,8 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
                     {
                         f"{vars_[0]} (°C)" if "(" not in str(vars_[0]) else str(vars_[0]): seq,
                         "humedad (%)": extend_series(
-                            [50.0 + float(rng.normal(0, 3))
-                             for _ in range(min(20, points))], points, rng, profile_id
+                            [50.0 + float(s_rng.normal(0, 3))
+                             for _ in range(min(20, points))], points, rng=s_rng, profile_id=profile_id, target_mean=target_value, series_seed=s_seed
                         ),
                     }
                 )
@@ -416,7 +438,9 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
         normalized = []
         profile_id = prompt_info.get("values", {}).get("profile_id", "P1_ESTABLE")
         target_value = prompt_info.get("values", {}).get("target_value")
-        for s in series_list[: self.num_series_target]:
+        for idx, s in enumerate(series_list[: self.num_series_target]):
+            s_seed = 42 + idx
+            s_rng = np.random.default_rng(s_seed)
             if "multi" in tipo_serie and isinstance(s, dict):
                 keys = list(s.keys())
                 if not keys:
@@ -428,20 +452,23 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
                 for k in keys:
                     vals = [float(x) for x in s[k][:cur_len]] if isinstance(
                         s.get(k), list) else []
-                    new_dict[k] = extend_series(vals, target, None, profile_id, target_mean=target_value)
+                    new_dict[k] = extend_series(vals, target, rng=s_rng, profile_id=profile_id, target_mean=target_value, series_seed=s_seed)
                 normalized.append(new_dict)
             elif isinstance(s, list):
                 vals = [float(x) for x in s]
-                normalized.append(extend_series(vals, target, None, profile_id, target_mean=target_value))
+                normalized.append(extend_series(vals, target, rng=s_rng, profile_id=profile_id, target_mean=target_value, series_seed=s_seed))
         while len(normalized) < self.num_series_target:
+            idx = len(normalized)
+            fallback_seed = 42 + idx
             normalized.extend(
                 self._fallback_series(
                     1,
                     target,
                     seeds_statistics([]) if not normalized else {
-                        "mean": 0, "std": 1, "min": 0, "max": 1},
+                        "mean": target_value if target_value is not None else 0, "std": 1, "min": 0, "max": 1},
                     "multi" in tipo_serie,
-                    {"values": {"variables": "valor"}},
+                    prompt_info,
+                    series_seed=fallback_seed,
                 )
             )
         return normalized[: self.num_series_target]
