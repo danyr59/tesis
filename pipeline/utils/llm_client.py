@@ -144,6 +144,9 @@ def extract_json_from_text(text: str) -> dict:
   # 6. Reparar comas sobrantes antes de cerrar llaves/corchetes (ej. [1, 2, ])
   cleaned = re.sub(r",\s*([\}\]])", r"\1", cleaned)
 
+  # 6.5. Reparar comillas dobles duplicadas antes del cierre (ej. "texto." "" })
+  cleaned = re.sub(r'""\s*\}', '"}', cleaned)
+
   # 7. Intentar parseo estándar con strict=False (acepta saltos de línea crudos en cadenas)
   try:
     return json.loads(cleaned, strict=False)

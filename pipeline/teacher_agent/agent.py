@@ -457,7 +457,7 @@ Devuelve ÚNICAMENTE JSON. Indica con `true` o `false` en "accept_document" si d
 {{
   "accept_document": true,
   "needs_refinement": false,
-  "quality_summary": "Justifica tu selección en UNA SOLA ORACIÓN CORTA. (Debe terminar con comillas dobles)"
+  "quality_summary": "Justifica brevemente tu selección en una sola oración concisa."
 }}
 """
         print(f"[{self.__class__.__name__}] Evaluando lote de {len(batch_metadata)} documentos con el LLM (esto puede tardar unos segundos)...")
