@@ -37,7 +37,11 @@ class TeacherAgent:
       Settings.get_teacher_model_path(),
       role_name="Maestro experto en series temporales",
     )
-    self.llm.load_adapter(Settings.get_teacher_model_path_adapter())
+    adapter_path = Settings.get_teacher_model_path_adapter()
+    if adapter_path and os.path.exists(adapter_path):
+        self.llm.load_adapter(adapter_path)
+    else:
+        print(f"[{self.__class__.__name__}] Sin adaptadores previos. Usando modelo base con RAG.")
     self.refinements_history: List[str] = []
     self.num_series_target = Settings.SYNTHETIC_NUM_SERIES
     self.points_per_series_target = Settings.SYNTHETIC_POINTS_PER_SERIES

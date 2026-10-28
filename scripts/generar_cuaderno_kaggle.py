@@ -90,10 +90,22 @@ if not pipeline_dir.exists() or not (pipeline_dir / "teacher_agent").exists():
     if input_code_dir.exists():
         print("📦 Copiando paquete 'pipeline' desde dataset interno de Kaggle...")
         pipeline_dir.mkdir(parents=True, exist_ok=True)
-        if (input_code_dir / "pipeline").exists():
+        
+        # 1. Si viene como archivo zip de Kaggle:
+        zip_files = list(input_code_dir.rglob("*.zip"))
+        if zip_files:
+            for z in zip_files:
+                shutil.unpack_archive(str(z), str(pipeline_dir))
+        elif (input_code_dir / "pipeline").exists():
             shutil.copytree(input_code_dir / "pipeline", pipeline_dir, dirs_exist_ok=True)
         else:
             shutil.copytree(input_code_dir, pipeline_dir, dirs_exist_ok=True)
+            
+        # 2. Si se desempaquetó una subcarpeta interna llamada 'pipeline', aplanarla
+        if (pipeline_dir / "pipeline").exists():
+            for item in (pipeline_dir / "pipeline").iterdir():
+                shutil.move(str(item), str(pipeline_dir))
+            shutil.rmtree(pipeline_dir / "pipeline")
             
         if not (pipeline_dir / "__init__.py").exists():
             (pipeline_dir / "__init__.py").touch()
@@ -316,7 +328,9 @@ purgar_memoria("Estado inicial")"""))
     
     # Configurar variables de entorno dinámicas
     os.environ["TEACHER_MODEL_ID"] = esc_info["teacher_id"]
+    os.environ["TEACHER_MODEL_PATH"] = esc_info["teacher_id"]
     os.environ["STUDENT_MODEL_ID"] = esc_info["student_id"]
+    os.environ["STUDENT_MODEL_PATH"] = esc_info["student_id"]
     
     # -------------------------------------------------------------------------
     # FASE 1: NACE EL MAESTRO (Razonamiento y RAG)

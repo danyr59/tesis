@@ -62,11 +62,11 @@ class Settings:
 
   @classmethod
   def get_teacher_model_path(cls):
-    return os.getenv("TEACHER_MODEL_PATH", "./models/profesor")
+    return os.getenv("TEACHER_MODEL_PATH", os.getenv("TEACHER_MODEL_ID", "./models/profesor"))
 
   @classmethod
   def get_student_model_path(cls):
-    return os.getenv("STUDENT_MODEL_PATH", "./models/student")
+    return os.getenv("STUDENT_MODEL_PATH", os.getenv("STUDENT_MODEL_ID", "./models/student"))
 
   @classmethod
   def synthetic_csv_path(cls) -> str:
