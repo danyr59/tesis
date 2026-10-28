@@ -291,7 +291,7 @@ class LLMClient:
     user_prompt: str,
     system_prompt: Optional[str] = None,
     max_new_tokens: Optional[int] = None,
-    temperature: float = 0.2,
+    temperature: float = 0.0,
   ) -> str:
     system_prompt = system_prompt or (
       f"Eres un {self.role_name} experto en series temporales. "
@@ -311,30 +311,27 @@ class LLMClient:
     target_device = getattr(self.model, "device", None) or self.device
     inputs = self.tokenizer(prompt, return_tensors="pt").to(target_device)
     max_new = max_new_tokens or Settings.LLM_MAX_NEW_TOKENS
+
+    # En float16, temperaturas menores a 0.2 causan desbordamiento a inf/NaN en multinomial.
+    # Para JSON o temperaturas bajas, usamos decodificación determinista Greedy (do_sample=False).
+    use_sampling = temperature is not None and temperature >= 0.2
+    gen_kwargs = {
+      "max_new_tokens": max_new,
+      "do_sample": use_sampling,
+      "pad_token_id": self.tokenizer.pad_token_id,
+      "eos_token_id": self.tokenizer.eos_token_id,
+      "repetition_penalty": 1.1,
+    }
+    if use_sampling:
+      gen_kwargs["temperature"] = float(temperature)
+      gen_kwargs["top_p"] = 0.9
+
     with torch.no_grad():
-      try:
-        output_ids = self.model.generate(
-          **inputs,
-          max_new_tokens=max_new,
-          do_sample=temperature > 0,
-          temperature=temperature if temperature > 0 else None,
-          pad_token_id=self.tokenizer.pad_token_id,
-          eos_token_id=self.tokenizer.eos_token_id,
-          repetition_penalty=1.15,
-        )
-      except RuntimeError as e:
-        if "probability tensor" in str(e).lower() or "nan" in str(e).lower():
-          print(f"[LLMClient] Aviso: Error numérico en sampling. Usando greedy decoding como fallback.")
-          output_ids = self.model.generate(
-            **inputs,
-            max_new_tokens=max_new,
-            do_sample=False,
-            pad_token_id=self.tokenizer.pad_token_id,
-            eos_token_id=self.tokenizer.eos_token_id,
-            repetition_penalty=1.15,
-          )
-        else:
-          raise
+      output_ids = self.model.generate(
+        **inputs,
+        **gen_kwargs,
+      )
+
     new_tokens = output_ids[0, inputs["input_ids"].shape[1] :]
     text = self.tokenizer.decode(new_tokens, skip_special_tokens=True).strip()
     
@@ -364,6 +361,6 @@ class LLMClient:
       user_prompt=user_prompt,
       system_prompt=system_prompt,
       max_new_tokens=max_new_tokens,
-      temperature=0.1,
+      temperature=0.0,
     )
     return extract_json_from_text(text)
