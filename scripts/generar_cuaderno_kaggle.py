@@ -85,48 +85,48 @@ for p in [EXP_DIR, TABLAS_DIR]:
 
 # 2. Obtener código fuente del proyecto
 pipeline_dir = PROJECT_ROOT / "pipeline"
-if not pipeline_dir.exists() or not (pipeline_dir / "teacher_agent").exists():
-    input_code_dir = Path("/kaggle/input/proyecto-tesis-codigo")
-    if input_code_dir.exists():
-        print("📦 Copiando paquete 'pipeline' desde dataset interno de Kaggle...")
-        pipeline_dir.mkdir(parents=True, exist_ok=True)
-        
-        # 1. Si viene como archivo zip de Kaggle:
-        zip_files = list(input_code_dir.rglob("*.zip"))
-        if zip_files:
-            for z in zip_files:
-                shutil.unpack_archive(str(z), str(pipeline_dir))
-        elif (input_code_dir / "pipeline").exists():
-            shutil.copytree(input_code_dir / "pipeline", pipeline_dir, dirs_exist_ok=True)
-        else:
-            shutil.copytree(input_code_dir, pipeline_dir, dirs_exist_ok=True)
-            
-        # 2. Si se desempaquetó una subcarpeta interna llamada 'pipeline', aplanarla
-        if (pipeline_dir / "pipeline").exists():
-            for item in (pipeline_dir / "pipeline").iterdir():
-                shutil.move(str(item), str(pipeline_dir))
-            shutil.rmtree(pipeline_dir / "pipeline")
-            
-        if not (pipeline_dir / "__init__.py").exists():
-            (pipeline_dir / "__init__.py").touch()
-            
-        print(f"✅ Paquete 'pipeline' instalado exitosamente en: {pipeline_dir}")
+input_code_dir = Path("/kaggle/input/proyecto-tesis-codigo")
+
+if input_code_dir.exists():
+    print("📦 Sincronizando paquete 'pipeline' desde dataset interno de Kaggle...")
+    pipeline_dir.mkdir(parents=True, exist_ok=True)
+    
+    # 1. Si viene como archivo zip de Kaggle:
+    zip_files = list(input_code_dir.rglob("*.zip"))
+    if zip_files:
+        for z in zip_files:
+            shutil.unpack_archive(str(z), str(pipeline_dir))
+    elif (input_code_dir / "pipeline").exists():
+        shutil.copytree(input_code_dir / "pipeline", pipeline_dir, dirs_exist_ok=True)
     else:
-        # Fallback a clonación git no-bloqueante con soporte de token
-        print("📥 Clonando repositorio desde GitHub...")
-        gh_token = None
-        try:
-            from kaggle_secrets import UserSecretsClient
-            gh_token = UserSecretsClient().get_secret("GITHUB_TOKEN")
-        except Exception:
-            gh_token = os.getenv("GITHUB_TOKEN")
-            
-        if gh_token:
-            print("🔑 Usando GITHUB_TOKEN para clonar repositorio privado...")
-            !GIT_TERMINAL_PROMPT=0 git clone -b kaggle_experimentos https://oauth2:{gh_token}@github.com/danyr59/tesis_antes.git {PROJECT_ROOT}
-        else:
-            print("ℹ️ Clonando con credenciales públicas (GIT_TERMINAL_PROMPT=0)...")
-            !GIT_TERMINAL_PROMPT=0 git clone -b kaggle_experimentos https://github.com/danyr59/tesis_antes.git {PROJECT_ROOT}
+        shutil.copytree(input_code_dir, pipeline_dir, dirs_exist_ok=True)
+        
+    # 2. Si se desempaquetó una subcarpeta interna llamada 'pipeline', aplanarla
+    if (pipeline_dir / "pipeline").exists():
+        for item in (pipeline_dir / "pipeline").iterdir():
+            shutil.move(str(item), str(pipeline_dir))
+        shutil.rmtree(pipeline_dir / "pipeline")
+        
+    if not (pipeline_dir / "__init__.py").exists():
+        (pipeline_dir / "__init__.py").touch()
+        
+    print(f"✅ Paquete 'pipeline' instalado exitosamente en: {pipeline_dir}")
+elif not pipeline_dir.exists() or not (pipeline_dir / "teacher_agent").exists():
+    # Fallback a clonación git no-bloqueante con soporte de token
+    print("📥 Clonando repositorio desde GitHub...")
+    gh_token = None
+    try:
+        from kaggle_secrets import UserSecretsClient
+        gh_token = UserSecretsClient().get_secret("GITHUB_TOKEN")
+    except Exception:
+        gh_token = os.getenv("GITHUB_TOKEN")
+        
+    if gh_token:
+        print("🔑 Usando GITHUB_TOKEN para clonar repositorio privado...")
+        !GIT_TERMINAL_PROMPT=0 git clone -b kaggle_experimentos https://oauth2:{gh_token}@github.com/danyr59/tesis_antes.git {PROJECT_ROOT}
+    else:
+        print("ℹ️ Clonando con credenciales públicas (GIT_TERMINAL_PROMPT=0)...")
+        !GIT_TERMINAL_PROMPT=0 git clone -b kaggle_experimentos https://github.com/danyr59/tesis_antes.git {PROJECT_ROOT}
 else:
     print(f"✅ Código del proyecto ya presente en: {pipeline_dir}")
 
