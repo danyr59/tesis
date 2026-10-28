@@ -85,8 +85,8 @@ for p in [EXP_DIR, TABLAS_DIR]:
 
 # 2. Descargar código fuente del proyecto si no existe
 if not PROJECT_ROOT.exists():
-    print("📥 Clonando repositorio del proyecto (rama nuevo_enfoque)...")
-    !git clone -b nuevo_enfoque https://github.com/danyr59/tesis_antes.git {PROJECT_ROOT}
+    print("📥 Clonando repositorio del proyecto (rama kaggle_experimentos)...")
+    !git clone -b kaggle_experimentos https://github.com/danyr59/tesis_antes.git {PROJECT_ROOT}
 else:
     print(f"✅ Repositorio encontrado en: {PROJECT_ROOT}")
 
