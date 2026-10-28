@@ -84,18 +84,29 @@ for p in [EXP_DIR, TABLAS_DIR]:
     p.mkdir(parents=True, exist_ok=True)
 
 # 2. Obtener código fuente del proyecto
-if not (PROJECT_ROOT / "pipeline").exists():
+pipeline_dir = PROJECT_ROOT / "pipeline"
+if not pipeline_dir.exists() or not (pipeline_dir / "teacher_agent").exists():
     input_code_dir = Path("/kaggle/input/proyecto-tesis-codigo")
     if input_code_dir.exists():
         print("📦 Cargando código del proyecto desde dataset interno de Kaggle...")
-        PROJECT_ROOT.mkdir(parents=True, exist_ok=True)
-        # Si está descomprimido
+        pipeline_dir.mkdir(parents=True, exist_ok=True)
+        # Si está descomprimido como carpeta
         if (input_code_dir / "pipeline").exists():
-            shutil.copytree(input_code_dir / "pipeline", PROJECT_ROOT / "pipeline", dirs_exist_ok=True)
+            shutil.copytree(input_code_dir / "pipeline", pipeline_dir, dirs_exist_ok=True)
         # Si está comprimido como zip
         for z in input_code_dir.rglob("*.zip"):
-            shutil.unpack_archive(str(z), str(PROJECT_ROOT))
-        print(f"✅ Código fuente instalado en: {PROJECT_ROOT}")
+            shutil.unpack_archive(str(z), str(pipeline_dir))
+            
+        # Si al descomprimir se creó una subcarpeta pipeline/pipeline, aplanar al nivel correcto
+        if (pipeline_dir / "pipeline").exists():
+            for item in (pipeline_dir / "pipeline").iterdir():
+                shutil.move(str(item), str(pipeline_dir))
+            shutil.rmtree(pipeline_dir / "pipeline")
+            
+        if not (pipeline_dir / "__init__.py").exists():
+            (pipeline_dir / "__init__.py").touch()
+            
+        print(f"✅ Paquete 'pipeline' instalado exitosamente en: {pipeline_dir}")
     else:
         # Fallback a clonación git no-bloqueante con soporte de token
         print("📥 Clonando repositorio desde GitHub...")
@@ -113,10 +124,11 @@ if not (PROJECT_ROOT / "pipeline").exists():
             print("ℹ️ Clonando con credenciales públicas (GIT_TERMINAL_PROMPT=0)...")
             !GIT_TERMINAL_PROMPT=0 git clone -b kaggle_experimentos https://github.com/danyr59/tesis_antes.git {PROJECT_ROOT}
 else:
-    print(f"✅ Código del proyecto ya presente en: {PROJECT_ROOT}")
+    print(f"✅ Código del proyecto ya presente en: {pipeline_dir}")
 
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+for p in [PROJECT_ROOT, BASE_DIR]:
+    if str(p) not in sys.path:
+        sys.path.insert(0, str(p))
 os.chdir(str(PROJECT_ROOT))
 
 # 3. Autenticación Hugging Face (requerida para descargar modelos de la familia LLaMA)
@@ -256,8 +268,16 @@ PERFILES_A_CORRER = ["P1", "P2", "P3", "P4", "P5"]
 # Si es False, salta automáticamente cualquier perfil que ya tenga métricas guardadas
 FORZAR_REPETICION = False
 
+# -------------------------------------------------------------------------
+# PARÁMETROS DE GENERACIÓN SINTÉTICA (Ajustables a tu gusto):
+# -------------------------------------------------------------------------
+os.environ["SYNTHETIC_POINTS_PER_SERIES"] = "400"  # Puntos por serie (ej: 400, 500, 1000)
+os.environ["SYNTHETIC_NUM_SERIES"] = "20"          # Cantidad de series (ej: 15, 20, 30)
+os.environ["RAG_TOP_K"] = "15"                     # Semillas extraídas del RAG por consulta
+
 print(f"🎯 Escenario activo para hoy: {ESCENARIO_SELECCIONADO} ({ESCENARIOS[ESCENARIO_SELECCIONADO]['nombre']})")
-print(f"📊 Perfiles a ejecutar: {PERFILES_A_CORRER}")"""))
+print(f"📊 Perfiles a ejecutar: {PERFILES_A_CORRER}")
+print(f"📏 Longitud serie: {os.environ['SYNTHETIC_POINTS_PER_SERIES']} pts | Series: {os.environ['SYNTHETIC_NUM_SERIES']} | RAG Top-K: {os.environ['RAG_TOP_K']}")"""))
 
     # =========================================================================
     # CELDA 6: FUNCIÓN DE PURGA DE VRAM
