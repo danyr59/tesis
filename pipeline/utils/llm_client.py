@@ -211,17 +211,23 @@ class LLMClient:
 
     if self.device == "cuda":
         num_gpus = torch.cuda.device_count()
-        # Verificar si se solicita o requiere 4-bit (ej. GPU única con VRAM limitada < 18GB para modelos grandes 7B+)
         use_4bit_env = os.environ.get("USE_4BIT", "").lower() in ("true", "1", "yes")
-        is_single_tight_gpu = (
-            num_gpus == 1
-            and torch.cuda.get_device_properties(0).total_memory < 18 * 1e9
-            and any(tag in model_path.lower() for tag in ["7b", "8b", "6.7b", "14b"])
+
+        gpu_capability = torch.cuda.get_device_capability(0) if num_gpus > 0 else (0, 0)
+        is_large_model = any(tag in model_path.lower() for tag in ["7b", "8b", "6.7b", "14b"])
+        # Tesla T4 (sm_75, capability < 8.0) no tiene soporte de hardware para bfloat16.
+        # En modelos 7B+ entrenados nativamente en bf16 (Qwen 2.5, Llama 3.1), usar float16 sin cuantizar
+        # causa desbordamiento de activaciones en atención (>65504).
+        # En T4 o VRAM limitada, activamos 4-bit NF4 (BitsAndBytes) para estabilizar cálculos y reducir VRAM a ~5 GB.
+        needs_4bit = (
+            use_4bit_env
+            or (is_large_model and gpu_capability[0] < 8)
+            or (num_gpus == 1 and torch.cuda.get_device_properties(0).total_memory < 18 * 1e9 and is_large_model)
         )
 
-        if (use_4bit_env or is_single_tight_gpu) and BitsAndBytesConfig is not None:
+        if needs_4bit and BitsAndBytesConfig is not None:
             try:
-                print(f"[LLMClient] Activando cuantización 4-bit (BitsAndBytes) para {model_path} en GPU única.")
+                print(f"[LLMClient] Activando cuantización 4-bit (BitsAndBytes NF4) para {model_path} en GPU sm_{gpu_capability[0]}{gpu_capability[1]}.")
                 model_kwargs["quantization_config"] = BitsAndBytesConfig(
                     load_in_4bit=True,
                     bnb_4bit_compute_dtype=torch.float16,
@@ -320,11 +326,11 @@ class LLMClient:
       "do_sample": use_sampling,
       "pad_token_id": self.tokenizer.pad_token_id,
       "eos_token_id": self.tokenizer.eos_token_id,
-      "repetition_penalty": 1.1,
     }
     if use_sampling:
       gen_kwargs["temperature"] = float(temperature)
       gen_kwargs["top_p"] = 0.9
+      gen_kwargs["repetition_penalty"] = 1.05
 
     with torch.no_grad():
       output_ids = self.model.generate(
