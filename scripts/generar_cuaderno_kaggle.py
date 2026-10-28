@@ -37,7 +37,7 @@ Este cuaderno implementa el **Protocolo Experimental formal** de la tesis:
 * **6 Escenarios de Destilación:** 3 Intra-familia (Qwen, LLaMA, DeepSeek) y 3 Cross-Family.
 * **5 Perfiles Temporales:** $P_1$ (Estable), $P_2$ (Estacional), $P_3$ (Tendencia-Estacional), $P_4$ (Tendencia-Ruido), $P_5$ (Complejo).
 * **Ciclo Automático de Purga de VRAM:** Cada modelo nace, cumple su función, se purga de memoria GPU y luego nace el siguiente.
-* **Persistencia Modular:** Cada corrida guarda sus datos sintéticos, modelo RNN, predicciones, métricas y gráficos en carpetas independientes.
+* **Persistencia Modular:** Cada corrida guarda sus datos sintéticos, el modelo Estudiante LoRA entrenado, configuración JSON para recreación futura, checkpoint RNN, predicciones, métricas y gráficos en carpetas independientes.
 * **Ejecución Diaria por Bloques:** Diseñado para correr **1 escenario por sesión (~45 min)** evitando el agotamiento de cuotas."""))
 
     # =========================================================================
@@ -351,6 +351,26 @@ purgar_memoria("Estado inicial")"""))
     target_csv = out_dir / "synthetic_series.csv"
     shutil.copy(csv_temp_path, target_csv)
     print(f"✅ Serie sintética guardada en: {target_csv}")
+    
+    # Guardar el adaptador LoRA del Estudiante (pesa solo ~20 MB)
+    if final_model_path and Path(final_model_path).exists():
+        target_adapter = out_dir / "student_adapter"
+        shutil.copytree(final_model_path, target_adapter, dirs_exist_ok=True)
+        print(f"🧠 Adaptador LoRA del Estudiante guardado en: {target_adapter}")
+
+    # Guardar configuración y semillas para recreación futura e inmediata
+    config_generacion = {
+        "escenario": esc_info["nombre"],
+        "perfil": perf_info["id"],
+        "query": perf_info["query"],
+        "dominio": perf_info["dominio"],
+        "structured_prompt": structured_prompt,
+        "metadata_summary": teacher_response.get("metadata_summary", {}),
+        "seed_dataset": current_dataset,
+    }
+    with open(out_dir / "config_generacion.json", "w", encoding="utf-8") as f:
+        json.dump(config_generacion, f, indent=2, ensure_ascii=False)
+    print(f"📋 Configuración de generación guardada en: {out_dir / 'config_generacion.json'}")
     
     # PURGA DEL ESTUDIANTE
     print("\\n[Fase 2] Purgando Estudiante de VRAM...")
