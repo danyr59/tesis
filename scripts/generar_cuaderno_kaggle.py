@@ -83,12 +83,37 @@ PROJECT_ROOT = BASE_DIR / "proyecto_tesis"
 for p in [EXP_DIR, TABLAS_DIR]:
     p.mkdir(parents=True, exist_ok=True)
 
-# 2. Descargar código fuente del proyecto si no existe
-if not PROJECT_ROOT.exists():
-    print("📥 Clonando repositorio del proyecto (rama kaggle_experimentos)...")
-    !git clone -b kaggle_experimentos https://github.com/danyr59/tesis_antes.git {PROJECT_ROOT}
+# 2. Obtener código fuente del proyecto
+if not (PROJECT_ROOT / "pipeline").exists():
+    input_code_dir = Path("/kaggle/input/proyecto-tesis-codigo")
+    if input_code_dir.exists():
+        print("📦 Cargando código del proyecto desde dataset interno de Kaggle...")
+        PROJECT_ROOT.mkdir(parents=True, exist_ok=True)
+        # Si está descomprimido
+        if (input_code_dir / "pipeline").exists():
+            shutil.copytree(input_code_dir / "pipeline", PROJECT_ROOT / "pipeline", dirs_exist_ok=True)
+        # Si está comprimido como zip
+        for z in input_code_dir.rglob("*.zip"):
+            shutil.unpack_archive(str(z), str(PROJECT_ROOT))
+        print(f"✅ Código fuente instalado en: {PROJECT_ROOT}")
+    else:
+        # Fallback a clonación git no-bloqueante con soporte de token
+        print("📥 Clonando repositorio desde GitHub...")
+        gh_token = None
+        try:
+            from kaggle_secrets import UserSecretsClient
+            gh_token = UserSecretsClient().get_secret("GITHUB_TOKEN")
+        except Exception:
+            gh_token = os.getenv("GITHUB_TOKEN")
+            
+        if gh_token:
+            print("🔑 Usando GITHUB_TOKEN para clonar repositorio privado...")
+            !GIT_TERMINAL_PROMPT=0 git clone -b kaggle_experimentos https://oauth2:{gh_token}@github.com/danyr59/tesis_antes.git {PROJECT_ROOT}
+        else:
+            print("ℹ️ Clonando con credenciales públicas (GIT_TERMINAL_PROMPT=0)...")
+            !GIT_TERMINAL_PROMPT=0 git clone -b kaggle_experimentos https://github.com/danyr59/tesis_antes.git {PROJECT_ROOT}
 else:
-    print(f"✅ Repositorio encontrado en: {PROJECT_ROOT}")
+    print(f"✅ Código del proyecto ya presente en: {PROJECT_ROOT}")
 
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
