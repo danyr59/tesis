@@ -4,11 +4,17 @@ from __future__ import annotations
 
 import gc
 import json
+import os
 import re
 from typing import Any, Dict, Optional
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
+
+try:
+    from transformers import BitsAndBytesConfig
+except ImportError:
+    BitsAndBytesConfig = None
 
 from pipeline.config.settings import Settings
 
@@ -213,9 +219,8 @@ class LLMClient:
             and any(tag in model_path.lower() for tag in ["7b", "8b", "6.7b", "14b"])
         )
 
-        if use_4bit_env or is_single_tight_gpu:
+        if (use_4bit_env or is_single_tight_gpu) and BitsAndBytesConfig is not None:
             try:
-                from transformers import BitsAndBytesConfig
                 print(f"[LLMClient] Activando cuantización 4-bit (BitsAndBytes) para {model_path} en GPU única.")
                 model_kwargs["quantization_config"] = BitsAndBytesConfig(
                     load_in_4bit=True,

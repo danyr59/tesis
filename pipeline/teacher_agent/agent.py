@@ -1,8 +1,11 @@
+import ast
 import json
+import os
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
 import chromadb
+import numpy as np
 from sentence_transformers import SentenceTransformer
 
 from pipeline.config.settings import Settings
@@ -328,10 +331,6 @@ Analiza el prompt estructurado del Usuario:
 
   def _summarize_time_series(self, ts_str: str) -> dict:
       try:
-          import json
-          import numpy as np
-          import ast
-          
           try:
               data = json.loads(ts_str)
           except Exception:
