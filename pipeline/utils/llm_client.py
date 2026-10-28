@@ -185,20 +185,26 @@ class LLMClient:
   def __init__(self, model_path: str, role_name: str = "asistente"):
     self.model_path = model_path
     self.role_name = role_name
-    print(f"[LLMClient] Cargando {role_name}: {model_path}")
+    
+    if torch.cuda.is_available():
+        self.device = "cuda"
+    elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+        self.device = "mps"
+    else:
+        self.device = "cpu"
+
+    print(f"[LLMClient] Cargando {role_name} en {self.device}: {model_path}")
     self.tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
     if self.tokenizer.pad_token is None:
       self.tokenizer.pad_token = self.tokenizer.eos_token
 
     # Cargamos el modelo base en float16 explícitamente para reducir la RAM a la mitad
-    # FIX: No usamos device_map="mps" porque la librería 'accelerate' de HF tiene un bug en Mac que duplica 
-    # la memoria (mantiene copias en CPU y MPS con buffers gigantes). Usamos .to("mps") para un envío directo.
     self._base_model = AutoModelForCausalLM.from_pretrained(
       model_path,
       torch_dtype=torch.float16,
       trust_remote_code=True,
-      attn_implementation="eager", # FIX: Evita el OOM de 26GB en Mac M-Series (Qwen2 SDPA memory leak)
-    ).to("mps")
+      attn_implementation="eager",
+    ).to(self.device)
    
     self._base_model.eval()
     # El modelo activo comienza siendo el base
@@ -216,7 +222,9 @@ class LLMClient:
         if self.model is not self._base_model:
             del self.model
             gc.collect()
-            if torch.backends.mps.is_available():
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
                 torch.mps.empty_cache()
             
 
@@ -229,7 +237,9 @@ class LLMClient:
         if self.model is not self._base_model:
             del self.model
             gc.collect()
-            if torch.backends.mps.is_available():
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
                 torch.mps.empty_cache()
             self.model = self._base_model
             print("[LLMClient] Adaptador descargado, modelo base restaurado.")
@@ -256,8 +266,7 @@ class LLMClient:
     else:
       prompt = f"{system_prompt}\n\nUsuario: {user_prompt}\n\nAsistente:"
 
-    device = "mps" if torch.backends.mps.is_available() else "cpu"
-    inputs = self.tokenizer(prompt, return_tensors="pt").to(device)
+    inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
     max_new = max_new_tokens or Settings.LLM_MAX_NEW_TOKENS
     with torch.no_grad():
       try:
@@ -272,7 +281,7 @@ class LLMClient:
         )
       except RuntimeError as e:
         if "probability tensor" in str(e).lower() or "nan" in str(e).lower():
-          print(f"[LLMClient] Aviso: Error numérico en sampling (MPS). Usando greedy decoding como fallback.")
+          print(f"[LLMClient] Aviso: Error numérico en sampling. Usando greedy decoding como fallback.")
           output_ids = self.model.generate(
             **inputs,
             max_new_tokens=max_new,
@@ -286,15 +295,17 @@ class LLMClient:
     new_tokens = output_ids[0, inputs["input_ids"].shape[1] :]
     text = self.tokenizer.decode(new_tokens, skip_special_tokens=True).strip()
     
-    # --- FIX: Evitar Fugas de Memoria en MPS (Apple Silicon) ---
+    # --- Limpieza de Memoria GPU ---
     import gc
     del inputs
     del output_ids
     del new_tokens
     gc.collect()
-    if torch.backends.mps.is_available():
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+    elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
         torch.mps.empty_cache()
-    # ------------------------------------------------------------
+    # -------------------------------
         
     return text
 

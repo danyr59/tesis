@@ -5,7 +5,7 @@ class Settings:
   # RAG (índice TSQA en ChromaDB)
   RAG_TOP_K = 15 # Reducido de 50 para evitar 17 ciclos de evaluación en Swap Memory
   RAG_COLLECTION_NAME = "time_series_generation"
-  RAG_DB_PATH = "./rag/maestro"
+  RAG_DB_PATH = os.getenv("RAG_DB_PATH", "./rag/maestro")
   RAG_DATASET_NAME = "TSQA"
 
   # Iteración Maestro / Estudiante
