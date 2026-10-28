@@ -198,13 +198,50 @@ class LLMClient:
     if self.tokenizer.pad_token is None:
       self.tokenizer.pad_token = self.tokenizer.eos_token
 
-    # Cargamos el modelo base en float16 explícitamente para reducir la RAM a la mitad
-    self._base_model = AutoModelForCausalLM.from_pretrained(
-      model_path,
-      torch_dtype=torch.float16,
-      trust_remote_code=True,
-      attn_implementation="eager",
-    ).to(self.device)
+    model_kwargs = {
+        "trust_remote_code": True,
+        "attn_implementation": "eager",
+    }
+
+    if self.device == "cuda":
+        num_gpus = torch.cuda.device_count()
+        # Verificar si se solicita o requiere 4-bit (ej. GPU única con VRAM limitada < 18GB para modelos grandes 7B+)
+        use_4bit_env = os.environ.get("USE_4BIT", "").lower() in ("true", "1", "yes")
+        is_single_tight_gpu = (
+            num_gpus == 1
+            and torch.cuda.get_device_properties(0).total_memory < 18 * 1e9
+            and any(tag in model_path.lower() for tag in ["7b", "8b", "6.7b", "14b"])
+        )
+
+        if use_4bit_env or is_single_tight_gpu:
+            try:
+                from transformers import BitsAndBytesConfig
+                print(f"[LLMClient] Activando cuantización 4-bit (BitsAndBytes) para {model_path} en GPU única.")
+                model_kwargs["quantization_config"] = BitsAndBytesConfig(
+                    load_in_4bit=True,
+                    bnb_4bit_compute_dtype=torch.float16,
+                    bnb_4bit_quant_type="nf4",
+                    bnb_4bit_use_double_quant=True,
+                )
+            except Exception as e:
+                print(f"[LLMClient] Aviso: No se pudo configurar BitsAndBytesConfig ({e}), continuando en fp16.")
+                model_kwargs["torch_dtype"] = torch.float16
+        else:
+            model_kwargs["torch_dtype"] = torch.float16
+
+        # En CUDA usamos device_map="auto" para repartir automáticamente entre GPUs disponibles (ej. 2x T4 en Kaggle)
+        model_kwargs["device_map"] = "auto"
+        self._base_model = AutoModelForCausalLM.from_pretrained(
+            model_path,
+            **model_kwargs,
+        )
+    else:
+        if self.device == "mps":
+            model_kwargs["torch_dtype"] = torch.float16
+        self._base_model = AutoModelForCausalLM.from_pretrained(
+            model_path,
+            **model_kwargs,
+        ).to(self.device)
    
     self._base_model.eval()
     # El modelo activo comienza siendo el base
@@ -266,7 +303,8 @@ class LLMClient:
     else:
       prompt = f"{system_prompt}\n\nUsuario: {user_prompt}\n\nAsistente:"
 
-    inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
+    target_device = getattr(self.model, "device", None) or self.device
+    inputs = self.tokenizer(prompt, return_tensors="pt").to(target_device)
     max_new = max_new_tokens or Settings.LLM_MAX_NEW_TOKENS
     with torch.no_grad():
       try:
