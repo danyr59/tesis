@@ -206,7 +206,7 @@ class LLMClient:
 
     model_kwargs = {
         "trust_remote_code": True,
-        "attn_implementation": "eager",
+        "attn_implementation": "sdpa" if self.device == "cuda" else "eager",
     }
 
     if self.device == "cuda":
