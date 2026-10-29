@@ -435,6 +435,37 @@ Analiza el prompt estructurado del Usuario:
         else:
             quality_summary_str = " ---- ".join(quality_summary_list[-5:])
 
+        # =====================================================================
+        # PROMPT ANTERIOR (ORIGINAL SIN GUÍA EXPLÍCITA DE ESCALA):
+        # Mantener aquí comentado para probar cuando el Maestro esté fine-tuneado
+        # previamente en series temporales y conozca la relación dinámica/escala.
+        # =====================================================================
+        # prompt = f"""Eres el Maestro, experto en series temporales (RAG {Settings.RAG_DATASET_NAME}).
+        # Solicitud del Usuario:
+        # {json.dumps(student_prompt, ensure_ascii=False)}
+        # 
+        # Ya has aceptado previamente {len(accepted_indexes_global)} documentos.
+        # Ejemplos de los últimos aceptados (para evaluar diversidad):
+        # {json.dumps(accepted_summary, ensure_ascii=False) if accepted_summary else 'Ninguno aún'}.
+        # 
+        # Resumen de calidad de lo aceptado hasta ahora: {quality_summary_str}
+        # 
+        # Ahora evalúa EXCLUSIVAMENTE este nuevo lote de {len(batch_metadata)} documentos (usa los valores "idx" relativos proporcionados abajo):
+        # {json.dumps(batch_metadata, ensure_ascii=False)}
+        # 
+        # Analiza: similitud semántica, dominio, frecuencia, diversidad con lo ya aceptado y utilidad.
+        # Puedes aceptar series cortas (<{Settings.MIN_SERIES_LENGTH} puntos) si aportan conocimiento nuevo.
+        # Si este lote aporta poco o es redundante respecto al resumen anterior, puedes rechazarlo entero (lista vacía).
+        # 
+        # Devuelve ÚNICAMENTE JSON. Indica con `true` o `false` en "accept_document" si decides aceptar el documento actual para tu investigación:
+        # {{
+        #   "accept_document": true,
+        #   "needs_refinement": false,
+        #   "quality_summary": "Justifica brevemente tu selección en una sola oración concisa."
+        # }}
+        # """
+        # =====================================================================
+
         # --- Prompt mejorado (criterios claros de dominio vs escala) ---
         domain_req = student_prompt.get("values", {}).get("dominio", "general")
         prompt = f"""Eres el Maestro, experto en series temporales con acceso al RAG {Settings.RAG_DATASET_NAME}.
