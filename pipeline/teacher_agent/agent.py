@@ -435,39 +435,43 @@ Analiza el prompt estructurado del Usuario:
         else:
             quality_summary_str = " ---- ".join(quality_summary_list[-5:])
 
-        # --- Prompt mejorado (ejemplo de salida más claro) ---
-        prompt = f"""Eres el Maestro, experto en series temporales (RAG {Settings.RAG_DATASET_NAME}).
-Solicitud del Usuario:
+        # --- Prompt mejorado (criterios claros de dominio vs escala) ---
+        domain_req = student_prompt.get("values", {}).get("dominio", "general")
+        prompt = f"""Eres el Maestro, experto en series temporales con acceso al RAG {Settings.RAG_DATASET_NAME}.
+Objetivo de generación del Usuario:
 {json.dumps(student_prompt, ensure_ascii=False)}
+
+CRITERIOS CLAVE PARA EVALUAR ESTE DOCUMENTO CANDIDATO:
+1. PROPÓSITO: El RAG provee series de referencia del mundo real para transferir dinámicas temporales, morfología y patrones del dominio al modelo Estudiante.
+2. ESCALA NUMÉRICA INDEPENDIENTE: Las series históricas del RAG provienen de diversas fuentes y pueden estar normalizadas o en escalas arbitrarias. La adaptación a la escala requerida por el usuario (ej. 70 lpm o valores constantes) la realizará el Estudiante durante la destilación. ¡NO descartes una serie porque sus valores numéricos o medias no sean exactamente 70!
+3. REGLA DE ACEPTACIÓN: Acepta ("accept_document": true) si la serie pertenece o se asemeja al dominio solicitado ({domain_req}) o áreas afines de sensores/medicina, aportando patrones temporales útiles para el aprendizaje del Estudiante.
+4. REGLA DE RECHAZO: Rechaza ("accept_document": false) ÚNICAMENTE si el dominio es totalmente ajeno (ej. finanzas o clima cuando se pide medicina) o si los datos están vacíos o corruptos.
 
 Ya has aceptado previamente {len(accepted_indexes_global)} documentos.
 Ejemplos de los últimos aceptados (para evaluar diversidad):
 {json.dumps(accepted_summary, ensure_ascii=False) if accepted_summary else 'Ninguno aún'}.
 
-Resumen de calidad de lo aceptado hasta ahora: {quality_summary_str}
+Resumen acumulado de calidad: {quality_summary_str}
 
-Ahora evalúa EXCLUSIVAMENTE este nuevo lote de {len(batch_metadata)} documentos (usa los valores "idx" relativos proporcionados abajo):
+Documento candidato a evaluar (idx relativo 0):
 {json.dumps(batch_metadata, ensure_ascii=False)}
 
-Analiza: similitud semántica, dominio, frecuencia, diversidad con lo ya aceptado y utilidad.
-Puedes aceptar series cortas (<{Settings.MIN_SERIES_LENGTH} puntos) si aportan conocimiento nuevo.
-Si este lote aporta poco o es redundante respecto al resumen anterior, puedes rechazarlo entero (lista vacía).
-
-Devuelve ÚNICAMENTE JSON. Indica con `true` o `false` en "accept_document" si decides aceptar el documento actual para tu investigación:
+Devuelve ÚNICAMENTE un objeto JSON válido con esta estructura:
 {{
   "accept_document": true,
   "needs_refinement": false,
-  "quality_summary": "Justifica brevemente tu selección en una sola oración concisa."
+  "quality_summary": "Justifica brevemente tu decisión en una sola oración concisa."
 }}
 """
         print(f"[{self.__class__.__name__}] Evaluando lote de {len(batch_metadata)} documentos con el LLM (esto puede tardar unos segundos)...")
         print("\n[DEBUG PROMPT MAESTRO]\n" + prompt[:1500] + "\n...\n")
         response = self.llm.generate_json(prompt, max_new_tokens=300)
         
-        accept_doc = response.get("accept_document", False)
-        # Soportamos múltiples formas de decir "sí" por si el modelo alucina un string
-        if str(accept_doc).strip().lower() in ["true", "si", "sí", "yes", "1", "verdadero", "aceptar"]:
-            accept_doc = True
+        raw_accept = response.get("accept_document", False)
+        if isinstance(raw_accept, bool):
+            accept_doc = raw_accept
+        else:
+            accept_doc = str(raw_accept).strip().lower() in ["true", "si", "sí", "yes", "1", "verdadero", "aceptar"]
             
         if accept_doc and len(batch_indices) > 0:
             global_idx = batch_indices[0]

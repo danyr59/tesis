@@ -5,12 +5,24 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import torch
 from datasets import Dataset
+
+# Parche de compatibilidad para evitar el ImportError de torchao (<0.16.0 en Kaggle)
+try:
+  import peft.import_utils
+  peft.import_utils.is_torchao_available = lambda: False
+  try:
+    import peft.tuners.lora.torchao
+    peft.tuners.lora.torchao.is_torchao_available = lambda: False
+  except Exception:
+    pass
+except Exception:
+  pass
+
 from peft import LoraConfig, PeftModel, get_peft_model
-from typing import Optional
 from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments, Trainer
 
 from pipeline.config.settings import Settings
@@ -104,26 +116,8 @@ def run_lora_fine_tune(
   out_dir = Path(Settings.STUDENT_LORA_PATH)
   out_dir.mkdir(parents=True, exist_ok=True)
 
-  # tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
-  # if tokenizer.pad_token is None:
-  #   tokenizer.pad_token = tokenizer.eos_token
-
-  # model = AutoModelForCausalLM.from_pretrained(
-  #   model_path,
-  #   torch_dtype="auto",
-  #   device_map="auto",
-  #   trust_remote_code=True,
-  # )
-
-  # lora_cfg = LoraConfig(
-  #   r=Settings.LORA_R,
-  #   lora_alpha=Settings.LORA_ALPHA,
-  #   lora_dropout=Settings.LORA_DROPOUT,
-  #   bias="none",
-  #   task_type="CAUSAL_LM",
-  #   target_modules=["q_proj", "v_proj", "k_proj", "o_proj"],
-  # )
-  # model = get_peft_model(model, lora_cfg)
+  if tokenizer.pad_token is None:
+    tokenizer.pad_token = tokenizer.eos_token
 
   # Si continuamos desde un adaptador, lo cargamos sobre el modelo base
   if continue_from_adapter is not None:
@@ -131,13 +125,20 @@ def run_lora_fine_tune(
     model = PeftModel.from_pretrained(base_model, continue_from_adapter)
   else:
     lora_cfg = LoraConfig(
-    r=Settings.LORA_R,
-    lora_alpha=Settings.LORA_ALPHA,
-    lora_dropout=Settings.LORA_DROPOUT,
-    bias="none",
-    task_type="CAUSAL_LM",
-    target_modules=["q_proj", "v_proj", "k_proj", "o_proj"],
+      r=Settings.LORA_R,
+      lora_alpha=Settings.LORA_ALPHA,
+      lora_dropout=Settings.LORA_DROPOUT,
+      bias="none",
+      task_type="CAUSAL_LM",
+      target_modules=["q_proj", "v_proj", "k_proj", "o_proj"],
     )
+    try:
+      import peft.import_utils
+      peft.import_utils.is_torchao_available = lambda: False
+      if hasattr(peft.tuners.lora, "torchao"):
+        peft.tuners.lora.torchao.is_torchao_available = lambda: False
+    except Exception:
+      pass
     model = get_peft_model(base_model, lora_cfg)
   model.print_trainable_parameters()
 

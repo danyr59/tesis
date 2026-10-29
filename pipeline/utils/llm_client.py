@@ -267,6 +267,13 @@ class LLMClient:
   
   def load_adapter(self, adapter_path: str) -> None:
         """Carga un adaptador LoRA sobre el modelo base. Si ya había adaptador, lo reemplaza."""
+        try:
+            import peft.import_utils
+            peft.import_utils.is_torchao_available = lambda: False
+            if hasattr(peft.tuners.lora, "torchao"):
+                peft.tuners.lora.torchao.is_torchao_available = lambda: False
+        except Exception:
+            pass
         from peft import PeftModel
 
         # Si el modelo activo no es el base (es decir, ya tenía adaptador), lo liberamos

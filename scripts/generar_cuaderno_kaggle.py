@@ -45,6 +45,8 @@ Este cuaderno implementa el **Protocolo Experimental formal** de la tesis:
     # =========================================================================
     cells.append(md("""## 1. Instalación de Dependencias y Verificación de Hardware"""))
     cells.append(code("""# Instalación de librerías requeridas en el entorno de Kaggle
+# Desinstalar torchao incompatible preinstalado en Kaggle (0.10.0 vs >=0.16.0 requerido por peft)
+!pip uninstall -y torchao
 !pip install -q -U transformers datasets accelerate peft bitsandbytes trl
 !pip install -q sentence-transformers chromadb evaluate
 
