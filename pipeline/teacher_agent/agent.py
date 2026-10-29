@@ -480,7 +480,7 @@ Devuelve ÚNICAMENTE JSON. Indica con `true` o `false` en "accept_document" si d
 
         print(f"[{self.__class__.__name__}] Evaluando lote de {len(batch_metadata)} documentos con el LLM (esto puede tardar unos segundos)...")
         print("\n[DEBUG PROMPT MAESTRO]\n" + prompt[:1500] + "\n...\n")
-        response = self.llm.generate_json(prompt, max_new_tokens=300, temperature=0.5)
+        response = self.llm.generate_json(prompt, max_new_tokens=300, temperature=0.4)
         
         raw_accept = response.get("accept_document", False)
         if isinstance(raw_accept, bool):
