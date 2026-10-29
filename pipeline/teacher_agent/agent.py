@@ -472,11 +472,11 @@ Analiza el prompt estructurado del Usuario:
 Objetivo de generación del Usuario:
 {json.dumps(student_prompt, ensure_ascii=False)}
 
-CRITERIOS CLAVE PARA EVALUAR ESTE DOCUMENTO CANDIDATO:
-1. PROPÓSITO: El RAG provee series de referencia del mundo real para transferir dinámicas temporales, morfología y patrones del dominio al modelo Estudiante.
-2. ESCALA NUMÉRICA INDEPENDIENTE: Las series históricas del RAG provienen de diversas fuentes y pueden estar normalizadas o en escalas arbitrarias. La adaptación a la escala requerida por el usuario (ej. 70 lpm o valores constantes) la realizará el Estudiante durante la destilación. ¡NO descartes una serie porque sus valores numéricos o medias no sean exactamente 70!
-3. REGLA DE ACEPTACIÓN: Acepta ("accept_document": true) si la serie pertenece o se asemeja al dominio solicitado ({domain_req}) o áreas afines de sensores/medicina, aportando patrones temporales útiles para el aprendizaje del Estudiante.
-4. REGLA DE RECHAZO: Rechaza ("accept_document": false) ÚNICAMENTE si el dominio es totalmente ajeno (ej. finanzas o clima cuando se pide medicina) o si los datos están vacíos o corruptos.
+REGLAS CRÍTICAS DE EVALUACIÓN PARA EL DATASET {Settings.RAG_DATASET_NAME}:
+1. NATURALEZA DE LAS SERIES DEL RAG: Este repositorio contiene registros reales de sensores biomédicos, fisiológicos y clínicos (ej. fotopletismografía PPG, electrocardiografía ECG, conteos de monitores o señales normalizadas).
+2. NO ESPERES VALORES DIRECTOS EN LATIDOS POR MINUTO: Las series del dominio '{domain_req}' o 'Healthcare' contienen conteos de sensor o voltajes crudos (con valores como 1080, 780, 37 o valores negativos normalizados). Esto es COMPLETAMENTE NORMAL en señales biomédicas. No son pulsaciones ya calculadas por un algoritmo, sino la señal fisiológica del sensor.
+3. ADAPTACIÓN MATEMÁTICA: El modelo Estudiante se encarga de reescalar y transformar estos patrones a los 70 lpm solicitados. NUNCA rechaces un documento porque sus números no estén entre 60 y 100 o su media no sea 70.
+4. CRITERIO DE ACEPTACIÓN: Si el documento pertenece al dominio 'Healthcare' o '{domain_req}', o contiene una señal fisiológica o de sensor, DEBES ACEPTARLO ("accept_document": true). Solo rechaza ("accept_document": false) si el dominio es ajeno (ej. finanzas, clima, tráfico) o si los datos están vacíos.
 
 Ya has aceptado previamente {len(accepted_indexes_global)} documentos.
 Ejemplos de los últimos aceptados (para evaluar diversidad):
@@ -503,6 +503,14 @@ Devuelve ÚNICAMENTE un objeto JSON válido con esta estructura:
             accept_doc = raw_accept
         else:
             accept_doc = str(raw_accept).strip().lower() in ["true", "si", "sí", "yes", "1", "verdadero", "aceptar"]
+
+        # Rescate automático si el LLM rechazó únicamente por confusión con la escala numérica de lpm
+        meta_domain = str(batch_metadata[0].get("domain", "")).strip().lower() if batch_metadata else ""
+        is_biomedical = any(d in meta_domain for d in ["healthcare", "medicina", "health", "ecg", "ppg", "medical"])
+        rejection_reason = str(response.get("quality_summary", "")).lower()
+        if not accept_doc and is_biomedical and any(k in rejection_reason for k in ["70", "lpm", "0 y 100", "0-100", "latidos", "media es", "negativo"]):
+            print(f"[{self.__class__.__name__}] Rescate de semilla: Documento '{meta_domain}' aceptado (rechazo previo por confusión de escala/voltaje).")
+            accept_doc = True
             
         if accept_doc and len(batch_indices) > 0:
             global_idx = batch_indices[0]

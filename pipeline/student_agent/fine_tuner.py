@@ -154,28 +154,36 @@ def run_lora_fine_tune(
 
   ds = Dataset.from_list(records)
   tokenized = ds.map(tokenize, batched=True, remove_columns=ds.column_names)
- 
 
-  args = TrainingArguments(
-    output_dir=str(out_dir / "checkpoints"),
-    num_train_epochs=hp["epochs"],
-    per_device_train_batch_size=1,  # Forzar a 1 para evitar OOM antes hp["batch_size"],
-    learning_rate=hp["learning_rate"],
-    logging_steps=5,
-    save_strategy="no",
-    report_to=[],
-    gradient_accumulation_steps=4,  # Compensar el batch size 1  antes 2
-    warmup_ratio=0.05,
-    fp16=torch.cuda.is_available(),
-    gradient_checkpointing=True,  # ESTO SALVA MUCHA MEMORIA
-  )
+  train_kwargs = {
+    "output_dir": str(out_dir / "checkpoints"),
+    "num_train_epochs": hp["epochs"],
+    "per_device_train_batch_size": 1,  # Forzar a 1 para evitar OOM
+    "learning_rate": hp["learning_rate"],
+    "logging_steps": 5,
+    "save_strategy": "no",
+    "report_to": [],
+    "gradient_accumulation_steps": 4,  # Compensar el batch size 1
+    "fp16": torch.cuda.is_available(),
+    "gradient_checkpointing": True,  # Ahorro sustancial de VRAM
+  }
+
+  import inspect
+  sig = inspect.signature(TrainingArguments.__init__)
+  safe_kwargs = {k: v for k, v in train_kwargs.items() if k in sig.parameters}
+  args = TrainingArguments(**safe_kwargs)
 
   # Habilitar checkpointing en el modelo base si es posible
   if hasattr(model, "enable_input_require_grads"):
       model.enable_input_require_grads()
+  if hasattr(model, "config") and hasattr(model.config, "use_cache"):
+      model.config.use_cache = False
 
   trainer = Trainer(model=model, args=args, train_dataset=tokenized)
   trainer.train()
+
+  if hasattr(model, "config") and hasattr(model.config, "use_cache"):
+      model.config.use_cache = True
 
   adapter_path = str(out_dir / "adapter")
   model.save_pretrained(adapter_path)
