@@ -340,7 +340,6 @@ class LLMClient:
     if use_sampling:
       gen_kwargs["temperature"] = float(temperature)
       gen_kwargs["top_p"] = 0.9
-      gen_kwargs["repetition_penalty"] = 1.05
 
     with torch.no_grad():
       output_ids = self.model.generate(
@@ -365,18 +364,17 @@ class LLMClient:
         
     return text
 
-  
-
   def generate_json(
     self,
     user_prompt: str,
     system_prompt: Optional[str] = None,
     max_new_tokens: Optional[int] = None,
+    temperature: float = 0.0,
   ) -> dict:
     text = self.generate_text(
       user_prompt=user_prompt,
       system_prompt=system_prompt,
       max_new_tokens=max_new_tokens,
-      temperature=0.0,
+      temperature=temperature,
     )
     return extract_json_from_text(text)

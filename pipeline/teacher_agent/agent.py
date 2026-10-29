@@ -436,67 +436,51 @@ Analiza el prompt estructurado del Usuario:
             quality_summary_str = " ---- ".join(quality_summary_list[-5:])
 
         # =====================================================================
-        # PROMPT ANTERIOR (ORIGINAL SIN GUÍA EXPLÍCITA DE ESCALA):
-        # Mantener aquí comentado para probar cuando el Maestro esté fine-tuneado
-        # previamente en series temporales y conozca la relación dinámica/escala.
+        # PROMPT ORIGINAL ACTIVO (EVALUACIÓN CON TEMPERATURA FLEXIBLE)
         # =====================================================================
-        # prompt = f"""Eres el Maestro, experto en series temporales (RAG {Settings.RAG_DATASET_NAME}).
-        # Solicitud del Usuario:
-        # {json.dumps(student_prompt, ensure_ascii=False)}
-        # 
-        # Ya has aceptado previamente {len(accepted_indexes_global)} documentos.
-        # Ejemplos de los últimos aceptados (para evaluar diversidad):
-        # {json.dumps(accepted_summary, ensure_ascii=False) if accepted_summary else 'Ninguno aún'}.
-        # 
-        # Resumen de calidad de lo aceptado hasta ahora: {quality_summary_str}
-        # 
-        # Ahora evalúa EXCLUSIVAMENTE este nuevo lote de {len(batch_metadata)} documentos (usa los valores "idx" relativos proporcionados abajo):
-        # {json.dumps(batch_metadata, ensure_ascii=False)}
-        # 
-        # Analiza: similitud semántica, dominio, frecuencia, diversidad con lo ya aceptado y utilidad.
-        # Puedes aceptar series cortas (<{Settings.MIN_SERIES_LENGTH} puntos) si aportan conocimiento nuevo.
-        # Si este lote aporta poco o es redundante respecto al resumen anterior, puedes rechazarlo entero (lista vacía).
-        # 
-        # Devuelve ÚNICAMENTE JSON. Indica con `true` o `false` en "accept_document" si decides aceptar el documento actual para tu investigación:
-        # {{
-        #   "accept_document": true,
-        #   "needs_refinement": false,
-        #   "quality_summary": "Justifica brevemente tu selección en una sola oración concisa."
-        # }}
-        # """
-        # =====================================================================
-
-        # --- Prompt mejorado (criterios claros de dominio vs escala) ---
-        domain_req = student_prompt.get("values", {}).get("dominio", "general")
-        prompt = f"""Eres el Maestro, experto en series temporales con acceso al RAG {Settings.RAG_DATASET_NAME}.
-Objetivo de generación del Usuario:
+        prompt = f"""Eres el Maestro, experto en series temporales (RAG {Settings.RAG_DATASET_NAME}).
+Solicitud del Usuario:
 {json.dumps(student_prompt, ensure_ascii=False)}
-
-REGLAS CRÍTICAS DE EVALUACIÓN PARA EL DATASET {Settings.RAG_DATASET_NAME}:
-1. NATURALEZA DE LAS SERIES DEL RAG: Este repositorio contiene registros reales de sensores biomédicos, fisiológicos y clínicos (ej. fotopletismografía PPG, electrocardiografía ECG, conteos de monitores o señales normalizadas).
-2. NO ESPERES VALORES DIRECTOS EN LATIDOS POR MINUTO: Las series del dominio '{domain_req}' o 'Healthcare' contienen conteos de sensor o voltajes crudos (con valores como 1080, 780, 37 o valores negativos normalizados). Esto es COMPLETAMENTE NORMAL en señales biomédicas. No son pulsaciones ya calculadas por un algoritmo, sino la señal fisiológica del sensor.
-3. ADAPTACIÓN MATEMÁTICA: El modelo Estudiante se encarga de reescalar y transformar estos patrones a los 70 lpm solicitados. NUNCA rechaces un documento porque sus números no estén entre 60 y 100 o su media no sea 70.
-4. CRITERIO DE ACEPTACIÓN: Si el documento pertenece al dominio 'Healthcare' o '{domain_req}', o contiene una señal fisiológica o de sensor, DEBES ACEPTARLO ("accept_document": true). Solo rechaza ("accept_document": false) si el dominio es ajeno (ej. finanzas, clima, tráfico) o si los datos están vacíos.
 
 Ya has aceptado previamente {len(accepted_indexes_global)} documentos.
 Ejemplos de los últimos aceptados (para evaluar diversidad):
 {json.dumps(accepted_summary, ensure_ascii=False) if accepted_summary else 'Ninguno aún'}.
 
-Resumen acumulado de calidad: {quality_summary_str}
+Resumen de calidad de lo aceptado hasta ahora: {quality_summary_str}
 
-Documento candidato a evaluar (idx relativo 0):
+Ahora evalúa EXCLUSIVAMENTE este nuevo lote de {len(batch_metadata)} documentos (usa los valores "idx" relativos proporcionados abajo):
 {json.dumps(batch_metadata, ensure_ascii=False)}
 
-Devuelve ÚNICAMENTE un objeto JSON válido con esta estructura:
+Analiza: similitud semántica, dominio, frecuencia, diversidad con lo ya aceptado y utilidad.
+Puedes aceptar series cortas (<{Settings.MIN_SERIES_LENGTH} puntos) si aportan conocimiento nuevo.
+Si este lote aporta poco o es redundante respecto al resumen anterior, puedes rechazarlo entero (lista vacía).
+
+Devuelve ÚNICAMENTE JSON. Indica con `true` o `false` en "accept_document" si decides aceptar el documento actual para tu investigación:
 {{
   "accept_document": true,
   "needs_refinement": false,
-  "quality_summary": "Justifica brevemente tu decisión en una sola oración concisa."
+  "quality_summary": "Justifica brevemente tu selección en una sola oración concisa."
 }}
 """
+
+        # =====================================================================
+        # PROMPT ALTERNATIVO CON GUÍA EXPLÍCITA DE ESCALAS/SENSORES (GUARDADO):
+        # =====================================================================
+        # domain_req = student_prompt.get("values", {}).get("dominio", "general")
+        # prompt_guiado = f"""Eres el Maestro, experto en series temporales con acceso al RAG {Settings.RAG_DATASET_NAME}.
+        # Objetivo de generación del Usuario:
+        # {json.dumps(student_prompt, ensure_ascii=False)}
+        # 
+        # REGLAS CRÍTICAS DE EVALUACIÓN PARA EL DATASET {Settings.RAG_DATASET_NAME}:
+        # 1. NATURALEZA DE LAS SERIES DEL RAG: Este repositorio contiene registros reales de sensores biomédicos, fisiológicos y clínicos.
+        # 2. NO ESPERES VALORES DIRECTOS EN LATIDOS POR MINUTO: Las series contienen conteos de sensor o voltajes crudos (1080, 780, 37 o normalizados).
+        # 3. ADAPTACIÓN MATEMÁTICA: El modelo Estudiante se encarga de reescalar estos patrones a los 70 lpm solicitados.
+        # 4. CRITERIO DE ACEPTACIÓN: Si el documento pertenece al dominio 'Healthcare' o similar, DEBES ACEPTARLO ("accept_document": true).
+        # """
+
         print(f"[{self.__class__.__name__}] Evaluando lote de {len(batch_metadata)} documentos con el LLM (esto puede tardar unos segundos)...")
         print("\n[DEBUG PROMPT MAESTRO]\n" + prompt[:1500] + "\n...\n")
-        response = self.llm.generate_json(prompt, max_new_tokens=300)
+        response = self.llm.generate_json(prompt, max_new_tokens=300, temperature=0.7)
         
         raw_accept = response.get("accept_document", False)
         if isinstance(raw_accept, bool):
@@ -504,13 +488,13 @@ Devuelve ÚNICAMENTE un objeto JSON válido con esta estructura:
         else:
             accept_doc = str(raw_accept).strip().lower() in ["true", "si", "sí", "yes", "1", "verdadero", "aceptar"]
 
-        # Rescate automático si el LLM rechazó únicamente por confusión con la escala numérica de lpm
-        meta_domain = str(batch_metadata[0].get("domain", "")).strip().lower() if batch_metadata else ""
-        is_biomedical = any(d in meta_domain for d in ["healthcare", "medicina", "health", "ecg", "ppg", "medical"])
-        rejection_reason = str(response.get("quality_summary", "")).lower()
-        if not accept_doc and is_biomedical and any(k in rejection_reason for k in ["70", "lpm", "0 y 100", "0-100", "latidos", "media es", "negativo"]):
-            print(f"[{self.__class__.__name__}] Rescate de semilla: Documento '{meta_domain}' aceptado (rechazo previo por confusión de escala/voltaje).")
-            accept_doc = True
+        # Rescate opcional (comentado para evaluar la decisión estocástica pura del Maestro con T=0.7)
+        # meta_domain = str(batch_metadata[0].get("domain", "")).strip().lower() if batch_metadata else ""
+        # is_biomedical = any(d in meta_domain for d in ["healthcare", "medicina", "health", "ecg", "ppg", "medical"])
+        # rejection_reason = str(response.get("quality_summary", "")).lower()
+        # if not accept_doc and is_biomedical and any(k in rejection_reason for k in ["70", "lpm", "0 y 100", "0-100", "latidos", "media es", "negativo"]):
+        #     print(f"[{self.__class__.__name__}] Rescate de semilla: Documento '{meta_domain}' aceptado.")
+        #     accept_doc = True
             
         if accept_doc and len(batch_indices) > 0:
             global_idx = batch_indices[0]
