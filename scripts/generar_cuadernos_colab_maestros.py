@@ -171,25 +171,45 @@ if not token_encontrado:
         login()"""))
 
     # =========================================================================
-    # CELDA 6: DESCARGA DEL DATASET
+    # CELDA 6: LOCALIZACIÓN O SUBIDA DEL DATASET
     # =========================================================================
-    cells.append(md("""## 5. Obtención del Dataset de Series Temporales (`TS_Dataset.jsonl`)"""))
+    cells.append(md("""## 5. Localización o Subida del Dataset (`TS_Dataset.jsonl`)"""))
     cells.append(code("""from pathlib import Path
 
-# Clonamos el repositorio para obtener data/TS_Dataset.jsonl de forma rápida y automática
-REPO_DIR = Path("/content/tesis_antes")
-if not REPO_DIR.exists():
-    print("📥 Clonando repositorio desde GitHub para extraer el dataset...")
-    !git clone --depth 1 -b kaggle_experimentos https://github.com/danyr59/tesis_antes.git /content/tesis_antes
+# Rutas donde buscar el dataset TS_Dataset.jsonl en Colab
+posibles_rutas = [
+    Path("/content/TS_Dataset.jsonl"),
+    Path("/content/drive/MyDrive/TS_Dataset.jsonl"),
+    Path("/content/time_series_generation.jsonl"),
+    Path("/content/drive/MyDrive/time_series_generation.jsonl"),
+]
 
-DATASET_PATH = REPO_DIR / "data" / "TS_Dataset.jsonl"
-if not DATASET_PATH.exists():
-    DATASET_PATH = REPO_DIR / "data" / "time_series_generation.jsonl"
+DATASET_PATH = None
+for p in posibles_rutas:
+    if p.exists():
+        DATASET_PATH = p
+        break
 
-if not DATASET_PATH.exists():
-    raise FileNotFoundError(f"❌ No se encontró el dataset en {DATASET_PATH}. Verifica la conexión.")
+# Si aún no se ha colocado en /content/, abrir selector interactivo de archivos
+if DATASET_PATH is None:
+    print("📤 No se detectó 'TS_Dataset.jsonl' en /content/.")
+    print("   Puedes arrastrarlo al panel de archivos a la izquierda (📁), o subirlo ahora:")
+    try:
+        from google.colab import files
+        subidos = files.upload()
+        for nombre in subidos.keys():
+            if nombre.endswith(".jsonl"):
+                DATASET_PATH = Path(f"/content/{nombre}")
+                break
+    except Exception as e:
+        print(f"Aviso en selector: {e}")
 
-print(f"✅ Dataset listo para entrenamiento: {DATASET_PATH} ({DATASET_PATH.stat().st_size / (1024*1024):.2f} MB)")"""))
+if DATASET_PATH is None or not DATASET_PATH.exists():
+    raise FileNotFoundError(
+        "❌ No se encontró 'TS_Dataset.jsonl' en /content/. Arrastra el archivo 'TS_Dataset.jsonl' al panel izquierdo de Google Colab (icono de carpeta 📁) y vuelve a ejecutar esta celda."
+    )
+
+print(f"✅ Dataset localizado y listo: {DATASET_PATH} ({DATASET_PATH.stat().st_size / (1024*1024):.2f} MB)")"""))
 
     # =========================================================================
     # CELDA 7: ESTRUCTURACIÓN DE DATOS
@@ -228,11 +248,11 @@ def formatear_instruccion(item):
         
         texto = (
             "### Instrucción: Eres un Maestro experto en series temporales. "
-            "Analiza el comportamiento numérico de la serie, su dinámica y sus características temporales.\n\n"
-            f"### Metadatos: {meta_str}\n"
-            f"### Serie Numérica: [{series_str}]\n\n"
-            "### Análisis de Características Temporales:\n"
-            f"{item.get('description', '')}\n"
+            "Analiza el comportamiento numérico de la serie, su dinámica y sus características temporales.\\n\\n"
+            f"### Metadatos: {meta_str}\\n"
+            f"### Serie Numérica: [{series_str}]\\n\\n"
+            "### Análisis de Características Temporales:\\n"
+            f"{item.get('description', '')}\\n"
             f"Detalles: {item.get('characteristics', '')}"
         )
         return {"text": texto}
@@ -241,8 +261,8 @@ def formatear_instruccion(item):
         dominio = meta.get("original_domain", meta.get("domain", "General"))
         tarea = meta.get("task_type", "análisis")
         texto = (
-            f"### Instrucción: Dominio: {dominio}. Tarea: {tarea}. {item['input']}\n\n"
-            f"### Respuesta del Maestro Experto:\n{item['output']}"
+            f"### Instrucción: Dominio: {dominio}. Tarea: {tarea}. {item['input']}\\n\\n"
+            f"### Respuesta del Maestro Experto:\\n{item['output']}"
         )
         return {"text": texto}
     else:
@@ -251,7 +271,7 @@ def formatear_instruccion(item):
 ds_estructurado = Dataset.from_list([formatear_instruccion(x) for x in raw_data])
 print("📝 Muestra del formato instructivo:")
 print("-" * 60)
-print(ds_estructurado[0]["text"][:500] + "\n...")
+print(ds_estructurado[0]["text"][:500] + "\\n...")
 print("-" * 60)"""))
 
     # =========================================================================
@@ -405,10 +425,10 @@ serie_str = ", ".join([str(x) for x in serie_test])
 
 prompt_test = (
     "### Instrucción: Eres un Maestro experto en series temporales. "
-    "Analiza el comportamiento numérico de la serie, su dinámica y sus características temporales.\n\n"
-    f"### Metadatos: unidades: lpm, frecuencia: minuto, rango: [2024-01-01 00:00 al 2024-01-01 00:10]\n"
-    f"### Serie Numérica: [{serie_str}]\n\n"
-    "### Análisis de Características Temporales:\n"
+    "Analiza el comportamiento numérico de la serie, su dinámica y sus características temporales.\\n\\n"
+    f"### Metadatos: unidades: lpm, frecuencia: minuto, rango: [2024-01-01 00:00 al 2024-01-01 00:10]\\n"
+    f"### Serie Numérica: [{serie_str}]\\n\\n"
+    "### Análisis de Características Temporales:\\n"
 )
 
 inputs = tokenizer(prompt_test, return_tensors="pt").to(peft_model.device)
@@ -480,3 +500,4 @@ if __name__ == "__main__":
             with open(r, "w", encoding="utf-8") as f:
                 json.dump(nb, f, indent=2, ensure_ascii=False)
             print(f"✅ Cuaderno generado: {r}")
+
