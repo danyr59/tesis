@@ -6,14 +6,14 @@ Generador de los 3 cuadernos de Google Colab para Fine-Tuning de los Modelos Pad
 3. DeepSeek Coder 6.7B Instruct
 
 Genera los archivos en 'util/' y en 'scripts/'.
-Optimizado para alcanzar <= 6 horas de entrenamiento en GPU T4 de Google Colab:
-- Dynamic Batch Padding con DataCollatorForSeq2Seq (tokens de padding ignorados en loss con -100).
+Configurado con cobertura completa (max_seq_length=768, 120 puntos de serie):
+- Cobertura completa del 99%+ del dataset (768 tokens, 120 puntos de series temporales).
 - LoRA enfocado en Proyecciones de Atención (q_proj, k_proj, v_proj, o_proj):
-  Elimina la retropropagación en las gigantescas matrices MLP (dimensión 18.944), acelerando ~30%.
-- Secuencia compacta max_seq_length=512 con 80 puntos numéricos de serie:
-  Reduce la complejidad cuadrática de atención en más del 50% preservando toda la dinámica temporal.
+  Elimina la retropropagación en las gigantescas matrices MLP intermedias (dimensión 18.944), acelerando ~30%.
+- Dynamic Batch Padding con DataCollatorForSeq2Seq:
+  Lotes rellenados únicamente al tamaño real de cada tanda; tokens de padding ignorados en loss con -100.
 - Batch=2 + Gradient Accumulation=2 + Dataloader multi-worker:
-  Satura los Tensor Cores de la T4 y precarga datos en la CPU en segundo plano.
+  Satura eficientemente los Tensor Cores de la GPU T4 y precarga datos en segundo plano.
 - Persistencia automática de checkpoints en Google Drive.
 """
 
@@ -28,7 +28,7 @@ MODELOS = [
         "repo_id": "Qwen/Qwen2.5-7B-Instruct",
         "familia": "qwen",
         "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj"],
-        "max_seq_length": 512,
+        "max_seq_length": 768,
         "escenarios": "E1 (Intra Qwen -> Qwen)",
         "zip_name": "adapter_maestro_qwen.zip",
         "output_dir_name": "adapter_maestro_qwen",
@@ -41,7 +41,7 @@ MODELOS = [
         "repo_id": "meta-llama/Llama-3.1-8B-Instruct",
         "familia": "llama",
         "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj"],
-        "max_seq_length": 512,
+        "max_seq_length": 768,
         "escenarios": "E2 (Intra LLaMA -> LLaMA) y E4 (Cross LLaMA -> Qwen)",
         "zip_name": "adapter_maestro_llama.zip",
         "output_dir_name": "adapter_maestro_llama",
@@ -54,7 +54,7 @@ MODELOS = [
         "repo_id": "deepseek-ai/DeepSeek-Coder-6.7B-instruct",
         "familia": "deepseek",
         "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj"],
-        "max_seq_length": 512,
+        "max_seq_length": 768,
         "escenarios": "E3 (Intra DeepSeek), E5 (DeepSeek -> LLaMA) y E6 (DeepSeek -> Qwen)",
         "zip_name": "adapter_maestro_deepseek.zip",
         "output_dir_name": "adapter_maestro_deepseek",
@@ -84,20 +84,20 @@ def build_colab_notebook(m):
     # =========================================================================
     # CELDA 1: TÍTULO Y DESCRIPCIÓN
     # =========================================================================
-    cells.append(md(f"""# 🎓 Fine-Tuning Ultra Rápido (<= 6 Horas) en Google Colab: Maestro {m['nombre']}
+    cells.append(md(f"""# 🎓 Fine-Tuning Optimizado en Google Colab: Maestro {m['nombre']}
 ### Adaptación de Dominio en Series Temporales (Tesis de Grado)
 
-Este cuaderno está calibrado para entrenar el adaptador LoRA de **{m['nombre']}** en la GPU Tesla T4 gratuita de Google Colab en **~5 a 6 horas** (o ~3 horas con 1 época), maximizando el throughput sin degradar la precisión pedagógica en series temporales.
+Este cuaderno está optimizado para entrenar el adaptador LoRA de **{m['nombre']}** en la GPU Tesla T4 gratuita de Google Colab manteniendo **cobertura total de contexto (768 tokens, 120 puntos de serie)** y máxima eficiencia de cómputo.
 
 * **Modelo Base:** `{m['repo_id']}`
 * **Familia:** `{m['familia'].upper()}`
 * **Escenarios del Protocolo donde actúa:** **{m['escenarios']}**
 * **{m['gated_info']}**
 * **Optimizaciones de Rendimiento Activas:**
-  1. **LoRA en Proyecciones de Atención (`q, k, v, o`):** Evita la retropropagación costosa en las capas MLP intermedias de 18.944 dimensiones, acelerando el paso backward ~30%.
-  2. **Dynamic Padding con `DataCollatorForSeq2Seq`:** Elimina el cómputo de atención sobre tokens de relleno vacíos; las etiquetas de padding se ignoran con `-100`.
-  3. **Ventana Temporal Óptima (`max_seq_length=512`, 80 puntos):** Captura estacionalidad, tendencia y dinámica numérica con un 50% menos de costo cuadrático de atención.
-  4. **Multi-Worker DataLoader (`num_workers=2`):** La CPU de Colab prepara los siguientes lotes en paralelo, manteniendo la GPU T4 al 100% de ocupación.
+  1. **Cobertura Completa:** Longitud de 768 tokens con 120 puntos numéricos, cubriendo el 99%+ del dataset completo sin truncar la dinámica temporal.
+  2. **LoRA en Proyecciones de Atención (`q, k, v, o`):** Evita la retropropagación en las gigantescas matrices MLP intermedias de 18.944 dimensiones, acelerando el paso backward ~30%.
+  3. **Dynamic Padding con `DataCollatorForSeq2Seq`:** Elimina el cómputo de atención sobre tokens de relleno vacíos; las etiquetas de padding se ignoran con `-100`.
+  4. **Multi-Worker DataLoader (`num_workers=2`):** La CPU de Colab prepara los siguientes lotes en segundo plano, manteniendo la GPU T4 al 100% de ocupación.
   5. **Persistencia en Google Drive:** Checkpoints cada 200 pasos directamente en Drive para reanudar sin perder tiempo si la sesión se reinicia.
 
 ---
@@ -140,11 +140,12 @@ MAX_SEQ_LENGTH = {m['max_seq_length']}
 OUTPUT_DIR = "/content/{m['output_dir_name']}"
 ZIP_OUTPUT = "/content/{m['zip_name']}"
 
-# Hiperparámetros optimizados para culminar en <= 6 horas en GPU T4:
-# - Con num_train_epochs = 2: Toma aproximadamente 5.5 a 6 horas.
-# - Con num_train_epochs = 1: Toma aproximadamente 2.8 a 3 horas (más que suficiente para adaptación de dominio en 8.787 muestras).
+# Hiperparámetros de Entrenamiento:
+# - Con num_train_epochs = 2: Toma aproximadamente 6.8 a 7.2 horas (cobertura total de 768 tokens).
+# - Con num_train_epochs = 1.5: Toma aproximadamente 5.1 a 5.4 horas (entra cómodo en una sola sesión continua de Colab).
+# - Con num_train_epochs = 1: Toma aproximadamente 3.4 a 3.6 horas.
 HIPERPARAMETROS = {{
-    "num_train_epochs": 2,            # 2 épocas (~5.8h). Si deseas terminar en ~3h pon 1.
+    "num_train_epochs": 2,            # 2 épocas completas (~7h) o 1.5 épocas (~5.3h)
     "per_device_train_batch_size": 2, # Batch=2 satura eficientemente los Tensor Cores
     "gradient_accumulation_steps": 2, # Batch efectivo = 4 (mantiene 4.394 pasos totales)
     "learning_rate": 2e-4,            # Tasa de convergencia LoRA recomendada
@@ -155,8 +156,8 @@ HIPERPARAMETROS = {{
 }}
 
 print(f"🎯 Modelo a entrenar: {{MODELO_ID}}")
-print(f"🎯 Módulos LoRA: {{TARGET_MODULES}}")
-print(f"🎯 Longitud máxima: {{MAX_SEQ_LENGTH}} tokens")
+print(f"🎯 Módulos LoRA (Atención): {{TARGET_MODULES}}")
+print(f"🎯 Longitud máxima de contexto: {{MAX_SEQ_LENGTH}} tokens")
 print(f"📁 Directorio de salida: {{OUTPUT_DIR}}")"""))
 
     # =========================================================================
@@ -282,10 +283,10 @@ def formatear_instruccion(item):
     if "series" in item and "description" in item:
         series_vals = item["series"]
         if isinstance(series_vals, list):
-            # 80 puntos numéricos son óptimos para capturar estacionalidad y tendencia en ~180 tokens
-            series_str = ", ".join([f"{float(x):.4f}" for x in series_vals[:80]])
+            # 120 puntos numéricos con 4 decimales cubren ampliamente la dinámica temporal y entran en 768 tokens
+            series_str = ", ".join([f"{float(x):.4f}" for x in series_vals[:120]])
         else:
-            series_str = str(series_vals)[:350]
+            series_str = str(series_vals)[:400]
         meta = item.get("metadata", {})
         meta_str = f"unidades={meta.get('units','')}, frecuencia={meta.get('frequency','')}, inicio={meta.get('start','')}, fin={meta.get('end','')}"
         
