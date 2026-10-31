@@ -126,16 +126,16 @@ MAX_SEQ_LENGTH = {m['max_seq_length']}
 OUTPUT_DIR = "/content/{m['output_dir_name']}"
 ZIP_OUTPUT = "/content/{m['zip_name']}"
 
-# Hiperparámetros óptimos para QLoRA en GPU T4
+# Hiperparámetros óptimos para QLoRA en GPU T4 (idénticos a tu cuaderno original)
 HIPERPARAMETROS = {{
     "num_train_epochs": 2,            # 2 épocas completas
     "per_device_train_batch_size": 1, # 1 por GPU para máxima estabilidad de VRAM
-    "gradient_accumulation_steps": 8, # Batch efectivo = 1 * 8 = 8
+    "gradient_accumulation_steps": 4, # Batch efectivo = 4 (produce exactamente 4.394 pasos)
     "learning_rate": 2e-4,            # Tasa óptima de convergencia LoRA
     "lora_r": 16,                     # Rango de adaptación LoRA
     "lora_alpha": 32,                 # alpha = 2 * r
     "lora_dropout": 0.05,
-    "max_samples": None               # None = todo el dataset, o un entero (ej. 5000) para pruebas rápidas
+    "max_samples": None               # None = todo el dataset (8.787 ejemplos)
 }}
 
 print(f"🎯 Modelo a entrenar: {{MODELO_ID}}")
@@ -365,10 +365,12 @@ training_args = TrainingArguments(
     num_train_epochs=HIPERPARAMETROS["num_train_epochs"],
     learning_rate=HIPERPARAMETROS["learning_rate"],
     logging_steps=10,
+    save_steps=200,
     save_strategy="epoch",
-    save_total_limit=1,
+    save_total_limit=2,
     fp16=torch.cuda.is_available(),
-    warmup_steps=20,
+    max_grad_norm=0.3,
+    warmup_steps=10,
     lr_scheduler_type="cosine",
     optim="paged_adamw_8bit",
     report_to="none",
