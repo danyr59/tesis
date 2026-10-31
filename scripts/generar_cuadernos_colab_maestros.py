@@ -140,14 +140,12 @@ MAX_SEQ_LENGTH = {m['max_seq_length']}
 OUTPUT_DIR = "/content/{m['output_dir_name']}"
 ZIP_OUTPUT = "/content/{m['zip_name']}"
 
-# Hiperparámetros de Entrenamiento:
-# - Con num_train_epochs = 2: Toma aproximadamente 6.8 a 7.2 horas (cobertura total de 768 tokens).
-# - Con num_train_epochs = 1.5: Toma aproximadamente 5.1 a 5.4 horas (entra cómodo en una sola sesión continua de Colab).
-# - Con num_train_epochs = 1: Toma aproximadamente 3.4 a 3.6 horas.
+# Hiperparámetros de Entrenamiento (Opción 2: 1.5 Épocas para <= 6 Horas):
+# - Con num_train_epochs = 1.5: Toma aproximadamente 5.1 a 5.4 horas en GPU T4 (cobertura total de 768 tokens y 120 puntos).
 HIPERPARAMETROS = {{
-    "num_train_epochs": 2,            # 2 épocas completas (~7h) o 1.5 épocas (~5.3h)
+    "num_train_epochs": 1.5,          # 1.5 épocas (~5.3 horas, culmina dentro de las 6h)
     "per_device_train_batch_size": 2, # Batch=2 satura eficientemente los Tensor Cores
-    "gradient_accumulation_steps": 2, # Batch efectivo = 4 (mantiene 4.394 pasos totales)
+    "gradient_accumulation_steps": 2, # Batch efectivo = 4 (2.128 pasos totales)
     "learning_rate": 2e-4,            # Tasa de convergencia LoRA recomendada
     "lora_r": 16,                     # Rango de adaptación LoRA
     "lora_alpha": 32,                 # alpha = 2 * r
