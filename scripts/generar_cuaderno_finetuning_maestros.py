@@ -452,3 +452,4 @@ if __name__ == "__main__":
         with open(ruta, "w", encoding="utf-8") as f:
             json.dump(nb, f, indent=2, ensure_ascii=False)
         print(f"✅ Cuaderno generado exitosamente en: {ruta}")
+

@@ -334,6 +334,36 @@ purgar_memoria("Estado inicial")"""))
     os.environ["STUDENT_MODEL_ID"] = esc_info["student_id"]
     os.environ["STUDENT_MODEL_PATH"] = esc_info["student_id"]
     
+    # Detección y vinculación automática de adaptadores para el Maestro (si fueron subidos a Kaggle)
+    familia_maestro = "qwen" if "qwen" in esc_info["teacher_id"].lower() else "llama" if "llama" in esc_info["teacher_id"].lower() else "deepseek"
+    adapter_found = None
+    
+    # 1. Buscar en /kaggle/input carpetas de adaptadores ya descomprimidas
+    for root, dirs, files in os.walk("/kaggle/input"):
+        if "adapter_config.json" in files:
+            root_lower = root.lower()
+            if familia_maestro in root_lower or "teacher" in root_lower or "maestro" in root_lower:
+                adapter_found = root
+                break
+                
+    # 2. Si vino empaquetado en archivo .zip, descomprimirlo en /kaggle/working/adapters
+    if not adapter_found:
+        for z in Path("/kaggle/input").rglob("*.zip"):
+            z_lower = z.name.lower()
+            if (familia_maestro in z_lower and "adapter" in z_lower) or ("maestro" in z_lower and familia_maestro in z_lower):
+                target_unzip = BASE_DIR / "adapters" / f"adapter_maestro_{familia_maestro}"
+                target_unzip.mkdir(parents=True, exist_ok=True)
+                shutil.unpack_archive(str(z), str(target_unzip))
+                adapter_found = str(target_unzip)
+                break
+                
+    if adapter_found:
+        os.environ["TEACHER_MODEL_PATH_ADAPTERS"] = str(adapter_found)
+        print(f"🎯 [Maestro Adapter] Adaptador LoRA detectado y vinculado: {adapter_found}")
+    else:
+        os.environ.pop("TEACHER_MODEL_PATH_ADAPTERS", None)
+        print(f"ℹ️ [Maestro Base] Sin adaptador LoRA previo para {familia_maestro.upper()}. Usando modelo base con RAG.")
+    
     # -------------------------------------------------------------------------
     # FASE 1: NACE EL MAESTRO (Razonamiento y RAG)
     # -------------------------------------------------------------------------
