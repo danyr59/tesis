@@ -537,3 +537,4 @@ if __name__ == "__main__":
             with open(r, "w", encoding="utf-8") as f:
                 json.dump(nb, f, indent=2, ensure_ascii=False)
             print(f"✅ Cuaderno Kaggle generado: {r}")
+
