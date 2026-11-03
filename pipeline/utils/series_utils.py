@@ -3,9 +3,78 @@
 from __future__ import annotations
 
 import json
+import re
 from typing import Any, Dict, List, Optional
 
 import numpy as np
+
+
+def normalize_frequency(freq: Optional[str]) -> str:
+  """Normaliza descripciones de frecuencia en lenguaje natural (español o inglés)
+  o abreviaciones hacia alias de frecuencia compatibles con Pandas.
+  
+  Soporta múltiplos (ej. '5 minutos' -> '5min', '30 segundos' -> '30s', '2 horas' -> '2h').
+  Si no se reconoce, devuelve 'D' (diario) por defecto.
+  """
+  if not freq or not isinstance(freq, str):
+    return "D"
+
+  clean = freq.strip().lower()
+  clean = re.sub(r"^(por|cada|every|per|a)\s+", "", clean)
+  clean = re.sub(r"\s+", " ", clean).strip()
+
+  frequency_map = {
+      # Segundos -> 's'
+      "s": "s", "sec": "s", "secs": "s", "second": "s", "seconds": "s", "secondly": "s",
+      "seg": "s", "segs": "s", "segundo": "s", "segundos": "s", "segundal": "s",
+      # Minutos -> 'min'
+      "min": "min", "mins": "min", "minute": "min", "minutes": "min", "minutely": "min",
+      "minuto": "min", "minutos": "min", "minutal": "min", "minutario": "min", "t": "min",
+      # Horas -> 'h'
+      "h": "h", "hr": "h", "hrs": "h", "hour": "h", "hours": "h", "hourly": "h",
+      "hora": "h", "horas": "h", "horario": "h", "horaria": "h", "horarios": "h", "horarias": "h",
+      # Días laborales / hábiles -> 'B'
+      "b": "B", "bday": "B", "bdays": "B", "business day": "B", "business days": "B",
+      "weekday": "B", "weekdays": "B", "laboral": "B", "laborales": "B", "habil": "B",
+      "habiles": "B", "hábil": "B", "hábiles": "B", "dia laboral": "B", "dias laborales": "B",
+      "dia habil": "B", "dias habiles": "B", "día hábil": "B", "días hábiles": "B",
+      # Días calendario -> 'D'
+      "d": "D", "day": "D", "days": "D", "daily": "D",
+      "dia": "D", "dias": "D", "día": "D", "días": "D", "diario": "D", "diaria": "D",
+      "diarios": "D", "diarias": "D",
+      # Semanas -> 'W'
+      "w": "W", "wk": "W", "wks": "W", "week": "W", "weeks": "W", "weekly": "W",
+      "sem": "W", "semana": "W", "semanas": "W", "semanal": "W", "semanales": "W",
+      # Meses -> 'MS' (Month Start)
+      "m": "MS", "mo": "MS", "mos": "MS", "month": "MS", "months": "MS", "monthly": "MS",
+      "mes": "MS", "meses": "MS", "mensual": "MS", "mensuales": "MS",
+      # Trimestres -> 'QS'
+      "q": "QS", "quarter": "QS", "quarters": "QS", "quarterly": "QS",
+      "trimestre": "QS", "trimestres": "QS", "trimestral": "QS", "trimestrales": "QS",
+      # Años -> 'YS' (Year Start)
+      "y": "YS", "yr": "YS", "yrs": "YS", "year": "YS", "years": "YS", "yearly": "YS",
+      "annual": "YS", "annually": "YS", "a": "YS", "año": "YS", "años": "YS",
+      "anio": "YS", "anios": "YS", "anual": "YS", "anuales": "YS",
+  }
+
+  if clean in frequency_map:
+    return frequency_map[clean]
+
+  # Extraer multiplicador numérico si existe
+  m_num = re.match(r"^(\d+)\s*([a-zA-Záéíóúñ\s]+)$", clean)
+  if m_num:
+    mult = m_num.group(1)
+    u = m_num.group(2).strip()
+    if u in frequency_map:
+      return f"{mult}{frequency_map[u]}"
+
+  # Verificar si ya es un código de Pandas reconocido
+  valid_pandas_codes = {"s", "min", "h", "D", "B", "W", "MS", "ME", "QS", "QE", "YS", "YE"}
+  for code in valid_pandas_codes:
+    if freq.strip() == code:
+      return code
+
+  return "D"
 
 
 def parser_search_query(value: str) -> str:

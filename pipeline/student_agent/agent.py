@@ -16,6 +16,7 @@ from pipeline.utils.llm_client import LLMClient, extract_json_from_text
 from pipeline.utils.series_utils import (
     extend_series,
     extract_numeric_series,
+    normalize_frequency,
     seeds_statistics,
 )
 from pipeline.config.profiles import get_profile
@@ -485,13 +486,17 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
         rows = []
         
         start_date = prompt_info.get("values", {}).get("start_date", "2024-01-01")
-        freq = prompt_info.get("values", {}).get("frecuencia", "D")
+        freq_raw = prompt_info.get("values", {}).get("frecuencia", "D")
+        freq = normalize_frequency(freq_raw)
         
         max_len = max([self._series_len(s, tipo_serie) for s in series_list] + [1])
         try:
             date_range = pd.date_range(start=start_date, periods=max_len, freq=freq)
         except Exception:
-            date_range = pd.date_range(start="2024-01-01", periods=max_len, freq="D")
+            try:
+                date_range = pd.date_range(start=start_date, periods=max_len, freq="D")
+            except Exception:
+                date_range = pd.date_range(start="2024-01-01", periods=max_len, freq="D")
 
         for series_idx, series_data in enumerate(series_list):
             series_id = series_idx + 1
