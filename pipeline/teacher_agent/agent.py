@@ -351,7 +351,12 @@ Analiza el prompt estructurado del Usuario:
           if not series or not isinstance(series, list):
               return {"raw_preview": ts_str[:100] + "..."}
               
-          floats = [float(x) for x in series]
+          floats = []
+          for x in series:
+              try:
+                  floats.append(float(x))
+              except (ValueError, TypeError):
+                  continue
           if not floats:
               return {"raw_preview": "empty"}
               

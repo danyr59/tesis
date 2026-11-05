@@ -279,7 +279,7 @@ FORZAR_REPETICION = False
 # -------------------------------------------------------------------------
 os.environ["SYNTHETIC_POINTS_PER_SERIES"] = "400"  # Puntos por serie (ej: 400, 500, 1000)
 os.environ["SYNTHETIC_NUM_SERIES"] = "20"          # Cantidad de series (ej: 15, 20, 30)
-os.environ["RAG_TOP_K"] = "15"                     # Semillas extraídas del RAG por consulta
+os.environ["RAG_TOP_K"] = "50"                     # Semillas extraídas del RAG por consulta (evaluadas y filtradas por el Maestro)
 
 print(f"🎯 Escenario activo para hoy: {ESCENARIO_SELECCIONADO} ({ESCENARIOS[ESCENARIO_SELECCIONADO]['nombre']})")
 print(f"📊 Perfiles a ejecutar: {PERFILES_A_CORRER}")

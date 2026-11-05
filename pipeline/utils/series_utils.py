@@ -119,8 +119,15 @@ def series_length_from_metadata(meta: Dict[str, Any]) -> int:
 def extract_numeric_series(seed_entry: Dict[str, Any]) -> List[float]:
   """Extrae una serie numérica representativa de una semilla RAG."""
   raw = seed_entry.get("series")
-  if isinstance(raw, list) and raw and isinstance(raw[0], (int, float)):
-    return [float(x) for x in raw]
+  if isinstance(raw, list) and raw:
+    nums = []
+    for x in raw:
+      try:
+        nums.append(float(x))
+      except (TypeError, ValueError):
+        continue
+    if len(nums) >= 3:
+      return nums
 
   meta = seed_entry.get("metadata", {})
   ts = parse_time_series_metadata(seed_entry.get("series"))
