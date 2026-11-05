@@ -279,23 +279,31 @@ os.environ["HF_TOKEN"] = os.getenv("HF_TOKEN", "hf_StPXMlYNfGpscokICAnFGmffPpYun
 os.environ["GITHUB_TOKEN"] = os.getenv("GITHUB_TOKEN", "")
 
 # -----------------------------------------------------------------------------
-# 2. IDENTIFICADORES DE MODELOS EN HUGGING FACE
+# 2. MODELOS BASE (HUGGING FACE O RUTAS LOCALES)
 # -----------------------------------------------------------------------------
+# En Hugging Face, 'from_pretrained' acepta tanto un ID de la nube como una ruta local.
+#   • Opción A (Por defecto en Kaggle): Usar el ID oficial de Hugging Face para que se
+#     descargue automáticamente en la sesión (ej: "Qwen/Qwen2.5-7B-Instruct").
+#   • Opción B (Pesos pre-descargados): Si agregaste un dataset de Kaggle con los pesos
+#     del modelo ya descargados, coloca la ruta de /kaggle/input/... para no gastar internet.
+# NOTA: Durante la ejecución, el orquestador actualiza estas variables automáticamente 
+# según el escenario seleccionado (E1 = Qwen, E2 = LLaMA, E3 = DeepSeek, etc.).
 os.environ["TEACHER_MODEL_ID"] = "Qwen/Qwen2.5-7B-Instruct"
 os.environ["STUDENT_MODEL_ID"] = "Qwen/Qwen2.5-1.5B-Instruct"
 
-# -----------------------------------------------------------------------------
-# 3. RUTAS DE ALMACENAMIENTO Y ADAPTADORES
-# -----------------------------------------------------------------------------
-# Rutas locales de caché y modelos base
-os.environ["TEACHER_MODEL_PATH"] = "Qwen/Qwen2.5-7B-Instruct"
-os.environ["STUDENT_MODEL_PATH"] = "Qwen/Qwen2.5-1.5B-Instruct"
+# Rutas de carga de los modelos base:
+# Si descargas desde Hugging Face, se usa el mismo ID. Si tienes carpeta local, pon la ruta aquí:
+os.environ["TEACHER_MODEL_PATH"] = os.environ["TEACHER_MODEL_ID"]
+os.environ["STUDENT_MODEL_PATH"] = os.environ["STUDENT_MODEL_ID"]
 
-# Directorio de salida donde se guardará el adaptador LoRA del Estudiante
-os.environ["STUDENT_LORA_PATH"] = str(BASE_DIR / "models" / "student_lora")
-
-# Adaptador preentrenado del Maestro (ubicación en /kaggle/input o ruta manual):
+# -----------------------------------------------------------------------------
+# 3. RUTAS DE ALMACENAMIENTO Y ADAPTADORES LORA
+# -----------------------------------------------------------------------------
+# Directorio donde se encuentra el adaptador LoRA preentrenado del Maestro (en /kaggle/input):
 os.environ["TEACHER_MODEL_PATH_ADAPTERS"] = "/kaggle/input/datasets/danielrangelsanch/maestro-qwen-adapter"
+
+# Directorio de salida donde se guardará el nuevo adaptador LoRA generado por el Estudiante:
+os.environ["STUDENT_LORA_PATH"] = str(BASE_DIR / "models" / "student_lora")
 
 # Ruta de la base de datos vectorial ChromaDB para el RAG:
 os.environ["RAG_DB_PATH"] = str(PROJECT_ROOT / "rag" / "maestro")
@@ -415,40 +423,13 @@ purgar_memoria("Estado inicial")"""))
     os.environ["STUDENT_MODEL_ID"] = esc_info["student_id"]
     os.environ["STUDENT_MODEL_PATH"] = esc_info["student_id"]
     
-    # Detección y vinculación automática de adaptadores para el Maestro (si fueron subidos a Kaggle)
-    familia_maestro = "qwen" if "qwen" in esc_info["teacher_id"].lower() else "llama" if "llama" in esc_info["teacher_id"].lower() else "deepseek"
-    adapter_found = None
-    
-    # 0. Si el usuario ya fijó una ruta válida en os.environ["TEACHER_MODEL_PATH_ADAPTERS"], respetarla primero:
-    env_adapter = os.environ.get("TEACHER_MODEL_PATH_ADAPTERS")
-    if env_adapter and Path(env_adapter).exists():
-        adapter_found = env_adapter
-    else:
-        # 1. Buscar en /kaggle/input carpetas de adaptadores ya descomprimidas
-        for root, dirs, files in os.walk("/kaggle/input"):
-            if "adapter_config.json" in files:
-                root_lower = root.lower()
-                if familia_maestro in root_lower or "teacher" in root_lower or "maestro" in root_lower:
-                    adapter_found = root
-                    break
-                    
-        # 2. Si vino empaquetado en archivo .zip, descomprimirlo en /kaggle/working/adapters
-        if not adapter_found:
-            for z in Path("/kaggle/input").rglob("*.zip"):
-                z_lower = z.name.lower()
-                if (familia_maestro in z_lower and "adapter" in z_lower) or ("maestro" in z_lower and familia_maestro in z_lower):
-                    target_unzip = BASE_DIR / "adapters" / f"adapter_maestro_{familia_maestro}"
-                    target_unzip.mkdir(parents=True, exist_ok=True)
-                    shutil.unpack_archive(str(z), str(target_unzip))
-                    adapter_found = str(target_unzip)
-                    break
-                
-    if adapter_found:
-        os.environ["TEACHER_MODEL_PATH_ADAPTERS"] = str(adapter_found)
-        print(f"🎯 [Maestro Adapter] Adaptador LoRA detectado y vinculado: {adapter_found}")
+    # Vinculación directa del adaptador del Maestro desde la variable de entorno
+    adapter_found = os.environ.get("TEACHER_MODEL_PATH_ADAPTERS")
+    if adapter_found and Path(adapter_found).exists():
+        print(f"🎯 [Maestro Adapter] Adaptador LoRA vinculado: {adapter_found}")
     else:
         os.environ.pop("TEACHER_MODEL_PATH_ADAPTERS", None)
-        print(f"ℹ️ [Maestro Base] Sin adaptador LoRA previo para {familia_maestro.upper()}. Usando modelo base con RAG.")
+        print("ℹ️ [Maestro Base] Sin adaptador LoRA previo configurado. Usando modelo base con RAG.")
     
     # -------------------------------------------------------------------------
     # FASE 1: NACE EL MAESTRO (Razonamiento y RAG)
