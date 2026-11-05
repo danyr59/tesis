@@ -35,14 +35,14 @@ class StudentAgent:
         self.best_snapshot: Optional[Dict[str, Any]] = None
         self.best_score: float = -1.0
         self.lora_adapter_path: Optional[str] = None
-        self.num_series_target = Settings.SYNTHETIC_NUM_SERIES
-        self.points_per_series_target = Settings.SYNTHETIC_POINTS_PER_SERIES
+        self.num_series_target = int(os.getenv("SYNTHETIC_NUM_SERIES", str(Settings.SYNTHETIC_NUM_SERIES)))
+        self.points_per_series_target = int(os.getenv("SYNTHETIC_POINTS_PER_SERIES", str(Settings.SYNTHETIC_POINTS_PER_SERIES)))
 
 
 
     def run_generation(self, structured_prompt: dict, teacher_response: dict) -> None:
-        self.num_series_target = Settings.SYNTHETIC_NUM_SERIES
-        self.points_per_series_target = Settings.SYNTHETIC_POINTS_PER_SERIES
+        self.num_series_target = int(os.getenv("SYNTHETIC_NUM_SERIES", str(Settings.SYNTHETIC_NUM_SERIES)))
+        self.points_per_series_target = int(os.getenv("SYNTHETIC_POINTS_PER_SERIES", str(Settings.SYNTHETIC_POINTS_PER_SERIES)))
 
         print(f"\n--- Iniciando Flujo Estudiante ---")
         print(

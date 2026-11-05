@@ -258,9 +258,97 @@ PERFILES = {
 print(f"✅ Catálogo cargado: {len(ESCENARIOS)} escenarios de destilación y {len(PERFILES)} perfiles temporales.")"""))
 
     # =========================================================================
-    # CELDA 5: SELECTOR DE LA SESIÓN DE HOY
+    # CELDA 5: INYECCIÓN CENTRALIZADA DE VARIABLES DE ENTORNO
     # =========================================================================
-    cells.append(md("""## 4. 🎛️ Selector de la Sesión de Hoy
+    cells.append(md("""## 4. 🌐 Inyección Centralizada de Variables de Entorno (.env en Kaggle)
+> **Instrucción:** Esta celda centraliza y carga en memoria **todas las variables de entorno** del proyecto con sus valores por defecto oficiales.
+> Puedes modificar cualquier parámetro directamente aquí antes de ejecutar la sesión."""))
+    cells.append(code("""# =============================================================================
+# INYECCIÓN CENTRALIZADA DE VARIABLES DE ENTORNO (EQUIVALENTE A .env)
+# =============================================================================
+import os
+from pathlib import Path
+
+# -----------------------------------------------------------------------------
+# 1. AUTENTICACIÓN Y SERVICIOS EXTERNOS
+# -----------------------------------------------------------------------------
+# Token de Hugging Face (requerido para modelos restringidos como LLaMA):
+os.environ["HF_TOKEN"] = os.getenv("HF_TOKEN", "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")
+
+# Token de GitHub (opcional si el repositorio es privado; vacío para clone público):
+os.environ["GITHUB_TOKEN"] = os.getenv("GITHUB_TOKEN", "")
+
+# -----------------------------------------------------------------------------
+# 2. IDENTIFICADORES DE MODELOS EN HUGGING FACE
+# -----------------------------------------------------------------------------
+os.environ["TEACHER_MODEL_ID"] = "Qwen/Qwen2.5-7B-Instruct"
+os.environ["STUDENT_MODEL_ID"] = "Qwen/Qwen2.5-1.5B-Instruct"
+
+# -----------------------------------------------------------------------------
+# 3. RUTAS DE ALMACENAMIENTO Y ADAPTADORES
+# -----------------------------------------------------------------------------
+# Rutas locales de caché y modelos base
+os.environ["TEACHER_MODEL_PATH"] = "Qwen/Qwen2.5-7B-Instruct"
+os.environ["STUDENT_MODEL_PATH"] = "Qwen/Qwen2.5-1.5B-Instruct"
+
+# Directorio de salida donde se guardará el adaptador LoRA del Estudiante
+os.environ["STUDENT_LORA_PATH"] = str(BASE_DIR / "models" / "student_lora")
+
+# Adaptador preentrenado del Maestro (ubicación en /kaggle/input o ruta manual):
+os.environ["TEACHER_MODEL_PATH_ADAPTERS"] = "/kaggle/input/datasets/danielrangelsanch/maestro-qwen-adapter"
+
+# Ruta de la base de datos vectorial ChromaDB para el RAG:
+os.environ["RAG_DB_PATH"] = str(PROJECT_ROOT / "rag" / "maestro")
+
+# -----------------------------------------------------------------------------
+# 4. PARÁMETROS DEL RAG Y BÚSQUEDA SEMÁNTICA
+# -----------------------------------------------------------------------------
+os.environ["RAG_TOP_K"] = "50"  # Cantidad de semillas extraídas del RAG para curar por el Maestro
+
+# -----------------------------------------------------------------------------
+# 5. PARÁMETROS DE GENERACIÓN SINTÉTICA (ESPECIFICACIONES DE LA TESIS)
+# -----------------------------------------------------------------------------
+os.environ["SYNTHETIC_NUM_SERIES"] = "20"          # Cantidad total de series independientes
+os.environ["SYNTHETIC_POINTS_PER_SERIES"] = "400"  # Timestamps por serie (Total = 20 x 400 = 8.000 filas)
+os.environ["SYNTHETIC_CHUNK_SERIES"] = "2"         # Series generadas por chunk en llamadas al LLM
+os.environ["SYNTHETIC_CHUNK_POINTS"] = "80"        # Puntos generados por chunk en llamadas al LLM
+os.environ["LLM_MAX_NEW_TOKENS"] = "2048"          # Límite de tokens de generación para el LLM
+
+# -----------------------------------------------------------------------------
+# 6. HIPERPARÁMETROS DE LoRA (DESTILACIÓN EN TIEMPO DE EJECUCIÓN)
+# -----------------------------------------------------------------------------
+os.environ["LORA_R"] = "8"                         # Dimensión del rango de LoRA
+os.environ["LORA_ALPHA"] = "16"                    # Multiplicador escalar alpha
+os.environ["LORA_DROPOUT"] = "0.05"                # Dropout aplicado a las capas LoRA
+
+# -----------------------------------------------------------------------------
+# DIAGNÓSTICO Y VERIFICACIÓN EN CONSOLA
+# -----------------------------------------------------------------------------
+print("=" * 80)
+print("🌐 VARIABLES DE ENTORNO DEL PROYECTO INYECTADAS EXITOSAMENTE:")
+print("=" * 80)
+categorias = {
+    "🔑 Autenticación": ["HF_TOKEN", "GITHUB_TOKEN"],
+    "🧠 Modelos": ["TEACHER_MODEL_ID", "STUDENT_MODEL_ID"],
+    "📂 Rutas": ["TEACHER_MODEL_PATH", "STUDENT_MODEL_PATH", "TEACHER_MODEL_PATH_ADAPTERS", "STUDENT_LORA_PATH", "RAG_DB_PATH"],
+    "🔍 RAG": ["RAG_TOP_K"],
+    "📈 Generación": ["SYNTHETIC_NUM_SERIES", "SYNTHETIC_POINTS_PER_SERIES", "SYNTHETIC_CHUNK_SERIES", "SYNTHETIC_CHUNK_POINTS", "LLM_MAX_NEW_TOKENS"],
+    "⚡ LoRA": ["LORA_R", "LORA_ALPHA", "LORA_DROPOUT"],
+}
+
+for cat, vars_list in categorias.items():
+    print(f"\\n{cat}:")
+    for var in vars_list:
+        val = os.environ.get(var, "NO CONFIGURADA")
+        if var == "HF_TOKEN" and len(val) > 10:
+            val = val[:6] + "..." + val[-4:]
+        print(f"  • {var:28s} = {val}")
+print("\\n" + "=" * 80)"""))
+
+    # =========================================================================
+    # CELDA 6: SELECTOR DE LA SESIÓN DE HOY
+    # =========================================================================
+    cells.append(md("""## 5. 🎛️ Selector de la Sesión de Hoy
 > **Instrucción:** Cambia `ESCENARIO_SELECCIONADO` según el día de trabajo.
 > El cuaderno correrá automáticamente los 5 perfiles para este escenario."""))
     cells.append(code("""# =========================================================================
@@ -274,21 +362,14 @@ PERFILES_A_CORRER = ["P1", "P2", "P3", "P4", "P5"]
 # Si es False, salta automáticamente cualquier perfil que ya tenga métricas guardadas
 FORZAR_REPETICION = False
 
-# -------------------------------------------------------------------------
-# PARÁMETROS DE GENERACIÓN SINTÉTICA (Ajustables a tu gusto):
-# -------------------------------------------------------------------------
-os.environ["SYNTHETIC_POINTS_PER_SERIES"] = "400"  # Puntos por serie (ej: 400, 500, 1000)
-os.environ["SYNTHETIC_NUM_SERIES"] = "20"          # Cantidad de series (ej: 15, 20, 30)
-os.environ["RAG_TOP_K"] = "50"                     # Semillas extraídas del RAG por consulta (evaluadas y filtradas por el Maestro)
-
 print(f"🎯 Escenario activo para hoy: {ESCENARIO_SELECCIONADO} ({ESCENARIOS[ESCENARIO_SELECCIONADO]['nombre']})")
 print(f"📊 Perfiles a ejecutar: {PERFILES_A_CORRER}")
 print(f"📏 Longitud serie: {os.environ['SYNTHETIC_POINTS_PER_SERIES']} pts | Series: {os.environ['SYNTHETIC_NUM_SERIES']} | RAG Top-K: {os.environ['RAG_TOP_K']}")"""))
 
     # =========================================================================
-    # CELDA 6: FUNCIÓN DE PURGA DE VRAM
+    # CELDA 7: FUNCIÓN DE PURGA DE VRAM
     # =========================================================================
-    cells.append(md("""## 5. Función de Purga Automática de Memoria GPU ("Uno se borra y el otro nace")"""))
+    cells.append(md("""## 6. Función de Purga Automática de Memoria GPU ("Uno se borra y el otro nace")"""))
     cells.append(code("""def purgar_memoria(mensaje=""):
     \"\"\"Libera completamente la memoria GPU y memoria RAM del sistema.\"\"\"
     gc.collect()
@@ -303,9 +384,9 @@ print(f"📏 Longitud serie: {os.environ['SYNTHETIC_POINTS_PER_SERIES']} pts | S
 purgar_memoria("Estado inicial")"""))
 
     # =========================================================================
-    # CELDA 7: MOTOR PRINCIPAL DE EJECUCIÓN MODULAR
+    # CELDA 8: MOTOR PRINCIPAL DE EJECUCIÓN MODULAR
     # =========================================================================
-    cells.append(md("""## 6. Motor de Ejecución Modular (M1 → M8) con Persistencia"""))
+    cells.append(md("""## 7. Motor de Ejecución Modular (M1 → M8) con Persistencia"""))
     cells.append(code("""def ejecutar_experimento_perfil(escenario_key, perfil_key, force=False):
     esc_info = ESCENARIOS[escenario_key]
     perf_info = PERFILES[perfil_key]
@@ -338,24 +419,29 @@ purgar_memoria("Estado inicial")"""))
     familia_maestro = "qwen" if "qwen" in esc_info["teacher_id"].lower() else "llama" if "llama" in esc_info["teacher_id"].lower() else "deepseek"
     adapter_found = None
     
-    # 1. Buscar en /kaggle/input carpetas de adaptadores ya descomprimidas
-    for root, dirs, files in os.walk("/kaggle/input"):
-        if "adapter_config.json" in files:
-            root_lower = root.lower()
-            if familia_maestro in root_lower or "teacher" in root_lower or "maestro" in root_lower:
-                adapter_found = root
-                break
-                
-    # 2. Si vino empaquetado en archivo .zip, descomprimirlo en /kaggle/working/adapters
-    if not adapter_found:
-        for z in Path("/kaggle/input").rglob("*.zip"):
-            z_lower = z.name.lower()
-            if (familia_maestro in z_lower and "adapter" in z_lower) or ("maestro" in z_lower and familia_maestro in z_lower):
-                target_unzip = BASE_DIR / "adapters" / f"adapter_maestro_{familia_maestro}"
-                target_unzip.mkdir(parents=True, exist_ok=True)
-                shutil.unpack_archive(str(z), str(target_unzip))
-                adapter_found = str(target_unzip)
-                break
+    # 0. Si el usuario ya fijó una ruta válida en os.environ["TEACHER_MODEL_PATH_ADAPTERS"], respetarla primero:
+    env_adapter = os.environ.get("TEACHER_MODEL_PATH_ADAPTERS")
+    if env_adapter and Path(env_adapter).exists():
+        adapter_found = env_adapter
+    else:
+        # 1. Buscar en /kaggle/input carpetas de adaptadores ya descomprimidas
+        for root, dirs, files in os.walk("/kaggle/input"):
+            if "adapter_config.json" in files:
+                root_lower = root.lower()
+                if familia_maestro in root_lower or "teacher" in root_lower or "maestro" in root_lower:
+                    adapter_found = root
+                    break
+                    
+        # 2. Si vino empaquetado en archivo .zip, descomprimirlo en /kaggle/working/adapters
+        if not adapter_found:
+            for z in Path("/kaggle/input").rglob("*.zip"):
+                z_lower = z.name.lower()
+                if (familia_maestro in z_lower and "adapter" in z_lower) or ("maestro" in z_lower and familia_maestro in z_lower):
+                    target_unzip = BASE_DIR / "adapters" / f"adapter_maestro_{familia_maestro}"
+                    target_unzip.mkdir(parents=True, exist_ok=True)
+                    shutil.unpack_archive(str(z), str(target_unzip))
+                    adapter_found = str(target_unzip)
+                    break
                 
     if adapter_found:
         os.environ["TEACHER_MODEL_PATH_ADAPTERS"] = str(adapter_found)

@@ -46,8 +46,8 @@ class TeacherAgent:
     else:
         print(f"[{self.__class__.__name__}] Sin adaptadores previos. Usando modelo base con RAG.")
     self.refinements_history: List[str] = []
-    self.num_series_target = Settings.SYNTHETIC_NUM_SERIES
-    self.points_per_series_target = Settings.SYNTHETIC_POINTS_PER_SERIES
+    self.num_series_target = int(os.getenv("SYNTHETIC_NUM_SERIES", str(Settings.SYNTHETIC_NUM_SERIES)))
+    self.points_per_series_target = int(os.getenv("SYNTHETIC_POINTS_PER_SERIES", str(Settings.SYNTHETIC_POINTS_PER_SERIES)))
 
 
   

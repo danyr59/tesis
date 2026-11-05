@@ -80,5 +80,17 @@ class Settings:
       f"= {total} filas CSV"
     )
   @classmethod
+  def get_rag_top_k(cls) -> int:
+    return int(os.getenv("RAG_TOP_K", str(cls.RAG_TOP_K)))
+
+  @classmethod
+  def get_synthetic_num_series(cls) -> int:
+    return int(os.getenv("SYNTHETIC_NUM_SERIES", str(cls.SYNTHETIC_NUM_SERIES)))
+
+  @classmethod
+  def get_synthetic_points_per_series(cls) -> int:
+    return int(os.getenv("SYNTHETIC_POINTS_PER_SERIES", str(cls.SYNTHETIC_POINTS_PER_SERIES)))
+
+  @classmethod
   def get_teacher_model_path_adapter(cls) -> str:
     return os.getenv("TEACHER_MODEL_PATH_ADAPTERS", "./models/teacher_adapters")
