@@ -169,24 +169,37 @@ except Exception:
 RAG_DEST = PROJECT_ROOT / "rag" / "maestro"
 if not (RAG_DEST / "chroma.sqlite3").exists():
     RAG_DEST.mkdir(parents=True, exist_ok=True)
-    print("🔍 Buscando archivo comprimido de la base RAG en /kaggle/input...")
-    zip_encontrado = None
-    for z in Path("/kaggle/input").rglob("*.zip"):
-        if "memoria" in z.name.lower() or "rag" in z.name.lower():
-            zip_encontrado = z
+    print("🔍 Configurando base de conocimiento RAG desde /kaggle/input...")
+    
+    # 1. Comprobar si existe el dataset directo descompreso:
+    candidatos_rag = [
+        Path("/kaggle/input/rag-maestro"),
+        Path("/kaggle/input/datasets/danielrangelsanch/rag-maestro"),
+        Path("/kaggle/input/danielrangelsanch/rag-maestro"),
+    ]
+    copiado = False
+    for c in candidatos_rag:
+        if (c / "chroma.sqlite3").exists():
+            print(f"📋 Copiando base RAG desde {c} hacia espacio de trabajo escribible ({RAG_DEST})...")
+            shutil.copytree(str(c), str(RAG_DEST), dirs_exist_ok=True)
+            print("✅ RAG copiado exitosamente.")
+            copiado = True
             break
             
-    if zip_encontrado and zip_encontrado.exists():
-        print(f"📦 Descomprimiendo base de conocimiento RAG desde {zip_encontrado}...")
-        shutil.unpack_archive(str(zip_encontrado), str(RAG_DEST))
-        print("✅ RAG descomprimido exitosamente.")
-    elif Path("/kaggle/input/rag-maestro/chroma.sqlite3").exists():
-        print("📋 Copiando base RAG desde dataset /kaggle/input/rag-maestro...")
-        shutil.copytree("/kaggle/input/rag-maestro", str(RAG_DEST), dirs_exist_ok=True)
-        print("✅ RAG copiado exitosamente.")
-    else:
-        print("⚠️ Advertencia: No se encontró la base RAG pre-indexada en /kaggle/input.")
-        print("   Asegúrate de agregar el dataset 'rag-maestro' al notebook de Kaggle.")
+    # 2. Si no estaba directo, buscar si viene comprimido en zip:
+    if not copiado:
+        for z in Path("/kaggle/input").rglob("*.zip"):
+            if "memoria" in z.name.lower() or "rag" in z.name.lower():
+                print(f"📦 Descomprimiendo base RAG desde {z}...")
+                shutil.unpack_archive(str(z), str(RAG_DEST))
+                print("✅ RAG descomprimido exitosamente.")
+                copiado = True
+                break
+                
+    if not (RAG_DEST / "chroma.sqlite3").exists():
+        print("⚠️ Advertencia: No se encontró chroma.sqlite3 en /kaggle/input/rag-maestro.")
+else:
+    print(f"✅ Base RAG ya presente y lista en: {RAG_DEST}")
 
 os.environ["RAG_DB_PATH"] = str(RAG_DEST)
 print(f"\\n📂 Espacio de trabajo activo: {os.getcwd()}")
@@ -311,12 +324,22 @@ os.environ["STUDENT_MODEL_PATH"] = os.environ["STUDENT_MODEL_ID"]
 # 3. RUTAS DE ALMACENAMIENTO Y ADAPTADORES LORA
 # -----------------------------------------------------------------------------
 # Directorio donde se encuentra el adaptador LoRA preentrenado del Maestro (en /kaggle/input):
-os.environ["TEACHER_MODEL_PATH_ADAPTERS"] = "/kaggle/input/datasets/danielrangelsanch/maestro-qwen-adapter"
+# Detección flexible: soporta rutas con o sin prefijo datasets
+posibles_adaptadores = [
+    Path("/kaggle/input/datasets/danielrangelsanch/maestro-qwen-adapter"),
+    Path("/kaggle/input/maestro-qwen-adapter"),
+    Path("/kaggle/input/danielrangelsanch/maestro-qwen-adapter"),
+]
+adaptador_detectado = next((p for p in posibles_adaptadores if (p / "adapter_config.json").exists()), posibles_adaptadores[0])
+os.environ["TEACHER_MODEL_PATH_ADAPTERS"] = str(adaptador_detectado)
 
 # Directorio de salida donde se guardará el nuevo adaptador LoRA generado por el Estudiante:
 os.environ["STUDENT_LORA_PATH"] = str(BASE_DIR / "models" / "student_lora")
 
 # Ruta de la base de datos vectorial ChromaDB para el RAG:
+# IMPORTANTE: En Kaggle, /kaggle/input es de solo lectura. ChromaDB (SQLite) exige permisos
+# de lectura y escritura para sus índices y bloqueos WAL; por ello, en la Celda 2 se copia
+# la base desde /kaggle/input/rag-maestro hacia /kaggle/working/proyecto_tesis/rag/maestro:
 os.environ["RAG_DB_PATH"] = str(PROJECT_ROOT / "rag" / "maestro")
 
 # -----------------------------------------------------------------------------
@@ -362,7 +385,14 @@ for cat, vars_list in categorias.items():
         if var == "HF_TOKEN" and len(val) > 10:
             val = val[:6] + "..." + val[-4:]
         print(f"  • {var:28s} = {val}")
-print("\\n" + "=" * 80)"""))
+
+rag_ok = (Path(os.environ["RAG_DB_PATH"]) / "chroma.sqlite3").exists()
+adaptador_ok = (Path(os.environ["TEACHER_MODEL_PATH_ADAPTERS"]) / "adapter_config.json").exists()
+print("\\n" + "-" * 80)
+print("🔎 DIAGNÓSTICO FÍSICO DE ARCHIVOS EN DISCO:")
+print(f"  • Base RAG ChromaDB (chroma.sqlite3): {'✅ LISTO' if rag_ok else '⚠️ NO DETECTADO (Asegúrate de ejecutar la Celda 2)'}")
+print(f"  • Adaptador Maestro (adapter_config.json): {'✅ LISTO' if adaptador_ok else '⚠️ NO DETECTADO en ' + os.environ['TEACHER_MODEL_PATH_ADAPTERS']}")
+print("=" * 80)"""))
 
     # =========================================================================
     # CELDA 6: SELECTOR DE LA SESIÓN DE HOY
