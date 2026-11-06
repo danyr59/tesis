@@ -211,8 +211,9 @@ print(f"📁 Directorio de salida de experimentos: {EXP_DIR}")"""))
     # =========================================================================
     cells.append(md("""## 3. Catálogo Formal de Escenarios y Perfiles Matemáticos"""))
     cells.append(code("""# Matriz Simétrica 3x3 de los 9 Escenarios de Destilación (Capítulo IV)
+# Estructurada por bloques de Padre (Maestro) para máxima claridad operativa:
 ESCENARIOS = {
-    # --- 1. INTRA-FAMILIA (3 escenarios) ---
+    # ── BLOQUE 1: PADRE QWEN (E1, E2, E3) ──────────────────────────────────
     "E1": {
         "nombre": "E1_qwen_qwen",
         "tipo": "Intra-Familia",
@@ -220,54 +221,56 @@ ESCENARIOS = {
         "student_id": "Qwen/Qwen2.5-1.5B-Instruct",
     },
     "E2": {
-        "nombre": "E2_llama_llama",
-        "tipo": "Intra-Familia",
-        "teacher_id": "meta-llama/Llama-3.1-8B-Instruct",
+        "nombre": "E2_qwen_llama",
+        "tipo": "Cross-Family",
+        "teacher_id": "Qwen/Qwen2.5-7B-Instruct",
         "student_id": "meta-llama/Llama-3.2-1B-Instruct",
     },
     "E3": {
-        "nombre": "E3_deepseek_deepseek",
+        "nombre": "E3_qwen_deepseek",
+        "tipo": "Cross-Family",
+        "teacher_id": "Qwen/Qwen2.5-7B-Instruct",
+        "student_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+    },
+
+    # ── BLOQUE 2: PADRE LLAMA (E4, E5, E6) ─────────────────────────────────
+    "E4": {
+        "nombre": "E4_llama_llama",
+        "tipo": "Intra-Familia",
+        "teacher_id": "meta-llama/Llama-3.1-8B-Instruct",
+        "student_id": "meta-llama/Llama-3.2-1B-Instruct",
+    },
+    "E5": {
+        "nombre": "E5_llama_qwen",
+        "tipo": "Cross-Family",
+        "teacher_id": "meta-llama/Llama-3.1-8B-Instruct",
+        "student_id": "Qwen/Qwen2.5-1.5B-Instruct",
+    },
+    "E6": {
+        "nombre": "E6_llama_deepseek",
+        "tipo": "Cross-Family",
+        "teacher_id": "meta-llama/Llama-3.1-8B-Instruct",
+        "student_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+    },
+
+    # ── BLOQUE 3: PADRE DEEPSEEK (E7, E8, E9) ──────────────────────────────
+    "E7": {
+        "nombre": "E7_deepseek_deepseek",
         "tipo": "Intra-Familia",
         "teacher_id": "deepseek-ai/DeepSeek-Coder-6.7B-instruct",
         "student_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
     },
-    # --- 2. CROSS-FAMILY ORIGINALES (3 escenarios) ---
-    "E4": {
-        "nombre": "E4_llama_qwen",
-        "tipo": "Cross-Family",
-        "teacher_id": "meta-llama/Llama-3.1-8B-Instruct",
-        "student_id": "Qwen/Qwen2.5-1.5B-Instruct",
-    },
-    "E5": {
-        "nombre": "E5_deepseek_llama",
-        "tipo": "Cross-Family",
-        "teacher_id": "deepseek-ai/DeepSeek-Coder-6.7B-instruct",
-        "student_id": "meta-llama/Llama-3.2-1B-Instruct",
-    },
-    "E6": {
-        "nombre": "E6_deepseek_qwen",
-        "tipo": "Cross-Family",
-        "teacher_id": "deepseek-ai/DeepSeek-Coder-6.7B-instruct",
-        "student_id": "Qwen/Qwen2.5-1.5B-Instruct",
-    },
-    # --- 3. CROSS-FAMILY DE CIERRE SIMÉTRICO (3 escenarios) ---
-    "E7": {
-        "nombre": "E7_qwen_llama",
-        "tipo": "Cross-Family",
-        "teacher_id": "Qwen/Qwen2.5-7B-Instruct",
-        "student_id": "meta-llama/Llama-3.2-1B-Instruct",
-    },
     "E8": {
-        "nombre": "E8_qwen_deepseek",
+        "nombre": "E8_deepseek_qwen",
         "tipo": "Cross-Family",
-        "teacher_id": "Qwen/Qwen2.5-7B-Instruct",
-        "student_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+        "teacher_id": "deepseek-ai/DeepSeek-Coder-6.7B-instruct",
+        "student_id": "Qwen/Qwen2.5-1.5B-Instruct",
     },
     "E9": {
-        "nombre": "E9_llama_deepseek",
+        "nombre": "E9_deepseek_llama",
         "tipo": "Cross-Family",
-        "teacher_id": "meta-llama/Llama-3.1-8B-Instruct",
-        "student_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+        "teacher_id": "deepseek-ai/DeepSeek-Coder-6.7B-instruct",
+        "student_id": "meta-llama/Llama-3.2-1B-Instruct",
     },
 }
 
@@ -421,7 +424,10 @@ print("=" * 80)"""))
     cells.append(md("""## 5. 🎛️ Selector de la Sesión de Hoy
 > **Instrucción:** Configura en `ESCENARIOS_A_CORRER` los escenarios que deseas ejecutar hoy.
 > * Puedes poner uno solo: `["E1"]`
-> * O poner varios en cola para dejarlos corriendo seguidos: `["E1", "E2", "E4", "E7"]`
+> * O por bloques temáticos de Padre:
+>     - Bloque Qwen (Padre Qwen): `["E1", "E2", "E3"]`
+>     - Bloque LLaMA (Padre LLaMA): `["E4", "E5", "E6"]`
+>     - Bloque DeepSeek (Padre DeepSeek): `["E7", "E8", "E9"]`
 > El orquestador detectará automáticamente el adaptador correspondiente para cada Maestro y purgará la VRAM entre ejecuciones."""))
     cells.append(code("""# =========================================================================
 # CONFIGURACIÓN DE LA CORRIDA DE HOY:
