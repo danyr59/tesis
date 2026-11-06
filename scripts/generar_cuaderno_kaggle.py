@@ -210,8 +210,9 @@ print(f"📁 Directorio de salida de experimentos: {EXP_DIR}")"""))
     # CELDA 4: CATÁLOGO DE ESCENARIOS Y PERFILES
     # =========================================================================
     cells.append(md("""## 3. Catálogo Formal de Escenarios y Perfiles Matemáticos"""))
-    cells.append(code("""# Matriz de los 6 Escenarios de Destilación (Capítulo IV)
+    cells.append(code("""# Matriz Simétrica 3x3 de los 9 Escenarios de Destilación (Capítulo IV)
 ESCENARIOS = {
+    # --- 1. INTRA-FAMILIA (3 escenarios) ---
     "E1": {
         "nombre": "E1_qwen_qwen",
         "tipo": "Intra-Familia",
@@ -230,6 +231,7 @@ ESCENARIOS = {
         "teacher_id": "deepseek-ai/DeepSeek-Coder-6.7B-instruct",
         "student_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
     },
+    # --- 2. CROSS-FAMILY ORIGINALES (3 escenarios) ---
     "E4": {
         "nombre": "E4_llama_qwen",
         "tipo": "Cross-Family",
@@ -247,6 +249,25 @@ ESCENARIOS = {
         "tipo": "Cross-Family",
         "teacher_id": "deepseek-ai/DeepSeek-Coder-6.7B-instruct",
         "student_id": "Qwen/Qwen2.5-1.5B-Instruct",
+    },
+    # --- 3. CROSS-FAMILY DE CIERRE SIMÉTRICO (3 escenarios) ---
+    "E7": {
+        "nombre": "E7_qwen_llama",
+        "tipo": "Cross-Family",
+        "teacher_id": "Qwen/Qwen2.5-7B-Instruct",
+        "student_id": "meta-llama/Llama-3.2-1B-Instruct",
+    },
+    "E8": {
+        "nombre": "E8_qwen_deepseek",
+        "tipo": "Cross-Family",
+        "teacher_id": "Qwen/Qwen2.5-7B-Instruct",
+        "student_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+    },
+    "E9": {
+        "nombre": "E9_llama_deepseek",
+        "tipo": "Cross-Family",
+        "teacher_id": "meta-llama/Llama-3.1-8B-Instruct",
+        "student_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
     },
 }
 
@@ -398,22 +419,29 @@ print("=" * 80)"""))
     # CELDA 6: SELECTOR DE LA SESIÓN DE HOY
     # =========================================================================
     cells.append(md("""## 5. 🎛️ Selector de la Sesión de Hoy
-> **Instrucción:** Cambia `ESCENARIO_SELECCIONADO` según el día de trabajo.
-> El cuaderno correrá automáticamente los 5 perfiles para este escenario."""))
+> **Instrucción:** Configura en `ESCENARIOS_A_CORRER` los escenarios que deseas ejecutar hoy.
+> * Puedes poner uno solo: `["E1"]`
+> * O poner varios en cola para dejarlos corriendo seguidos: `["E1", "E2", "E4", "E7"]`
+> El orquestador detectará automáticamente el adaptador correspondiente para cada Maestro y purgará la VRAM entre ejecuciones."""))
     cells.append(code("""# =========================================================================
 # CONFIGURACIÓN DE LA CORRIDA DE HOY:
 # =========================================================================
-ESCENARIO_SELECCIONADO = "E1"   # Opciones: "E1", "E2", "E3", "E4", "E5", "E6"
+# Escenarios en cola para ejecutar en esta sesión:
+# Opciones disponibles: "E1" a "E9"
+ESCENARIOS_A_CORRER = ["E1"]
 
-# Lista de perfiles a ejecutar en esta sesión:
+# Lista de perfiles a ejecutar por cada escenario:
 PERFILES_A_CORRER = ["P1", "P2", "P3", "P4", "P5"]
 
 # Si es False, salta automáticamente cualquier perfil que ya tenga métricas guardadas
+# (ideal si se reinicia la sesión o para retomar sin repetir trabajo previo)
 FORZAR_REPETICION = False
 
-print(f"🎯 Escenario activo para hoy: {ESCENARIO_SELECCIONADO} ({ESCENARIOS[ESCENARIO_SELECCIONADO]['nombre']})")
-print(f"📊 Perfiles a ejecutar: {PERFILES_A_CORRER}")
-print(f"📏 Longitud serie: {os.environ['SYNTHETIC_POINTS_PER_SERIES']} pts | Series: {os.environ['SYNTHETIC_NUM_SERIES']} | RAG Top-K: {os.environ['RAG_TOP_K']}")"""))
+print(f"🎯 Escenarios en cola para hoy: {ESCENARIOS_A_CORRER}")
+for esc in ESCENARIOS_A_CORRER:
+    print(f"   • {esc}: {ESCENARIOS[esc]['nombre']} ({ESCENARIOS[esc]['teacher_id'].split('/')[-1]} -> {ESCENARIOS[esc]['student_id'].split('/')[-1]})")
+print(f"📊 Perfiles a ejecutar por escenario: {PERFILES_A_CORRER}")
+print(f"📏 Longitud serie: {os.environ.get('SYNTHETIC_POINTS_PER_SERIES', '400')} pts | Series: {os.environ.get('SYNTHETIC_NUM_SERIES', '20')} | RAG Top-K: {os.environ.get('RAG_TOP_K', '50')}")"""))
 
     # =========================================================================
     # CELDA 7: FUNCIÓN DE PURGA DE VRAM
@@ -464,13 +492,40 @@ purgar_memoria("Estado inicial")"""))
     os.environ["STUDENT_MODEL_ID"] = esc_info["student_id"]
     os.environ["STUDENT_MODEL_PATH"] = esc_info["student_id"]
     
-    # Vinculación directa del adaptador del Maestro desde la variable de entorno
-    adapter_found = os.environ.get("TEACHER_MODEL_PATH_ADAPTERS")
-    if adapter_found and Path(adapter_found).exists():
-        print(f"🎯 [Maestro Adapter] Adaptador LoRA vinculado: {adapter_found}")
+    # Mapeo y detección inteligente del adaptador según el Maestro del escenario
+    maestro_adapter_map = {
+        "Qwen/Qwen2.5-7B-Instruct": [
+            Path("/kaggle/input/datasets/danielrangelsanch/maestro-qwen-adapter"),
+            Path("/kaggle/input/maestro-qwen-adapter"),
+            Path("/kaggle/input/danielrangelsanch/maestro-qwen-adapter"),
+        ],
+        "meta-llama/Llama-3.1-8B-Instruct": [
+            Path("/kaggle/input/datasets/danielrangelsanch/maestro-llama-adapter"),
+            Path("/kaggle/input/maestro-llama-adapter"),
+            Path("/kaggle/input/danielrangelsanch/maestro-llama-adapter"),
+        ],
+        "deepseek-ai/DeepSeek-Coder-6.7B-instruct": [
+            Path("/kaggle/input/datasets/danielrangelsanch/maestro-deepseek-adapter"),
+            Path("/kaggle/input/maestro-deepseek-adapter"),
+            Path("/kaggle/input/danielrangelsanch/maestro-deepseek-adapter"),
+        ],
+    }
+
+    candidatos_adapter = maestro_adapter_map.get(esc_info["teacher_id"], [])
+    adapter_found = next((str(p) for p in candidatos_adapter if (p / "adapter_config.json").exists()), None)
+    
+    # Respaldo si el usuario definió manualmente una variable de entorno
+    if not adapter_found and os.environ.get("TEACHER_MODEL_PATH_ADAPTERS"):
+        manual_p = Path(os.environ["TEACHER_MODEL_PATH_ADAPTERS"])
+        if (manual_p / "adapter_config.json").exists():
+            adapter_found = str(manual_p)
+
+    if adapter_found:
+        os.environ["TEACHER_MODEL_PATH_ADAPTERS"] = adapter_found
+        print(f"🎯 [Maestro Adapter] Adaptador LoRA vinculado ({esc_info['teacher_id'].split('/')[-1]}): {adapter_found}")
     else:
         os.environ.pop("TEACHER_MODEL_PATH_ADAPTERS", None)
-        print("ℹ️ [Maestro Base] Sin adaptador LoRA previo configurado. Usando modelo base con RAG.")
+        print(f"ℹ️ [Maestro Base] Sin adaptador LoRA detectado para {esc_info['teacher_id']}. Usando modelo base con RAG.")
     
     # -------------------------------------------------------------------------
     # FASE 1: NACE EL MAESTRO (Razonamiento y RAG)
@@ -613,71 +668,94 @@ purgar_memoria("Estado inicial")"""))
     # =========================================================================
     # CELDA 8: BUCLE PRINCIPAL DE LA SESIÓN DE HOY
     # =========================================================================
-    cells.append(md("""## 7. 🚀 Ejecución de la Sesión de Hoy"""))
-    cells.append(code("""resultados_sesion = []
+    cells.append(md("""## 7. 🚀 Ejecución de la Sesión de Hoy (Cola Continua)"""))
+    cells.append(code("""resultados_totales = {}
 
-for p_key in PERFILES_A_CORRER:
-    try:
-        res = ejecutar_experimento_perfil(
-            ESCENARIO_SELECCIONADO, 
-            p_key, 
-            force=FORZAR_REPETICION
-        )
-        if res:
-            resultados_sesion.append(res)
-    except Exception as e:
-        print(f"❌ Error en perfil {p_key}: {e}")
-        import traceback
-        traceback.print_exc()
-
-print(f"\\n🎉 Sesión completada: {len(resultados_sesion)}/{len(PERFILES_A_CORRER)} perfiles procesados.")"""))
+for esc_key in ESCENARIOS_A_CORRER:
+    esc_nombre = ESCENARIOS[esc_key]["nombre"]
+    print("\\n" + "=" * 90)
+    print(f"🏁 INICIANDO BLOQUE EXPERIMENTAL: {esc_key} ({esc_nombre})")
+    print(f"   Maestro: {ESCENARIOS[esc_key]['teacher_id']} -> Estudiante: {ESCENARIOS[esc_key]['student_id']}")
+    print("=" * 90 + "\\n")
+    
+    resultados_esc = []
+    for p_key in PERFILES_A_CORRER:
+        try:
+            res = ejecutar_experimento_perfil(
+                esc_key, 
+                p_key, 
+                force=FORZAR_REPETICION
+            )
+            if res:
+                resultados_esc.append(res)
+        except Exception as e:
+            print(f"❌ Error en {esc_key} perfil {p_key}: {e}")
+            import traceback
+            traceback.print_exc()
+            
+    resultados_totales[esc_key] = resultados_esc
+    print(f"\\n🎉 Escenario {esc_key} ({esc_nombre}) finalizado: {len(resultados_esc)}/{len(PERFILES_A_CORRER)} perfiles procesados.")"""))
 
     # =========================================================================
     # CELDA 9: TABLA DE RESULTADOS DE LA SESIÓN
     # =========================================================================
     cells.append(md("""## 8. 📊 Visualización de Resultados y Tabla Comparativa"""))
-    cells.append(code("""# Construir tabla comparativa en DataFrame
-filas = []
-for r in resultados_sesion:
-    filas.append({
-        "Escenario": r["escenario"],
-        "Perfil": r["perfil"],
-        "R² (LSTM)": f"{r['downstream']['r2']:.4f}",
-        "MAPE (%)": f"{r['downstream']['mape']:.2f}%",
-        "RMSE": f"{r['downstream']['rmse']:.2f}",
-        "MAE": f"{r['downstream']['mae']:.2f}",
-        "Juez": "APROBADO" if r["juez"]["aprobado"] else "RECHAZADO",
-        "Tasa Aluc. (%)": f"{r['alucinaciones']['tasa_alucinacion']:.2%}",
-        "VRAM Pico (GB)": f"{r['eficiencia']['vram_pico_gb']:.2f}",
-        "Tiempo (s)": f"{r['eficiencia']['tiempo_segundos']:.1f}"
-    })
+    cells.append(code("""# Construir tablas comparativas por escenario
+todas_filas = []
 
-df_resumen = pd.DataFrame(filas)
-print("\\n" + "=" * 90)
-print(f"RESUMEN EXPERIMENTAL — SESIÓN {ESCENARIO_SELECCIONADO}")
-print("=" * 90)
-display(df_resumen)
+for esc_key, res_list in resultados_totales.items():
+    if not res_list:
+        continue
+    filas_esc = []
+    for r in res_list:
+        registro = {
+            "Escenario": r["escenario"],
+            "Perfil": r["perfil"],
+            "R² (LSTM)": f"{r['downstream']['r2']:.4f}",
+            "MAPE (%)": f"{r['downstream']['mape']:.2f}%",
+            "RMSE": f"{r['downstream']['rmse']:.2f}",
+            "MAE": f"{r['downstream']['mae']:.2f}",
+            "Juez": "APROBADO" if r["juez"]["aprobado"] else "RECHAZADO",
+            "Tasa Aluc. (%)": f"{r['alucinaciones']['tasa_alucinacion']:.2%}",
+            "VRAM Pico (GB)": f"{r['eficiencia']['vram_pico_gb']:.2f}",
+            "Tiempo (s)": f"{r['eficiencia']['tiempo_segundos']:.1f}"
+        }
+        filas_esc.append(registro)
+        todas_filas.append(registro)
 
-# Guardar CSV consolidado de la sesión
-csv_resumen_path = TABLAS_DIR / f"resumen_{ESCENARIO_SELECCIONADO}.csv"
-df_resumen.to_csv(csv_resumen_path, index=False)
-print(f"\\n💾 Resumen guardado en: {csv_resumen_path}")"""))
+    df_esc = pd.DataFrame(filas_esc)
+    print("\\n" + "=" * 90)
+    print(f"RESUMEN EXPERIMENTAL — {esc_key} ({ESCENARIOS[esc_key]['nombre']})")
+    print("=" * 90)
+    display(df_esc)
+
+    csv_resumen_path = TABLAS_DIR / f"resumen_{esc_key}.csv"
+    df_esc.to_csv(csv_resumen_path, index=False)
+    print(f"💾 Resumen guardado en: {csv_resumen_path}")
+
+if len(resultados_totales) > 1 and todas_filas:
+    df_consolidado = pd.DataFrame(todas_filas)
+    consolidado_path = TABLAS_DIR / "resumen_consolidado_sesion.csv"
+    df_consolidado.to_csv(consolidado_path, index=False)
+    print(f"\\n📊 Resumen consolidado multi-escenario guardado en: {consolidado_path}")"""))
 
     # =========================================================================
     # CELDA 10: EMPAQUETADO FINAL EN ZIP PARA DESCARGA
     # =========================================================================
     cells.append(md("""## 9. 📦 Empaquetado Automático en ZIP (Descarga a tu PC)"""))
-    cells.append(code("""# Comprimir la carpeta del escenario actual para descarga directa
-zip_name = f"{ESCENARIO_SELECCIONADO}_resultados.zip"
-zip_path = BASE_DIR / zip_name
+    cells.append(code("""# Comprimir resultados de cada escenario procesado para descarga directa
+for esc_key in ESCENARIOS_A_CORRER:
+    esc_nombre = ESCENARIOS[esc_key]["nombre"]
+    zip_name = f"{esc_key}_resultados.zip"
+    zip_path = BASE_DIR / zip_name
 
-dir_a_comprimir = EXP_DIR / ESCENARIOS[ESCENARIO_SELECCIONADO]["nombre"]
-if dir_a_comprimir.exists():
-    shutil.make_archive(str(BASE_DIR / f"{ESCENARIO_SELECCIONADO}_resultados"), 'zip', dir_a_comprimir)
-    print(f"✅ Archivo ZIP generado: {zip_path} ({zip_path.stat().st_size / 1e6:.2f} MB)")
-    print(f"👉 Puedes descargarlo directamente desde el panel lateral derecho de Kaggle ('Output').")
-else:
-    print(f"⚠️ No se encontró la carpeta: {dir_a_comprimir}")"""))
+    dir_a_comprimir = EXP_DIR / esc_nombre
+    if dir_a_comprimir.exists():
+        shutil.make_archive(str(BASE_DIR / f"{esc_key}_resultados"), 'zip', dir_a_comprimir)
+        print(f"✅ Archivo ZIP generado: {zip_path} ({zip_path.stat().st_size / 1e6:.2f} MB)")
+        print(f"   👉 Descárgalo desde el panel lateral derecho ('Output' -> '{zip_name}')")
+    else:
+        print(f"⚠️ No se encontró la carpeta para empaquetar: {dir_a_comprimir}")"""))
 
     # Guardar archivo .ipynb
     nb_dict = {
