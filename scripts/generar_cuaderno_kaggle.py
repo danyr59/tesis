@@ -89,11 +89,39 @@ for p in [EXP_DIR, TABLAS_DIR]:
 pipeline_dir = PROJECT_ROOT / "pipeline"
 input_code_dir = Path("/kaggle/input/proyecto-tesis-codigo")
 
-if input_code_dir.exists():
+# Prioridad 1: Sincronización directa y actualizada desde GitHub
+git_exitoso = False
+try:
+    if (PROJECT_ROOT / ".git").exists():
+        print("🔄 Actualizando repositorio existente desde GitHub (rama kaggle_experimentos)...")
+        !git -C {PROJECT_ROOT} fetch origin kaggle_experimentos
+        !git -C {PROJECT_ROOT} reset --hard origin/kaggle_experimentos
+        git_exitoso = (pipeline_dir / "teacher_agent").exists()
+    elif not pipeline_dir.exists():
+        print("📥 Clonando repositorio desde GitHub (rama kaggle_experimentos)...")
+        gh_token = None
+        try:
+            from kaggle_secrets import UserSecretsClient
+            gh_token = UserSecretsClient().get_secret("GITHUB_TOKEN")
+        except Exception:
+            gh_token = os.getenv("GITHUB_TOKEN")
+            
+        if gh_token:
+            print("🔑 Usando GITHUB_TOKEN para clonar repositorio...")
+            !GIT_TERMINAL_PROMPT=0 git clone -b kaggle_experimentos https://oauth2:{gh_token}@github.com/danyr59/tesis_antes.git {PROJECT_ROOT}
+        else:
+            print("ℹ️ Clonando con credenciales públicas (GIT_TERMINAL_PROMPT=0)...")
+            !GIT_TERMINAL_PROMPT=0 git clone -b kaggle_experimentos https://github.com/danyr59/tesis_antes.git {PROJECT_ROOT}
+        git_exitoso = (pipeline_dir / "teacher_agent").exists()
+except Exception as e_git:
+    print(f"ℹ️ Git clone/pull no disponible: {e_git}")
+
+# Prioridad 2 (Respaldo sin conexión): Dataset interno de Kaggle
+if (not git_exitoso and not pipeline_dir.exists()) and input_code_dir.exists():
     print("📦 Sincronizando paquete 'pipeline' desde dataset interno de Kaggle...")
     pipeline_dir.mkdir(parents=True, exist_ok=True)
     
-    # 1. Si viene como archivo zip de Kaggle:
+    # Si viene como archivo zip de Kaggle:
     zip_files = list(input_code_dir.rglob("*.zip"))
     if zip_files:
         for z in zip_files:
@@ -103,7 +131,6 @@ if input_code_dir.exists():
     else:
         shutil.copytree(input_code_dir, pipeline_dir, dirs_exist_ok=True)
         
-    # 2. Si se desempaquetó una subcarpeta interna llamada 'pipeline', aplanarla
     if (pipeline_dir / "pipeline").exists():
         for item in (pipeline_dir / "pipeline").iterdir():
             shutil.move(str(item), str(pipeline_dir))
@@ -112,25 +139,9 @@ if input_code_dir.exists():
     if not (pipeline_dir / "__init__.py").exists():
         (pipeline_dir / "__init__.py").touch()
         
-    print(f"✅ Paquete 'pipeline' instalado exitosamente en: {pipeline_dir}")
-elif not pipeline_dir.exists() or not (pipeline_dir / "teacher_agent").exists():
-    # Fallback a clonación git no-bloqueante con soporte de token
-    print("📥 Clonando repositorio desde GitHub...")
-    gh_token = None
-    try:
-        from kaggle_secrets import UserSecretsClient
-        gh_token = UserSecretsClient().get_secret("GITHUB_TOKEN")
-    except Exception:
-        gh_token = os.getenv("GITHUB_TOKEN")
-        
-    if gh_token:
-        print("🔑 Usando GITHUB_TOKEN para clonar repositorio privado...")
-        !GIT_TERMINAL_PROMPT=0 git clone -b kaggle_experimentos https://oauth2:{gh_token}@github.com/danyr59/tesis_antes.git {PROJECT_ROOT}
-    else:
-        print("ℹ️ Clonando con credenciales públicas (GIT_TERMINAL_PROMPT=0)...")
-        !GIT_TERMINAL_PROMPT=0 git clone -b kaggle_experimentos https://github.com/danyr59/tesis_antes.git {PROJECT_ROOT}
+    print(f"✅ Paquete 'pipeline' instalado exitosamente desde dataset en: {pipeline_dir}")
 else:
-    print(f"✅ Código del proyecto ya presente en: {pipeline_dir}")
+    print(f"✅ Código del proyecto listo en: {pipeline_dir}")
 
 for p in [PROJECT_ROOT, BASE_DIR]:
     if str(p) not in sys.path:
@@ -657,11 +668,18 @@ else:
         "nbformat_minor": 5
     }
 
-    target_path = Path("scripts/orquestador_experimentos_kaggle.ipynb")
-    with open(target_path, "w", encoding="utf-8") as f:
-        json.dump(nb_dict, f, indent=2, ensure_ascii=False)
-
-    print(f"✅ Cuaderno generado exitosamente en: {target_path}")
+    # Guardar archivo .ipynb en las rutas estándar del proyecto
+    rutas_destino = [
+        Path("scripts/orquestador_experimentos_kaggle.ipynb"),
+        Path("util/orquestador_experimentos_kaggle.ipynb"),
+        Path("scratch_kaggle/kernel/orquestador_experimentos_kaggle.ipynb")
+    ]
+    
+    for target_path in rutas_destino:
+        if target_path.parent.exists():
+            with open(target_path, "w", encoding="utf-8") as f:
+                json.dump(nb_dict, f, indent=2, ensure_ascii=False)
+            print(f"✅ Cuaderno sincronizado en: {target_path}")
 
 if __name__ == "__main__":
     create_notebook()
