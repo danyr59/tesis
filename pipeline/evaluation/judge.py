@@ -223,7 +223,7 @@ class Judge:
             if i >= preds.shape[1]:
                 break
 
-            constraint = self.domain_constraints.get(name, {})
+            constraint = self.domain_constraints.get(name) or self.domain_constraints.get(name.lower(), {})
             col = preds[:, i]
 
             fmin = constraint.get("min")

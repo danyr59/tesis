@@ -300,6 +300,11 @@ PERFILES = {
         "id": "P5_COMPLEJO",
         "query": "Monitorear el consumo de ancho de banda en un centro de datos empresarial. Dominio: Telecomunicaciones y Servidores. Variable estricta: Únicamente 'Ancho_Banda_Gbps'. Perfil matemático: P5_COMPLEJO, con fuerte estacionalidad por horario laboral, alto ruido de tráfico y picos anómalos esporádicos por sobrecarga. Escala: promedio de 45 Gbps.",
         "dominio": "servidores"
+    },
+    "P6": {
+        "id": "P6_MULTIVARIADO",
+        "query": "Monitoreo hemodinámico continuo de signos vitales en un paciente en reposo. Dominio: Medicina y salud. Variables estrictas: 'Presion_Sistolica' y 'Presion_Diastolica'. Perfil matemático: P6_MULTIVARIADO, valores estables con variaciones fisiológicas suaves y correlación acoplada. Escala: Sistólica promedio alrededor de 120 mmHg, Diastólica promedio alrededor de 80 mmHg.",
+        "dominio": "medicina"
     }
 }
 
@@ -437,7 +442,7 @@ print("=" * 80)"""))
 ESCENARIOS_A_CORRER = ["E1"]
 
 # Lista de perfiles a ejecutar por cada escenario:
-PERFILES_A_CORRER = ["P1", "P2", "P3", "P4", "P5"]
+PERFILES_A_CORRER = ["P1", "P2", "P3", "P4", "P5", "P6"]
 
 # Si es False, salta automáticamente cualquier perfil que ya tenga métricas guardadas
 # (ideal si se reinicia la sesión o para retomar sin repetir trabajo previo)
@@ -647,6 +652,7 @@ purgar_memoria("Estado inicial")"""))
             "mape": float(pred_dict.get("mape", 0.0)),
             "rmse": float(pred_dict.get("rmse", 0.0)),
             "mae": float(pred_dict.get("mae", 0.0)),
+            **({"per_feature": pred_dict["per_feature"]} if "per_feature" in pred_dict else {})
         },
         "juez": {
             "aprobado": bool(judgment_dict.get("approved", False)),
@@ -655,6 +661,7 @@ purgar_memoria("Estado inicial")"""))
         },
         "alucinaciones": {
             "tasa_alucinacion": float(eval_result.get("hallucination_rate", 0.0)),
+            **(eval_result.get("hallucinations_breakdown", {})),
         },
         "eficiencia": {
             "tiempo_segundos": round(t_total, 2),
@@ -668,6 +675,10 @@ purgar_memoria("Estado inicial")"""))
         
     print(f"\\n🏁 Experimento completado con éxito en {t_total:.1f}s.")
     print(f"   R²={resultado_consolidado['downstream']['r2']:.4f} | MAPE={resultado_consolidado['downstream']['mape']:.2f}% | Veredicto Juez: {resultado_consolidado['juez']['aprobado']}")
+    if "per_feature" in resultado_consolidado.get("downstream", {}):
+        print("   🔍 Desglose por variable:")
+        for feat_name, fm in resultado_consolidado["downstream"]["per_feature"].items():
+            print(f"      • {feat_name:22s}: R²={fm['r2']:.4f} | RMSE={fm['rmse']:.2f} | MAE={fm['mae']:.2f} | MAPE={fm['mape']:.2f}%")
     
     return resultado_consolidado"""))
 

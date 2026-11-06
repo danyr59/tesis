@@ -41,6 +41,14 @@ PROFILES: Dict[str, Dict[str, Any]] = {
         "seasonality_expected": "weekly",
         "noise_expected": "high",
         "expected_anomalies": 3
+    },
+    "P6_MULTIVARIADO": {
+        "profile_id": "P6_MULTIVARIADO",
+        "description": "Serie temporal multivariada con dinámicas acopladas en régimen estable, variaciones fisiológicas suaves y correlación entre variables.",
+        "trend_expected": "flat",
+        "seasonality_expected": "none",
+        "noise_expected": "low",
+        "expected_anomalies": 0
     }
 }
 

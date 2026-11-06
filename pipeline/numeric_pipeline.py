@@ -72,7 +72,7 @@ def run_numeric_pipeline(
   logger.info("=" * 60)
 
   predictor = Predictor(trainer=trainer)
-  result = predictor.predict_from_data(data)
+  result = predictor.predict_from_data(data, feature_names=feature_names)
   predictor.plot_predictions(result, output_path=cfg.plot_output_path)
 
   logger.info("=" * 60)
@@ -103,6 +103,15 @@ def run_numeric_pipeline(
       "hallucination_score": judgment.hallucination_score,
     },
     "hallucination_rate": hall_report.hallucination_rate,
+    "hallucinations_breakdown": {
+      "total_predictions": hall_report.total_predictions,
+      "total_hallucinations": len(hall_report.hallucinations),
+      "range_violations": hall_report.range_violations,
+      "temporal_violations": hall_report.temporal_violations,
+      "correlation_violations": hall_report.correlation_violations,
+      "statistical_violations": hall_report.statistical_violations,
+      "is_clean": hall_report.is_clean,
+    },
     "model_path": cfg.model_output_path,
     "plot_path": cfg.plot_output_path,
   }
@@ -110,10 +119,17 @@ def run_numeric_pipeline(
 
 def _domain_constraints_for(domain: str) -> Dict[str, Any]:
   d = domain.lower()
+  constraints: Dict[str, Any] = {}
   if "clima" in d or "temperatura" in d:
-    return {
+    constraints.update({
       "temperatura": {"min": -40, "max": 55},
       "temperatura (°C)": {"min": -40, "max": 55},
       "humedad (%)": {"min": 0, "max": 100},
-    }
-  return {}
+    })
+  if "medicina" in d or "salud" in d:
+    constraints.update({
+      "frecuencia_cardiaca": {"min": 35, "max": 220},
+      "presion_sistolica": {"min": 60, "max": 240},
+      "presion_diastolica": {"min": 35, "max": 150},
+    })
+  return constraints

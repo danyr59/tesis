@@ -94,16 +94,22 @@ class TeacherAgent:
     # Regla de consistencia: si el usuario especifica explícitamente un perfil (ej. P3_TENDENCIA_ESTACIONAL), respetarlo
     q_lower = current_query.lower()
     vals = response.get("values", {})
-    m_profile = re.search(r"\b(P[1-5]_[A-Z_]+)\b", current_query, re.IGNORECASE)
+    m_profile = re.search(r"\b(P[1-6]_[A-Z_]+)\b", current_query, re.IGNORECASE)
     if m_profile:
         vals["profile_id"] = m_profile.group(1).upper()
-    elif ("estable" in q_lower or "constante" in q_lower) and vals.get("profile_id") != "P1_ESTABLE":
+    elif ("estable" in q_lower or "constante" in q_lower) and vals.get("profile_id") not in ("P1_ESTABLE", "P6_MULTIVARIADO"):
         vals["profile_id"] = "P1_ESTABLE"
 
     # Regla de consistencia: si el usuario especifica variables estrictas o únicas, respetarlas sin alucinar
-    m_strict_var = re.search(r"(?:variables?\s+estrictas?|únicamente)\s*:?\s*(?:únicamente\s*)?['\"]?([a-zA-Z0-9_]+)['\"]?", current_query, re.IGNORECASE)
-    if m_strict_var:
-        vals["variables"] = [m_strict_var.group(1)]
+    m_strict = re.search(r"(?:variables?\s+estrictas?|únicamente)\s*:?\s*([^.\n]+)", current_query, re.IGNORECASE)
+    if m_strict:
+        found_vars = re.findall(r"['\"]([a-zA-Z0-9_]+)['\"]", m_strict.group(1))
+        if found_vars:
+            vals["variables"] = found_vars
+        else:
+            single_m = re.search(r"([a-zA-Z0-9_]+)", m_strict.group(1))
+            if single_m:
+                vals["variables"] = [single_m.group(1)]
 
     # Regla de consistencia: tipo_serie debe ser coherente con la cantidad de variables
     var_list = vals.get("variables", [])

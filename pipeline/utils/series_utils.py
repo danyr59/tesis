@@ -229,8 +229,8 @@ def extend_series(
     base_mean = abs(target_mean) if target_mean is not None else (np.mean(np.abs(out)) if out else 1.0)
     raw_std = np.std(out) if len(out) > 1 else 1.0
 
-    if profile_id == "P1_ESTABLE":
-      # Para P1, el ruido no debería exceder el 2% de la media
+    if profile_id in ["P1_ESTABLE", "P6_MULTIVARIADO"]:
+      # Para P1 y P6, el ruido no debería exceder el 2% de la media
       noise_std = min(raw_std, base_mean * 0.02)
     elif profile_id in ["P2_ESTACIONAL", "P3_TENDENCIA_ESTACIONAL"]:
         # Para estacionales, ruido moderado (hasta 5%)
@@ -242,7 +242,7 @@ def extend_series(
     noise_std = max(0.1, noise_std)
     noise = float(rng.normal(0, noise_std))
     
-    if profile_id == "P1_ESTABLE":
+    if profile_id in ["P1_ESTABLE", "P6_MULTIVARIADO"]:
         val = base_val + noise
         
     elif profile_id == "P2_ESTACIONAL":

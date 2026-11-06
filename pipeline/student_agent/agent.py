@@ -364,13 +364,15 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
                     if isinstance(s_item, dict):
                         ext_dict = {}
                         for var, vals in s_item.items():
-                            ext_dict[var] = extend_series(vals, num_points, rng=s_rng, profile_id=profile_id, target_mean=target_value, series_seed=s_seed)
+                            t_mean = target_value.get(var) if isinstance(target_value, dict) else None
+                            ext_dict[var] = extend_series(vals, num_points, rng=s_rng, profile_id=profile_id, target_mean=t_mean, series_seed=s_seed)
                         extended_series.append(ext_dict)
                     elif isinstance(s_item, list):
                         v_name = prompt_info.get("values", {}).get("variables", ["value"])
                         v_key = str(v_name[0]) if isinstance(v_name, list) and v_name else str(v_name)
+                        t_mean = target_value.get(v_key) if isinstance(target_value, dict) else None
                         extended_series.append({
-                            v_key: extend_series(s_item, num_points, rng=s_rng, profile_id=profile_id, target_mean=target_value, series_seed=s_seed)
+                            v_key: extend_series(s_item, num_points, rng=s_rng, profile_id=profile_id, target_mean=t_mean, series_seed=s_seed)
                         })
             else:
                 for idx, s_arr in enumerate(series):
@@ -453,7 +455,8 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
                 for k in keys:
                     vals = [float(x) for x in s[k][:cur_len]] if isinstance(
                         s.get(k), list) else []
-                    new_dict[k] = extend_series(vals, target, rng=s_rng, profile_id=profile_id, target_mean=target_value, series_seed=s_seed)
+                    t_mean = target_value.get(k) if isinstance(target_value, dict) else None
+                    new_dict[k] = extend_series(vals, target, rng=s_rng, profile_id=profile_id, target_mean=t_mean, series_seed=s_seed)
                 normalized.append(new_dict)
             elif isinstance(s, list):
                 vals = [float(x) for x in s]
