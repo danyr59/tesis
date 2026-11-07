@@ -233,7 +233,7 @@ ESCENARIOS = {
         "nombre": "E3_qwen_deepseek",
         "tipo": "Cross-Family",
         "teacher_id": "Qwen/Qwen2.5-7B-Instruct",
-        "student_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+        "student_id": "deepseek-ai/deepseek-coder-1.3b-instruct",
     },
 
     # ── BLOQUE 2: PADRE LLAMA (E4, E5, E6) ─────────────────────────────────
@@ -253,7 +253,7 @@ ESCENARIOS = {
         "nombre": "E6_llama_deepseek",
         "tipo": "Cross-Family",
         "teacher_id": "meta-llama/Llama-3.1-8B-Instruct",
-        "student_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+        "student_id": "deepseek-ai/deepseek-coder-1.3b-instruct",
     },
 
     # ── BLOQUE 3: PADRE DEEPSEEK (E7, E8, E9) ──────────────────────────────
@@ -261,7 +261,7 @@ ESCENARIOS = {
         "nombre": "E7_deepseek_deepseek",
         "tipo": "Intra-Familia",
         "teacher_id": "deepseek-ai/DeepSeek-Coder-6.7B-instruct",
-        "student_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+        "student_id": "deepseek-ai/deepseek-coder-1.3b-instruct",
     },
     "E8": {
         "nombre": "E8_deepseek_qwen",

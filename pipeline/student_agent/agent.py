@@ -41,7 +41,7 @@ class StudentAgent:
     @property
     def is_reasoning_model(self) -> bool:
         path = getattr(self.llm, "model_path", "") or ""
-        return any(tag in str(path).lower() for tag in ["deepseek", "r1"])
+        return any(tag in str(path).lower() for tag in ["-r1", "/r1", "reasoning"])
 
     def run_generation(self, structured_prompt: dict, teacher_response: dict) -> None:
         self.num_series_target = int(os.getenv("SYNTHETIC_NUM_SERIES", str(Settings.SYNTHETIC_NUM_SERIES)))
