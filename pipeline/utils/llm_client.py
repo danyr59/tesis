@@ -118,17 +118,27 @@ def extract_json_from_text(text: str) -> dict:
   if fenced:
     cleaned = fenced.group(1)
   else:
-    # Si viene con bloques de código pero sin cerrar las llaves correctamente
-    cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
-    cleaned = re.sub(r"\s*```$", "", cleaned)
-    match = re.search(r"\{.*\}", cleaned, re.DOTALL)
-    if match:
-      cleaned = match.group(0)
-    elif "{" in cleaned:
-      cleaned = cleaned[cleaned.find("{") :]
+    fenced_arr = re.search(r"```(?:json)?\s*(\[.*?\])\s*```", cleaned, re.DOTALL)
+    if fenced_arr:
+      cleaned = fenced_arr.group(1)
+    else:
+      # Si viene con bloques de código pero sin cerrar las llaves correctamente
+      cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
+      cleaned = re.sub(r"\s*```$", "", cleaned)
+      match = re.search(r"\{.*\}", cleaned, re.DOTALL)
+      if match:
+        cleaned = match.group(0)
+      elif "{" in cleaned:
+        cleaned = cleaned[cleaned.find("{") :]
 
   # 1. Eliminar comentarios JS (// o /* */) que el LLM suele insertar
   cleaned = strip_json_comments(cleaned)
+
+  # 1.5. Reparar llaves dobles de apertura/cierre (ej. '{{ ... }}' o '{{"key": ...}}')
+  if cleaned.startswith("{{") and cleaned.endswith("}}"):
+    cleaned = cleaned[1:-1].strip()
+  elif cleaned.startswith("{{"):
+    cleaned = cleaned[1:].strip()
 
   # 2. Reparar cierres con paréntesis en lugar de llaves (ej. '[[1, 2]])' -> '[[1, 2]]}')
   cleaned = re.sub(r"\)\s*$", "}", cleaned)
@@ -153,7 +163,13 @@ def extract_json_from_text(text: str) -> dict:
 
   # 7. Intentar parseo estándar con strict=False (acepta saltos de línea crudos en cadenas)
   try:
-    return json.loads(cleaned, strict=False)
+    obj = json.loads(cleaned, strict=False)
+    if isinstance(obj, dict):
+      return obj
+    elif isinstance(obj, list):
+      if obj and isinstance(obj[0], (int, float)):
+        return {"synthetic_series": [obj]}
+      return {"synthetic_series": obj}
   except json.JSONDecodeError:
     pass
 
@@ -178,11 +194,25 @@ def extract_json_from_text(text: str) -> dict:
     obj, _ = decoder.raw_decode(cleaned)
     if isinstance(obj, dict):
       return obj
+    elif isinstance(obj, list):
+      if obj and isinstance(obj[0], (int, float)):
+        return {"synthetic_series": [obj]}
+      return {"synthetic_series": obj}
+  except Exception:
+    pass
+
+  # 9.5. Fallback: Si el modelo devolvió un arreglo crudo [[...], [...]] o [...]
+  try:
+    array_match = re.search(r"(\[\s*\[.*?\]\s*\])", cleaned, re.DOTALL)
+    if array_match:
+      arr = json.loads(array_match.group(1), strict=False)
+      if isinstance(arr, list):
+        return {"synthetic_series": arr}
   except Exception:
     pass
 
   # 10. Fallback para series sintéticas: rescatar números si el LLM se truncó por tokens
-  if "synthetic_series" in text:
+  if "synthetic_series" in text or "[[" in text or "series" in text.lower():
     nums = re.findall(r"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?", text)
     floats = [float(x) for x in nums if x != ""]
     if len(floats) >= 10:

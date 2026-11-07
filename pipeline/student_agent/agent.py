@@ -312,9 +312,9 @@ NO COPIES ESTOS EJEMPLOS. Úsalos como inspiración para el comportamiento de la
 
         if multivariate:
             variables = prompt_info.get("values", {}).get("variables", "var1, var2")
-            example = '{{"synthetic_series": [{{"var1": [1.2, 1.3, 1.4], "var2": [5.1, 5.2, 5.0]}}]}}'
+            example = '{"synthetic_series": [{"var1": [1.2, 1.3, 1.4], "var2": [5.1, 5.2, 5.0]}]}'
         else:
-            example = '{{"synthetic_series": [[1.2, 1.3, 1.4]]}}'
+            example = '{"synthetic_series": [[1.2, 1.3, 1.4]]}'
 
         prompt = f"""Eres un motor experto en la generación de series temporales de alta fidelidad. 
 Tu tarea es generar los primeros 10 valores (semilla) de una serie temporal basándote en el perfil solicitado y el dominio del RAG. El sistema se encargará de extrapolar el resto matemáticamente.
@@ -344,9 +344,8 @@ Muestra de semillas: {json.dumps(seed_preview)[:500]}
 4. NO escribas texto introductorio, explicaciones, ni comentarios. 
 5. Si es univariada, devuelve las series como un arreglo plano. Si es multivariada, como un diccionario plano de arreglos.
 
-Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, RECUERDA DEBES CAMBIARLO CON EL INDICADO):
+Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, RECUERDA DEBES GENERAR 10 VALORES POR SERIE):
 {example}
-```json
 """
         # Usamos 500 tokens: el modelo termina naturalmente en ~320 tokens y se detiene solo vía EOS
         response = self.llm.generate_json(prompt, max_new_tokens=500)
@@ -536,7 +535,13 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
                     rows.append({"series_id": series_id,
                                 "timestamp": timestamp, str(var_name): f_val})
 
-        pd.DataFrame(rows).to_csv(output_file, index=False)
+        df_out = pd.DataFrame(rows)
+        # Limpieza defensiva de NaNs / Infs generados por modelos pequeños o variables dispares
+        num_cols = [c for c in df_out.columns if c not in ("series_id", "timestamp")]
+        if num_cols:
+            df_out[num_cols] = df_out[num_cols].replace([np.inf, -np.inf], np.nan)
+            df_out[num_cols] = df_out[num_cols].ffill().bfill().fillna(0.0)
+        df_out.to_csv(output_file, index=False)
         return output_file
 
     def _update_best_snapshot(

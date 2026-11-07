@@ -26,6 +26,10 @@ def load_synthetic_matrix(csv_path: str) -> Tuple[np.ndarray, List[str]]:
   if not feature_cols:
     raise ValueError("El CSV sintético no tiene columnas de variables.")
 
+  # Limpieza defensiva de NaNs / Infs para evitar propagación de nan a la RNN
+  df[feature_cols] = df[feature_cols].replace([np.inf, -np.inf], np.nan)
+  df[feature_cols] = df[feature_cols].ffill().bfill().fillna(0.0)
+
   blocks = []
   for _, group in df.groupby("series_id", sort=True):
     sub = group.sort_values("timestamp")
