@@ -35,7 +35,8 @@ class TeacherAgent:
     self.chroma_client = chromadb.PersistentClient(path=Settings.RAG_DB_PATH)
     self.collection = self.chroma_client.get_collection(
         Settings.RAG_COLLECTION_NAME)
-    self.embedder = SentenceTransformer("all-mpnet-base-v2")
+    # Ejecutamos el Embedder en CPU para dejar el 100% de la VRAM de GPU libre para el LLM Maestro/Estudiante
+    self.embedder = SentenceTransformer("all-mpnet-base-v2", device="cpu")
     self.llm = llm or LLMClient(
       Settings.get_teacher_model_path(),
       role_name="Maestro experto en series temporales",
@@ -308,22 +309,20 @@ Analiza el prompt estructurado del Usuario:
     import re
     compact = []
     for i, meta in enumerate(rag_results["metadatas"][0]):
-        # Las bases de datos TSQA a veces incrustan los números crudos dentro de 'question' o 'response'.
-        # Usamos regex para eliminar arreglos gigantes de números (ej. "[1.2, 3.4, ...]") que causan OOM.
+        # Las bases de datos TSQA a veces incrustan números crudos dentro de 'question' o 'response'.
+        # Usamos regex robusto para eliminar cualquier arreglo entre corchetes (incluso con 'X', comas, letras)
         q_text = str(meta.get("question", ""))
         a_text = str(meta.get("response", ""))
-        q_clean = re.sub(r'\[\s*[-\d.,\s]+\]', '[ARREGLO DE NUMEROS REMOVIDO]', q_text)
-        a_clean = re.sub(r'\[\s*[-\d.,\s]+\]', '[ARREGLO DE NUMEROS REMOVIDO]', a_text)
+        q_clean = re.sub(r'\[[^\]]{15,}\]', '[ARREGLO DE NUMEROS REMOVIDO]', q_text)
+        a_clean = re.sub(r'\[[^\]]{15,}\]', '[ARREGLO DE NUMEROS REMOVIDO]', a_text)
         
-        # TRUNCADO ABSOLUTO DE SEGURIDAD
-        if len(q_clean) > 2000:
-            q_clean = q_clean[:2000] + "... [TRUNCADO POR SEGURIDAD]"
-        if len(a_clean) > 2000:
-            a_clean = a_clean[:2000] + "... [TRUNCADO POR SEGURIDAD]"
+        # TRUNCADO ESTRICTO DE SEGURIDAD PARA PROMPT (máx 400 caracteres)
+        if len(q_clean) > 400:
+            q_clean = q_clean[:400] + "... [TRUNCADO]"
+        if len(a_clean) > 400:
+            a_clean = a_clean[:400] + "... [TRUNCADO]"
         
         ts_clean = str(meta.get("time_series", ""))
-        # if len(ts_clean) > 2000:
-        #     ts_clean = ts_clean[:2000] + "... [TRUNCADO POR SEGURIDAD]"
         
         compact.append({
             "idx": i,
@@ -415,9 +414,9 @@ Analiza el prompt estructurado del Usuario:
             # 1. Agregar el resumen matemático y downsampling
             meta_copy["time_series_math_summary"] = self._summarize_time_series(ts_str)
             
-            # 2. Mantener la serie cruda truncada como pidió el usuario (para el lote actual)
-            if len(ts_str) > 4000:
-                meta_copy["time_series_raw_truncated"] = ts_str[:4000] + "... (truncado)"
+            # 2. Preview conciso de la serie cruda (máx 300 chars) para evitar explosión de tokens en el prompt
+            if len(ts_str) > 300:
+                meta_copy["time_series_raw_truncated"] = ts_str[:300] + "... (truncado)"
             else:
                 meta_copy["time_series_raw_truncated"] = ts_str
                 
@@ -491,6 +490,8 @@ Devuelve ÚNICAMENTE JSON. Indica con `true` o `false` en "accept_document" si d
 
         print(f"[{self.__class__.__name__}] Evaluando lote de {len(batch_metadata)} documentos con el LLM (esto puede tardar unos segundos)...")
         print("\n[DEBUG PROMPT MAESTRO]\n" + prompt[:1500] + "\n...\n")
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
         response = self.llm.generate_json(prompt, max_new_tokens=300, temperature=0.4)
         
         raw_accept = response.get("accept_document", False)

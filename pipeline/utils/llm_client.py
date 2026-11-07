@@ -8,6 +8,10 @@ import os
 import re
 from typing import Any, Dict, Optional
 
+# Prevenir fragmentación de VRAM en PyTorch (recomendado ante cargas intensivas de atención)
+if "PYTORCH_CUDA_ALLOC_CONF" not in os.environ:
+    os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -237,6 +241,9 @@ class LLMClient:
                     bnb_4bit_quant_type="nf4",
                     bnb_4bit_use_double_quant=True,
                 )
+                # CRÍTICO: torch_dtype DEBE ser float16 para que embed_tokens y lm_head
+                # no se carguen en float32 (ahorra ~2.2 GB de VRAM en GPU 0).
+                model_kwargs["torch_dtype"] = torch.float16
             except Exception as e:
                 print(f"[LLMClient] Aviso: No se pudo configurar BitsAndBytesConfig ({e}), continuando en fp16.")
                 model_kwargs["torch_dtype"] = torch.float16
@@ -245,6 +252,17 @@ class LLMClient:
 
         # En CUDA usamos device_map="auto" para repartir automáticamente entre GPUs disponibles (ej. 2x T4 en Kaggle)
         model_kwargs["device_map"] = "auto"
+        if num_gpus > 1:
+            # En configuraciones multi-GPU (ej. 2x T4 en Kaggle de ~15 GB cada una),
+            # Accelerate tiende a saturar GPU 0 al 98% dejando poco margen para atención SDPA y KV cache.
+            # Limitamos el peso estático del modelo en GPU 0 para garantizar ~5 GB libres para buffers dinámicos.
+            max_mem = {i: "13.5GiB" for i in range(num_gpus)}
+            max_mem[0] = "9.5GiB"
+            model_kwargs["max_memory"] = max_mem
+
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
         self._base_model = AutoModelForCausalLM.from_pretrained(
             model_path,
             **model_kwargs,

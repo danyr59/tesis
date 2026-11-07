@@ -51,6 +51,9 @@ Este cuaderno implementa el **Protocolo Experimental formal** de la tesis:
 !pip install -q sentence-transformers chromadb evaluate
 
 import os
+# Optimización de asignación de memoria PyTorch para evitar fragmentación en GPUs T4
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+
 import gc
 import sys
 import json
