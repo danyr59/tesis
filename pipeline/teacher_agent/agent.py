@@ -310,12 +310,13 @@ Analiza el prompt estructurado del Usuario:
     import re
     compact = []
     for i, meta in enumerate(rag_results["metadatas"][0]):
-        # Las bases de datos TSQA a veces incrustan números crudos dentro de 'question' o 'response'.
-        # Usamos regex robusto para eliminar cualquier arreglo entre corchetes (incluso con 'X', comas, letras)
-        q_text = str(meta.get("question", ""))
-        a_text = str(meta.get("response", ""))
-        q_clean = re.sub(r'\[[^\]]{15,}\]', '[ARREGLO DE NUMEROS REMOVIDO]', q_text)
-        a_clean = re.sub(r'\[[^\]]{15,}\]', '[ARREGLO DE NUMEROS REMOVIDO]', a_text)
+        # 1. Regex original intacta para números estándar (P1 a P5)
+        q_clean = re.sub(r'\[\s*[-\d.,\s]+\]', '[ARREGLO DE NUMEROS REMOVIDO]', q_text)
+        a_clean = re.sub(r'\[\s*[-\d.,\s]+\]', '[ARREGLO DE NUMEROS REMOVIDO]', a_text)
+        
+        # 2. Adicional: cubrir series que incluyan valores faltantes 'X', "X" o comillas (como en imputación P6)
+        q_clean = re.sub(r'\[\s*[-\d.,\s\'"xX]+\]', '[ARREGLO DE NUMEROS REMOVIDO]', q_clean)
+        a_clean = re.sub(r'\[\s*[-\d.,\s\'"xX]+\]', '[ARREGLO DE NUMEROS REMOVIDO]', a_clean)
         
         # TRUNCADO ABSOLUTO DE SEGURIDAD
         if len(q_clean) > 2000:
