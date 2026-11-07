@@ -310,6 +310,9 @@ Analiza el prompt estructurado del Usuario:
     import re
     compact = []
     for i, meta in enumerate(rag_results["metadatas"][0]):
+        q_text = str(meta.get("question", ""))
+        a_text = str(meta.get("response", ""))
+        
         # 1. Regex original intacta para números estándar (P1 a P5)
         q_clean = re.sub(r'\[\s*[-\d.,\s]+\]', '[ARREGLO DE NUMEROS REMOVIDO]', q_text)
         a_clean = re.sub(r'\[\s*[-\d.,\s]+\]', '[ARREGLO DE NUMEROS REMOVIDO]', a_text)
