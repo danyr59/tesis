@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import chromadb
 import numpy as np
+import torch
 from sentence_transformers import SentenceTransformer
 
 from pipeline.config.settings import Settings
