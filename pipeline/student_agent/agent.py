@@ -38,7 +38,10 @@ class StudentAgent:
         self.num_series_target = int(os.getenv("SYNTHETIC_NUM_SERIES", str(Settings.SYNTHETIC_NUM_SERIES)))
         self.points_per_series_target = int(os.getenv("SYNTHETIC_POINTS_PER_SERIES", str(Settings.SYNTHETIC_POINTS_PER_SERIES)))
 
-
+    @property
+    def is_reasoning_model(self) -> bool:
+        path = getattr(self.llm, "model_path", "") or ""
+        return any(tag in str(path).lower() for tag in ["deepseek", "r1"])
 
     def run_generation(self, structured_prompt: dict, teacher_response: dict) -> None:
         self.num_series_target = int(os.getenv("SYNTHETIC_NUM_SERIES", str(Settings.SYNTHETIC_NUM_SERIES)))
@@ -134,7 +137,8 @@ Selecciona los valores adecuados y justifica en modo verbose:
 RECUERDA PONER LOS VALORES
 
 """
-        reasoning = self.llm.generate_text(prompt, max_new_tokens=1024)
+        ft_tokens = 1500 if self.is_reasoning_model else 1024
+        reasoning = self.llm.generate_text(prompt, max_new_tokens=ft_tokens)
         
         prompt_json = f"""Vas a analizar el siguiente razonamiento:
         {reasoning} 
@@ -146,7 +150,7 @@ RECUERDA PONER LOS VALORES
         Nota: SOLO COMO RESPUESTA DEBES ENTREGAR EL JSON, SEGUIR EL FORMATO, sin cosas adicionales
 
 """ 
-        values_json = self.llm.generate_text(prompt_json, max_new_tokens=1024)
+        values_json = self.llm.generate_text(prompt_json, max_new_tokens=ft_tokens)
 
         values = extract_json_from_text(values_json)
 
@@ -347,8 +351,10 @@ Muestra de semillas: {json.dumps(seed_preview)[:500]}
 Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, RECUERDA DEBES GENERAR 10 VALORES POR SERIE):
 {example}
 """
-        # Usamos 500 tokens: el modelo termina naturalmente en ~320 tokens y se detiene solo vía EOS
-        response = self.llm.generate_json(prompt, max_new_tokens=500)
+        # Modelos con cadena de pensamiento (DeepSeek-R1) razonan antes de volcar el JSON,
+        # por lo que requieren mayor margen de tokens (1500) para no truncarse.
+        chunk_max_tokens = 1500 if self.is_reasoning_model else 500
+        response = self.llm.generate_json(prompt, max_new_tokens=chunk_max_tokens)
         series = response.get("synthetic_series", [])
         
         if not series:
@@ -360,7 +366,7 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
                 f"Comienza directamente con la estructura JSON solicitada:\n"
                 f"{example}"
             )
-            response = self.llm.generate_json(retry_prompt, max_new_tokens=500, temperature=0.2)
+            response = self.llm.generate_json(retry_prompt, max_new_tokens=chunk_max_tokens, temperature=0.2)
             series = response.get("synthetic_series", [])
         
         if series:

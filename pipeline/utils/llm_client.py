@@ -114,6 +114,8 @@ def extract_json_from_text(text: str) -> dict:
   if not text or not text.strip():
     return {}
   cleaned = text.strip()
+  # 0.5. Si el modelo es de tipo razonamiento (ej. DeepSeek-R1), remover bloques <think>...</think>
+  cleaned = re.sub(r"<think>.*?</think>", "", cleaned, flags=re.DOTALL).strip()
   fenced = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", cleaned, re.DOTALL)
   if fenced:
     cleaned = fenced.group(1)
