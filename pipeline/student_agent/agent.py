@@ -351,6 +351,18 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
         response = self.llm.generate_json(prompt, max_new_tokens=500)
         series = response.get("synthetic_series", [])
         
+        if not series:
+            # Reintento aditivo: si el modelo respondió con explicaciones en prosa sin números
+            retry_prompt = (
+                f"{prompt}\n\n"
+                f"[RECORDATORIO DE FORMATO: ENTREGA ÚNICAMENTE EL JSON]\n"
+                f"NO des explicaciones ni texto conversacional.\n"
+                f"Comienza directamente con la estructura JSON solicitada:\n"
+                f"{example}"
+            )
+            response = self.llm.generate_json(retry_prompt, max_new_tokens=500, temperature=0.2)
+            series = response.get("synthetic_series", [])
+        
         if series:
             # Extrapolar las semillas generadas por el LLM a su longitud final
             from pipeline.utils.series_utils import extend_series
