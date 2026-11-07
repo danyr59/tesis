@@ -316,11 +316,11 @@ Analiza el prompt estructurado del Usuario:
         q_clean = re.sub(r'\[[^\]]{15,}\]', '[ARREGLO DE NUMEROS REMOVIDO]', q_text)
         a_clean = re.sub(r'\[[^\]]{15,}\]', '[ARREGLO DE NUMEROS REMOVIDO]', a_text)
         
-        # TRUNCADO ESTRICTO DE SEGURIDAD PARA PROMPT (máx 400 caracteres)
-        if len(q_clean) > 400:
-            q_clean = q_clean[:400] + "... [TRUNCADO]"
-        if len(a_clean) > 400:
-            a_clean = a_clean[:400] + "... [TRUNCADO]"
+        # TRUNCADO ABSOLUTO DE SEGURIDAD
+        if len(q_clean) > 2000:
+            q_clean = q_clean[:2000] + "... [TRUNCADO POR SEGURIDAD]"
+        if len(a_clean) > 2000:
+            a_clean = a_clean[:2000] + "... [TRUNCADO POR SEGURIDAD]"
         
         ts_clean = str(meta.get("time_series", ""))
         
@@ -414,9 +414,9 @@ Analiza el prompt estructurado del Usuario:
             # 1. Agregar el resumen matemático y downsampling
             meta_copy["time_series_math_summary"] = self._summarize_time_series(ts_str)
             
-            # 2. Preview conciso de la serie cruda (máx 300 chars) para evitar explosión de tokens en el prompt
-            if len(ts_str) > 300:
-                meta_copy["time_series_raw_truncated"] = ts_str[:300] + "... (truncado)"
+            # 2. Mantener la serie cruda truncada como pidió el usuario (para el lote actual)
+            if len(ts_str) > 4000:
+                meta_copy["time_series_raw_truncated"] = ts_str[:4000] + "... (truncado)"
             else:
                 meta_copy["time_series_raw_truncated"] = ts_str
                 
