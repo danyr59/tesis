@@ -130,6 +130,8 @@ def extract_json_from_text(text: str) -> dict:
         cleaned = match.group(0)
       elif "{" in cleaned:
         cleaned = cleaned[cleaned.find("{") :]
+      elif "[" in cleaned and "]" in cleaned:
+        cleaned = cleaned[cleaned.find("[") : cleaned.rfind("]") + 1]
 
   # 1. Eliminar comentarios JS (// o /* */) que el LLM suele insertar
   cleaned = strip_json_comments(cleaned)
@@ -188,6 +190,24 @@ def extract_json_from_text(text: str) -> dict:
     except Exception:
       pass
 
+  # 8.5. Fallback para hiperparámetros (ej. cuando el modelo responde en asignaciones Python como en P2)
+  if "epochs" in text or "batch_size" in text or "learning_rate" in text:
+    hp_extracted = {}
+    m_ep = re.search(r"epochs?\s*[:=]\s*(\d+)", text, re.I)
+    if m_ep:
+      hp_extracted["epochs"] = int(m_ep.group(1))
+    m_bs = re.search(r"batch[_\s-]*size\s*[:=]\s*(\d+)", text, re.I)
+    if m_bs:
+      hp_extracted["batch_size"] = int(m_bs.group(1))
+    m_lr = re.search(r"learning[_\s-]*rate\s*[:=]\s*([\d.eE+-]+)", text, re.I)
+    if m_lr:
+      try:
+        hp_extracted["learning_rate"] = float(m_lr.group(1).rstrip("."))
+      except ValueError:
+        pass
+    if hp_extracted:
+      return hp_extracted
+
   # 9. Fallback: Usar raw_decode para ignorar caracteres sobrantes al final
   try:
     decoder = json.JSONDecoder(strict=False)
@@ -201,18 +221,20 @@ def extract_json_from_text(text: str) -> dict:
   except Exception:
     pass
 
-  # 9.5. Fallback: Si el modelo devolvió un arreglo crudo [[...], [...]] o [...]
+  # 9.5. Fallback: Si el modelo devolvió un arreglo crudo [[...], [...]] o [...] plano
   try:
-    array_match = re.search(r"(\[\s*\[.*?\]\s*\])", cleaned, re.DOTALL)
+    array_match = re.search(r"(\[\s*\[.*?\]\s*\]|\[\s*[-+\d.,eE\s]+\])", cleaned, re.DOTALL)
     if array_match:
       arr = json.loads(array_match.group(1), strict=False)
       if isinstance(arr, list):
+        if arr and isinstance(arr[0], (int, float)):
+          return {"synthetic_series": [arr]}
         return {"synthetic_series": arr}
   except Exception:
     pass
 
-  # 10. Fallback para series sintéticas: rescatar números si el LLM se truncó por tokens
-  if "synthetic_series" in text or "[[" in text or "series" in text.lower():
+  # 10. Fallback para series sintéticas: rescatar números si el LLM se truncó por tokens o tuvo typos
+  if "synthetic_series" in text or "[" in text or "series" in text.lower():
     nums = re.findall(r"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?", text)
     floats = [float(x) for x in nums if x != ""]
     if len(floats) >= 10:
