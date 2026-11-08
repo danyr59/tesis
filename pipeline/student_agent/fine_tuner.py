@@ -60,6 +60,9 @@ def parse_hyperparams_from_text(text: str, n_samples: int, hyperparams_json: Opt
 
   epochs = max(1, min(epochs, 15))
   batch_size = max(1, min(batch_size, 8))
+  # En añadidura: acotar learning rate a un rango numéricamente estable para LoRA en FP16
+  # (evita explosión de gradientes y valores NaN cuando el modelo propone valores >= 1e-3).
+  lr = max(1e-5, min(lr, 3e-4))
   return {"epochs": epochs, "batch_size": batch_size, "learning_rate": lr}
 
 
@@ -160,6 +163,7 @@ def run_lora_fine_tune(
     "num_train_epochs": hp["epochs"],
     "per_device_train_batch_size": 1,  # Forzar a 1 para evitar OOM
     "learning_rate": hp["learning_rate"],
+    "max_grad_norm": 0.3,  # Recorte de gradientes para prevenir desbordamientos numéricos en FP16
     "logging_steps": 5,
     "save_strategy": "no",
     "report_to": [],
