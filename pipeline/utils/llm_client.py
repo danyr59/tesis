@@ -390,9 +390,21 @@ class LLMClient:
       {"role": "user", "content": user_prompt},
     ]
     if hasattr(self.tokenizer, "apply_chat_template"):
-      prompt = self.tokenizer.apply_chat_template(
-        messages, tokenize=False, add_generation_prompt=True
-      )
+      try:
+        prompt = self.tokenizer.apply_chat_template(
+          messages, tokenize=False, add_generation_prompt=True
+        )
+      except Exception:
+        # Fallback para modelos que no admiten rol 'system' directamente (ej. Gemma)
+        messages_fallback = [
+          {"role": "user", "content": f"{system_prompt}\n\n{user_prompt}"}
+        ]
+        try:
+          prompt = self.tokenizer.apply_chat_template(
+            messages_fallback, tokenize=False, add_generation_prompt=True
+          )
+        except Exception:
+          prompt = f"{system_prompt}\n\nUsuario: {user_prompt}\n\nAsistente:"
     else:
       prompt = f"{system_prompt}\n\nUsuario: {user_prompt}\n\nAsistente:"
 

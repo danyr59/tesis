@@ -34,7 +34,7 @@ def create_notebook():
     cells.append(md("""# 🧪 Orquestador Experimental — Tesis de Grado (Kaggle)
 ### Generación y Destilación de Series Temporales con LLMs Ligeros
 Este cuaderno implementa el **Protocolo Experimental formal** de la tesis:
-* **6 Escenarios de Destilación:** 3 Intra-familia (Qwen, LLaMA, DeepSeek) y 3 Cross-Family.
+* **9 Escenarios de Destilación:** 3 Intra-familia (Qwen, LLaMA, Gemma) y 6 Cross-Family.
 * **5 Perfiles Temporales:** $P_1$ (Estable), $P_2$ (Estacional), $P_3$ (Tendencia-Estacional), $P_4$ (Tendencia-Ruido), $P_5$ (Complejo).
 * **Ciclo Automático de Purga de VRAM:** Cada modelo nace, cumple su función, se purga de memoria GPU y luego nace el siguiente.
 * **Persistencia Modular:** Cada corrida guarda sus datos sintéticos, el modelo Estudiante LoRA entrenado, configuración JSON para recreación futura, checkpoint RNN, predicciones, métricas y gráficos en carpetas independientes.
@@ -230,10 +230,10 @@ ESCENARIOS = {
         "student_id": "meta-llama/Llama-3.2-1B-Instruct",
     },
     "E3": {
-        "nombre": "E3_qwen_deepseek",
+        "nombre": "E3_qwen_gemma",
         "tipo": "Cross-Family",
         "teacher_id": "Qwen/Qwen2.5-7B-Instruct",
-        "student_id": "deepseek-ai/deepseek-coder-1.3b-instruct",
+        "student_id": "google/gemma-2-2b-it",
     },
 
     # ── BLOQUE 2: PADRE LLAMA (E4, E5, E6) ─────────────────────────────────
@@ -250,29 +250,29 @@ ESCENARIOS = {
         "student_id": "Qwen/Qwen2.5-1.5B-Instruct",
     },
     "E6": {
-        "nombre": "E6_llama_deepseek",
+        "nombre": "E6_llama_gemma",
         "tipo": "Cross-Family",
         "teacher_id": "meta-llama/Llama-3.1-8B-Instruct",
-        "student_id": "deepseek-ai/deepseek-coder-1.3b-instruct",
+        "student_id": "google/gemma-2-2b-it",
     },
 
-    # ── BLOQUE 3: PADRE DEEPSEEK (E7, E8, E9) ──────────────────────────────
+    # ── BLOQUE 3: PADRE GEMMA (E7, E8, E9) ─────────────────────────────────
     "E7": {
-        "nombre": "E7_deepseek_deepseek",
+        "nombre": "E7_gemma_gemma",
         "tipo": "Intra-Familia",
-        "teacher_id": "deepseek-ai/DeepSeek-Coder-6.7B-instruct",
-        "student_id": "deepseek-ai/deepseek-coder-1.3b-instruct",
+        "teacher_id": "google/gemma-2-9b-it",
+        "student_id": "google/gemma-2-2b-it",
     },
     "E8": {
-        "nombre": "E8_deepseek_qwen",
+        "nombre": "E8_gemma_qwen",
         "tipo": "Cross-Family",
-        "teacher_id": "deepseek-ai/DeepSeek-Coder-6.7B-instruct",
+        "teacher_id": "google/gemma-2-9b-it",
         "student_id": "Qwen/Qwen2.5-1.5B-Instruct",
     },
     "E9": {
-        "nombre": "E9_deepseek_llama",
+        "nombre": "E9_gemma_llama",
         "tipo": "Cross-Family",
-        "teacher_id": "deepseek-ai/DeepSeek-Coder-6.7B-instruct",
+        "teacher_id": "google/gemma-2-9b-it",
         "student_id": "meta-llama/Llama-3.2-1B-Instruct",
     },
 }
@@ -343,7 +343,7 @@ os.environ["GITHUB_TOKEN"] = os.getenv("GITHUB_TOKEN", "")
 #   • Opción B (Pesos pre-descargados): Si agregaste un dataset de Kaggle con los pesos
 #     del modelo ya descargados, coloca la ruta de /kaggle/input/... para no gastar internet.
 # NOTA: Durante la ejecución, el orquestador actualiza estas variables automáticamente 
-# según el escenario seleccionado (E1 = Qwen, E2 = LLaMA, E3 = DeepSeek, etc.).
+# según el escenario seleccionado (E1 = Qwen, E2 = LLaMA, E3 = Gemma, etc.).
 os.environ["TEACHER_MODEL_ID"] = "Qwen/Qwen2.5-7B-Instruct"
 os.environ["STUDENT_MODEL_ID"] = "Qwen/Qwen2.5-1.5B-Instruct"
 
@@ -435,14 +435,14 @@ print("=" * 80)"""))
 > * O por bloques temáticos de Padre:
 >     - Bloque Qwen (Padre Qwen): `["E1", "E2", "E3"]`
 >     - Bloque LLaMA (Padre LLaMA): `["E4", "E5", "E6"]`
->     - Bloque DeepSeek (Padre DeepSeek): `["E7", "E8", "E9"]`
+>     - Bloque Gemma (Padre Gemma): `["E7", "E8", "E9"]`
 > El orquestador detectará automáticamente el adaptador correspondiente para cada Maestro y purgará la VRAM entre ejecuciones."""))
     cells.append(code("""# =========================================================================
 # CONFIGURACIÓN DE LA CORRIDA DE HOY:
 # =========================================================================
 # Escenarios en cola para ejecutar en esta sesión:
 # Opciones disponibles: "E1" a "E9"
-ESCENARIOS_A_CORRER = ["E1"]
+ESCENARIOS_A_CORRER = ["E3"]
 
 # Lista de perfiles a ejecutar por cada escenario:
 PERFILES_A_CORRER = ["P1", "P2", "P3", "P4", "P5", "P6"]
@@ -518,10 +518,10 @@ purgar_memoria("Estado inicial")"""))
             Path("/kaggle/input/maestro-llama-adapter"),
             Path("/kaggle/input/danielrangelsanch/maestro-llama-adapter"),
         ],
-        "deepseek-ai/DeepSeek-Coder-6.7B-instruct": [
-            Path("/kaggle/input/datasets/danielrangelsanch/maestro-deepseek-adapter"),
-            Path("/kaggle/input/maestro-deepseek-adapter"),
-            Path("/kaggle/input/danielrangelsanch/maestro-deepseek-adapter"),
+        "google/gemma-2-9b-it": [
+            Path("/kaggle/input/datasets/danielrangelsanch/maestro-gemma-adapter"),
+            Path("/kaggle/input/maestro-gemma-adapter"),
+            Path("/kaggle/input/danielrangelsanch/maestro-gemma-adapter"),
         ],
     }
 
