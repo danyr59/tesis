@@ -29,6 +29,8 @@ MODELOS = [
         "familia": "qwen",
         "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj"],
         "max_seq_length": 768,
+        "batch_size": 2,
+        "gradient_accumulation_steps": 2,
         "escenarios": "E1 (Intra Qwen -> Qwen)",
         "zip_name": "adapter_maestro_qwen.zip",
         "output_dir_name": "adapter_maestro_qwen",
@@ -42,6 +44,8 @@ MODELOS = [
         "familia": "llama",
         "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj"],
         "max_seq_length": 768,
+        "batch_size": 2,
+        "gradient_accumulation_steps": 2,
         "escenarios": "E2 (Intra LLaMA -> LLaMA) y E4 (Cross LLaMA -> Qwen)",
         "zip_name": "adapter_maestro_llama.zip",
         "output_dir_name": "adapter_maestro_llama",
@@ -54,7 +58,9 @@ MODELOS = [
         "repo_id": "google/gemma-2-9b-it",
         "familia": "gemma",
         "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj"],
-        "max_seq_length": 768,
+        "max_seq_length": 512,
+        "batch_size": 1,
+        "gradient_accumulation_steps": 4,
         "escenarios": "E7 (Intra Gemma -> Gemma), E8 (Cross Gemma -> Qwen) y E9 (Cross Gemma -> LLaMA)",
         "zip_name": "adapter_maestro_gemma.zip",
         "output_dir_name": "adapter_maestro_gemma",
@@ -144,8 +150,8 @@ ZIP_OUTPUT = "/content/{m['zip_name']}"
 # - Con num_train_epochs = 1: Toma aproximadamente 4.0 a 4.3 horas en GPU T4 (cobertura total de 768 tokens y 120 puntos).
 HIPERPARAMETROS = {{
     "num_train_epochs": 1,            # 1 época completa (~4.2 horas, ideal para Colab gratis)
-    "per_device_train_batch_size": 2, # Batch=2 satura eficientemente los Tensor Cores
-    "gradient_accumulation_steps": 2, # Batch efectivo = 4 (~1.648 pasos totales)
+    "per_device_train_batch_size": {m.get('batch_size', 2)}, # Batch adaptado a la VRAM de la GPU
+    "gradient_accumulation_steps": {m.get('gradient_accumulation_steps', 2)}, # Batch efectivo = 4 (~1.648 pasos totales)
     "learning_rate": 2e-4,            # Tasa de convergencia LoRA recomendada
     "lora_r": 16,                     # Rango de adaptación LoRA
     "lora_alpha": 32,                 # alpha = 2 * r
@@ -437,6 +443,7 @@ training_args = TrainingArguments(
     optim="paged_adamw_8bit",
     report_to="none",
     gradient_checkpointing=True,
+    gradient_checkpointing_kwargs={"use_reentrant": False},
     dataloader_num_workers=2,
     dataloader_pin_memory=False,
 )

@@ -26,6 +26,8 @@ MODELOS = [
         "familia": "qwen",
         "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj"],
         "max_seq_length": 768,
+        "batch_size": 2,
+        "gradient_accumulation_steps": 2,
         "escenarios": "E1 (Intra Qwen -> Qwen)",
         "zip_name": "adapter_maestro_qwen.zip",
         "output_dir_name": "adapter_maestro_qwen",
@@ -39,6 +41,8 @@ MODELOS = [
         "familia": "llama",
         "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj"],
         "max_seq_length": 768,
+        "batch_size": 2,
+        "gradient_accumulation_steps": 2,
         "escenarios": "E2 (Intra LLaMA -> LLaMA) y E4 (Cross LLaMA -> Qwen)",
         "zip_name": "adapter_maestro_llama.zip",
         "output_dir_name": "adapter_maestro_llama",
@@ -51,7 +55,9 @@ MODELOS = [
         "repo_id": "google/gemma-2-9b-it",
         "familia": "gemma",
         "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj"],
-        "max_seq_length": 768,
+        "max_seq_length": 512,
+        "batch_size": 1,
+        "gradient_accumulation_steps": 4,
         "escenarios": "E7 (Intra Gemma -> Gemma), E8 (Cross Gemma -> Qwen) y E9 (Cross Gemma -> LLaMA)",
         "zip_name": "adapter_maestro_gemma.zip",
         "output_dir_name": "adapter_maestro_gemma",
@@ -117,6 +123,9 @@ Este cuaderno está configurado para ejecutarse en **Kaggle (GPU P100 o GPU T4 x
     cells.append(code("""import os
 import torch
 
+# Optimización de asignación de memoria PyTorch para evitar fragmentación en GPUs T4
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+
 # Forzar GPU 0 si hay múltiples GPUs para estabilidad con BitsAndBytes QLoRA
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
@@ -145,8 +154,8 @@ ZIP_OUTPUT = "/kaggle/working/{m['zip_name']}"
 # Con 1 época el modelo ve el 100% de los 8.787 ejemplos del dataset y culmina en ~2.5 - 3.5 horas en Kaggle.
 HIPERPARAMETROS = {{
     "num_train_epochs": 1,            # 1 época completa (~3h en P100 / T4)
-    "per_device_train_batch_size": 2, # Batch=2 aprovecha la RAM y Tensor Cores
-    "gradient_accumulation_steps": 2, # Batch efectivo = 4 (~1.648 pasos totales)
+    "per_device_train_batch_size": {m.get('batch_size', 2)}, # Batch adaptado a la VRAM de la GPU
+    "gradient_accumulation_steps": {m.get('gradient_accumulation_steps', 2)}, # Batch efectivo = 4 (~1.648 pasos totales)
     "learning_rate": 2e-4,            # Tasa de convergencia LoRA recomendada
     "lora_r": 16,                     # Rango de adaptación LoRA
     "lora_alpha": 32,                 # alpha = 2 * r
@@ -419,6 +428,7 @@ training_args = TrainingArguments(
     optim="paged_adamw_8bit",
     report_to="none",
     gradient_checkpointing=True,
+    gradient_checkpointing_kwargs={"use_reentrant": False},
     dataloader_num_workers=2,
     dataloader_pin_memory=True,
 )

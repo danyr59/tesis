@@ -70,6 +70,9 @@ import shutil
 import torch
 from pathlib import Path
 
+# Optimización de asignación de memoria PyTorch para evitar fragmentación en GPUs T4
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+
 print("=" * 65)
 print(f"CUDA Disponible: {torch.cuda.is_available()}")
 if torch.cuda.is_available():
@@ -112,7 +115,7 @@ CONFIG_MODELOS = {
         "repo_id": "google/gemma-2-9b-it",
         "familia": "gemma",
         "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
-        "max_seq_length": 1024,
+        "max_seq_length": 512,
     }
 }
 
