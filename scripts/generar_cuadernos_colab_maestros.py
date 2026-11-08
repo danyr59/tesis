@@ -58,7 +58,7 @@ MODELOS = [
         "repo_id": "google/gemma-2-9b-it",
         "familia": "gemma",
         "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj"],
-        "max_seq_length": 512,
+        "max_seq_length": 768,
         "batch_size": 1,
         "gradient_accumulation_steps": 4,
         "escenarios": "E7 (Intra Gemma -> Gemma), E8 (Cross Gemma -> Qwen) y E9 (Cross Gemma -> LLaMA)",
