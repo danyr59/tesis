@@ -269,13 +269,18 @@ class LLMClient:
         "trust_remote_code": True,
         "attn_implementation": "sdpa" if self.device == "cuda" else "eager",
     }
+    # En añadidura: los modelos Gemma (ej. Gemma 2) requieren atención 'eager'
+    # debido a su mecanismo de logit soft-capping y sliding window attention.
+    # Modelos como Qwen y LLaMA continúan usando 'sdpa' intacto.
+    if "gemma" in str(model_path).lower():
+        model_kwargs["attn_implementation"] = "eager"
 
     if self.device == "cuda":
         num_gpus = torch.cuda.device_count()
         use_4bit_env = os.environ.get("USE_4BIT", "").lower() in ("true", "1", "yes")
 
         gpu_capability = torch.cuda.get_device_capability(0) if num_gpus > 0 else (0, 0)
-        is_large_model = any(tag in model_path.lower() for tag in ["7b", "8b", "6.7b", "14b"])
+        is_large_model = any(tag in model_path.lower() for tag in ["7b", "8b", "6.7b", "9b", "14b"])
         # Tesla T4 (sm_75, capability < 8.0) no tiene soporte de hardware para bfloat16.
         # En modelos 7B+ entrenados nativamente en bf16 (Qwen 2.5, Llama 3.1), usar float16 sin cuantizar
         # causa desbordamiento de activaciones en atención (>65504).
