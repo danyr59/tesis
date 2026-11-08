@@ -45,17 +45,17 @@ MODELOS = [
         "gated_info": "⚠️ MODELO GATED: Debes haber aceptado la licencia de Meta en Hugging Face y agregar tu HF_TOKEN en Kaggle Secrets (Add-ons -> Secrets)."
     },
     {
-        "id": "deepseek",
+        "id": "gemma",
         "num": "03",
-        "nombre": "DeepSeek Coder 6.7B Instruct",
-        "repo_id": "deepseek-ai/DeepSeek-Coder-6.7B-instruct",
-        "familia": "deepseek",
+        "nombre": "Gemma 2 9B Instruct",
+        "repo_id": "google/gemma-2-9b-it",
+        "familia": "gemma",
         "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj"],
         "max_seq_length": 768,
-        "escenarios": "E3 (Intra DeepSeek), E5 (DeepSeek -> LLaMA) y E6 (DeepSeek -> Qwen)",
-        "zip_name": "adapter_maestro_deepseek.zip",
-        "output_dir_name": "adapter_maestro_deepseek",
-        "gated_info": "Este modelo es público en Hugging Face y se descarga directamente."
+        "escenarios": "E7 (Intra Gemma -> Gemma), E8 (Cross Gemma -> Qwen) y E9 (Cross Gemma -> LLaMA)",
+        "zip_name": "adapter_maestro_gemma.zip",
+        "output_dir_name": "adapter_maestro_gemma",
+        "gated_info": "⚠️ MODELO GATED: Debes haber aceptado la licencia de Google Gemma en Hugging Face y agregar tu HF_TOKEN en Kaggle Secrets (Add-ons -> Secrets)."
     }
 ]
 
@@ -348,13 +348,19 @@ bnb_config = BitsAndBytesConfig(
     bnb_4bit_use_double_quant=True,
 )
 
+model_kwargs = {
+    "quantization_config": bnb_config,
+    "device_map": {"": "cuda:0"},
+    "trust_remote_code": True,
+    "low_cpu_mem_usage": True,
+}
+if "gemma" in MODELO_ID.lower():
+    model_kwargs["attn_implementation"] = "eager"
+
 print(f"🚀 Cargando modelo base {MODELO_ID} en 4-bit...")
 base_model = AutoModelForCausalLM.from_pretrained(
     MODELO_ID,
-    quantization_config=bnb_config,
-    device_map={"": "cuda:0"},
-    trust_remote_code=True,
-    low_cpu_mem_usage=True,
+    **model_kwargs,
 )
 
 # 2. Habilitar Gradient Checkpointing para ahorro de VRAM

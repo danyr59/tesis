@@ -38,7 +38,7 @@ Este cuaderno permite realizar el **fine-tuning de adaptación de dominio (Domai
 |---|---|---|---|---|
 | **1** | `Qwen/Qwen2.5-7B-Instruct` | Qwen | ~7.6B | $E_1$ (Intra Qwen $\to$ Qwen) |
 | **2** | `meta-llama/Llama-3.1-8B-Instruct` | LLaMA | ~8.0B | $E_2$ (Intra LLaMA $\to$ LLaMA), $E_4$ (Cross LLaMA $\to$ Qwen) |
-| **3** | `deepseek-ai/DeepSeek-Coder-6.7B-instruct` | DeepSeek | ~6.7B | $E_3$ (Intra DeepSeek), $E_5$ (DeepSeek $\to$ LLaMA), $E_6$ (DeepSeek $\to$ Qwen) |
+| **3** | `google/gemma-2-9b-it` | Gemma | ~9.2B | $E_7$ (Intra Gemma $\to$ Gemma), $E_8$ (Cross Gemma $\to$ Qwen), $E_9$ (Cross Gemma $\to$ LLaMA) |
 
 ---
 ### 📊 Análisis de Consumo de Memoria (RAM y VRAM) en Kaggle (Tesla T4)
@@ -88,9 +88,9 @@ print("=" * 65)"""))
     cells.append(md("""## 3. Selector del Modelo Padre a Entrenar"""))
     cells.append(code("""# =============================================================================
 # SELECCIONA EL MODELO PADRE A ENTRENAR CAMBIANDO LA VARIABLE 'MODELO_KEY':
-# Opciones disponibles: "QWEN_7B" | "LLAMA_8B" | "DEEPSEEK_7B"
+# Opciones disponibles: "QWEN_7B" | "LLAMA_8B" | "GEMMA_9B"
 # =============================================================================
-MODELO_KEY = "QWEN_7B"
+MODELO_KEY = "GEMMA_9B"
 
 CONFIG_MODELOS = {
     "QWEN_7B": {
@@ -107,10 +107,10 @@ CONFIG_MODELOS = {
         "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
         "max_seq_length": 1024,
     },
-    "DEEPSEEK_7B": {
-        "nombre": "DeepSeek Coder 6.7B Instruct",
-        "repo_id": "deepseek-ai/DeepSeek-Coder-6.7B-instruct",
-        "familia": "deepseek",
+    "GEMMA_9B": {
+        "nombre": "Gemma 2 9B Instruct",
+        "repo_id": "google/gemma-2-9b-it",
+        "familia": "gemma",
         "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
         "max_seq_length": 1024,
     }
@@ -298,11 +298,17 @@ bnb_config = BitsAndBytesConfig(
 )
 
 print(f"🚀 Cargando modelo base '{cfg['repo_id']}' en cuantización 4-bit NF4...")
+model_kwargs = {
+    "quantization_config": bnb_config,
+    "device_map": "auto",
+    "trust_remote_code": True,
+}
+if "gemma" in cfg["repo_id"].lower():
+    model_kwargs["attn_implementation"] = "eager"
+
 base_model = AutoModelForCausalLM.from_pretrained(
     cfg["repo_id"],
-    quantization_config=bnb_config,
-    device_map="auto",
-    trust_remote_code=True,
+    **model_kwargs,
 )
 
 # 2. Preparar el modelo para entrenamiento en k-bit con Gradient Checkpointing
