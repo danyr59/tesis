@@ -133,7 +133,22 @@ def extract_json_from_text(text: str) -> dict:
       elif "{" in cleaned:
         cleaned = cleaned[cleaned.find("{") :]
       elif "[" in cleaned and "]" in cleaned:
-        cleaned = cleaned[cleaned.find("[") : cleaned.rfind("]") + 1]
+        # En añadidura: No confundir etiquetas de metadatos tipo [PERFIL ...] con arreglos JSON numéricos
+        arr_cand = re.search(r"(\[\s*\[.*?\]\s*\]|\[\s*[-+\d.,eE\s]{3,}\])", cleaned, re.DOTALL)
+        if arr_cand:
+          cleaned = arr_cand.group(1)
+        else:
+          # Si no hay arreglo numérico estricto, buscar corchetes pero descartar cabeceras conocidas entre corchetes
+          text_sin_tags = re.sub(
+            r"\[(PERFIL|DOMINIO|ESCALA|RECORDATORIO|REGLAS|EJEMPLOS)[^\]]*\]",
+            "",
+            cleaned,
+            flags=re.IGNORECASE,
+          ).strip()
+          if "[" in text_sin_tags and "]" in text_sin_tags:
+            cleaned = text_sin_tags[text_sin_tags.find("[") : text_sin_tags.rfind("]") + 1]
+          elif "[" in cleaned and "]" in cleaned:
+            cleaned = cleaned[cleaned.find("[") : cleaned.rfind("]") + 1]
 
   # 1. Eliminar comentarios JS (// o /* */) que el LLM suele insertar
   cleaned = strip_json_comments(cleaned)
@@ -361,7 +376,25 @@ class LLMClient:
                 torch.cuda.empty_cache()
             elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
                 torch.mps.empty_cache()
-            
+
+        # En añadidura: Si el modelo base fue envuelto previamente por get_peft_model (ej. durante fine-tuning in-place),
+        # descargamos/unificamos el adaptador previo para evitar apilar adaptadores dobles (UserWarning en PEFT).
+        target_base = self._base_model
+        if hasattr(target_base, "unload"):
+            try:
+                target_base = target_base.unload()
+                self._base_model = target_base
+            except Exception:
+                pass
+        elif hasattr(target_base, "base_model") and hasattr(target_base.base_model, "model"):
+            target_base = getattr(target_base.base_model, "model", target_base)
+            self._base_model = target_base
+
+        if hasattr(target_base, "peft_config"):
+            try:
+                delattr(target_base, "peft_config")
+            except Exception:
+                pass
 
         print(f"[LLMClient] Cargando adapter LoRA: {adapter_path}", flush=True)
         self.model = PeftModel.from_pretrained(self._base_model, adapter_path)

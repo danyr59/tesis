@@ -358,15 +358,16 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
         series = response.get("synthetic_series", [])
         
         if not series:
-            # Reintento aditivo: si el modelo respondió con explicaciones en prosa sin números
+            # Reintento aditivo: si el modelo no entregó JSON válido o se atascó repitiendo el prompt
+            # Usamos un prompt directo enfocado en la salida numérica y temperatura estocástica (0.3)
             retry_prompt = (
-                f"{prompt}\n\n"
-                f"[RECORDATORIO DE FORMATO: ENTREGA ÚNICAMENTE EL JSON]\n"
-                f"NO des explicaciones ni texto conversacional.\n"
-                f"Comienza directamente con la estructura JSON solicitada:\n"
+                f"Genera exactamente {num_series} series temporales sintéticas de 10 puntos para el perfil {profile_id}.\n"
+                f"Tendencia: {profile['trend_expected']}, Ruido: {profile['noise_expected']}.\n"
+                f"{scale_guideline}\n"
+                f"Devuelve ÚNICAMENTE la estructura JSON requerida sin explicaciones:\n"
                 f"{example}"
             )
-            response = self.llm.generate_json(retry_prompt, max_new_tokens=chunk_max_tokens, temperature=0.2)
+            response = self.llm.generate_json(retry_prompt, max_new_tokens=chunk_max_tokens, temperature=0.3)
             series = response.get("synthetic_series", [])
         
         if series:
