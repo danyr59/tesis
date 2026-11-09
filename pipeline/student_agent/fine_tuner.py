@@ -58,7 +58,9 @@ def parse_hyperparams_from_text(text: str, n_samples: int, hyperparams_json: Opt
     except (ValueError, TypeError) as e:
       print(f"[FineTuner] Error parsing JSON hyperparameters ({e}), fallback to text parsing.")
 
-  epochs = max(1, min(epochs, 15))
+  # En añadidura: acotar épocas a un rango óptimo de SFT (máx 3) para datasets pequeños (~45-50 semillas).
+  # Evita sobreajuste severo y pérdida de seguimiento de instrucciones en modelos compactos (1B-2B).
+  epochs = max(1, min(epochs, 3))
   batch_size = max(1, min(batch_size, 8))
   # En añadidura: acotar learning rate a un rango numéricamente estable para LoRA en FP16
   # (evita explosión de gradientes y valores NaN cuando el modelo propone valores >= 1e-3).

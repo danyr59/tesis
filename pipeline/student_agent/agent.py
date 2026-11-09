@@ -352,9 +352,20 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
 {example}
 """
         # Modelos con cadena de pensamiento (DeepSeek-R1) razonan antes de volcar el JSON,
-        # por lo que requieren mayor margen de tokens (1500) para no truncarse.
+        # por lo que no usan assistant_prefix y requieren mayor margen de tokens (1500).
         chunk_max_tokens = 1500 if self.is_reasoning_model else 500
-        response = self.llm.generate_json(prompt, max_new_tokens=chunk_max_tokens)
+        prefix_to_use = None if self.is_reasoning_model else '{"synthetic_series": ['
+        strict_sys_prompt = (
+            "You are a raw numeric data generator. Output ONLY valid JSON starting with {\"synthetic_series\":. "
+            "Never output conversational text, preambles, or explanations."
+        )
+
+        response = self.llm.generate_json(
+            prompt,
+            system_prompt=strict_sys_prompt,
+            max_new_tokens=chunk_max_tokens,
+            assistant_prefix=prefix_to_use,
+        )
         series = response.get("synthetic_series", [])
         
         if not series:
@@ -367,7 +378,13 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
                 f"Devuelve ÚNICAMENTE la estructura JSON requerida sin explicaciones:\n"
                 f"{example}"
             )
-            response = self.llm.generate_json(retry_prompt, max_new_tokens=chunk_max_tokens, temperature=0.3)
+            response = self.llm.generate_json(
+                retry_prompt,
+                system_prompt=strict_sys_prompt,
+                max_new_tokens=chunk_max_tokens,
+                temperature=0.3,
+                assistant_prefix=prefix_to_use,
+            )
             series = response.get("synthetic_series", [])
         
         if series:

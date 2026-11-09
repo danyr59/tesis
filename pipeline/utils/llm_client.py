@@ -225,6 +225,19 @@ def extract_json_from_text(text: str) -> dict:
     if hp_extracted:
       return hp_extracted
 
+  # 8.8. Auto-reparación de cierres incompletos si se agotaron los tokens al final
+  if cleaned.startswith("{") and not cleaned.endswith("}"):
+    open_curlies = cleaned.count("{") - cleaned.count("}")
+    open_brackets = cleaned.count("[") - cleaned.count("]")
+    if open_brackets > 0 or open_curlies > 0:
+      candidate_repaired = cleaned + ("]" * max(0, open_brackets)) + ("}" * max(0, open_curlies))
+      try:
+        obj = json.loads(candidate_repaired, strict=False)
+        if isinstance(obj, dict):
+          return obj
+      except Exception:
+        pass
+
   # 9. Fallback: Usar raw_decode para ignorar caracteres sobrantes al final
   try:
     decoder = json.JSONDecoder(strict=False)
@@ -418,6 +431,7 @@ class LLMClient:
     system_prompt: Optional[str] = None,
     max_new_tokens: Optional[int] = None,
     temperature: float = 0.0,
+    assistant_prefix: Optional[str] = None,
   ) -> str:
     system_prompt = system_prompt or (
       f"Eres un {self.role_name} experto en series temporales. "
@@ -446,6 +460,12 @@ class LLMClient:
     else:
       prompt = f"{system_prompt}\n\nUsuario: {user_prompt}\n\nAsistente:"
 
+    # Si se especifica un prefijo del asistente (ej. '{"synthetic_series": ['),
+    # se concatena al final del prompt para forzar al modelo a continuar directamente generando los datos
+    # sin emitir texto introductorio ni explicaciones conversacionales.
+    if assistant_prefix:
+      prompt = prompt + assistant_prefix
+
     target_device = getattr(self.model, "device", None) or self.device
     inputs = self.tokenizer(prompt, return_tensors="pt").to(target_device)
     max_new = max_new_tokens or Settings.LLM_MAX_NEW_TOKENS
@@ -470,7 +490,8 @@ class LLMClient:
       )
 
     new_tokens = output_ids[0, inputs["input_ids"].shape[1] :]
-    text = self.tokenizer.decode(new_tokens, skip_special_tokens=True).strip()
+    decoded = self.tokenizer.decode(new_tokens, skip_special_tokens=True).strip()
+    text = (assistant_prefix + decoded) if assistant_prefix else decoded
     
     # --- Limpieza de Memoria GPU ---
     import gc
@@ -492,11 +513,13 @@ class LLMClient:
     system_prompt: Optional[str] = None,
     max_new_tokens: Optional[int] = None,
     temperature: float = 0.0,
+    assistant_prefix: Optional[str] = None,
   ) -> dict:
     text = self.generate_text(
       user_prompt=user_prompt,
       system_prompt=system_prompt,
       max_new_tokens=max_new_tokens,
       temperature=temperature,
+      assistant_prefix=assistant_prefix,
     )
     return extract_json_from_text(text)
