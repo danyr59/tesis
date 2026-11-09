@@ -58,14 +58,19 @@ def parse_hyperparams_from_text(text: str, n_samples: int, hyperparams_json: Opt
     except (ValueError, TypeError) as e:
       print(f"[FineTuner] Error parsing JSON hyperparameters ({e}), fallback to text parsing.")
 
-  # En añadidura: acotar épocas a un rango óptimo de SFT (máx 3) para datasets pequeños (~45-50 semillas).
-  # Evita sobreajuste severo y pérdida de seguimiento de instrucciones en modelos compactos (1B-2B).
-  epochs = max(1, min(epochs, 3))
-  batch_size = max(1, min(batch_size, 8))
-  # En añadidura: acotar learning rate a un rango numéricamente estable para LoRA en FP16
-  # (evita explosión de gradientes y valores NaN cuando el modelo propone valores >= 1e-3).
-  lr = max(1e-5, min(lr, 3e-4))
-  return {"epochs": epochs, "batch_size": batch_size, "learning_rate": lr}
+  # Configuración estándar controlada para el protocolo experimental de la tesis:
+  # Garantiza paridad de condiciones (ceteris paribus) y reproducibilidad científica entre escenarios E1-E9.
+  # El modelo razona y sugiere valores en la consola, pero el benchmark fija el estándar formal:
+  # 3 épocas completas, batch size físico 1 (efectivo 4 con acumulación) y tasa de aprendizaje 2e-4.
+  STD_EPOCHS = 3
+  STD_BATCH_SIZE = 1
+  STD_LR = 2e-4
+
+  print(
+    f"[FineTuner] Hiperparámetros propuestos por LLM: épocas={epochs}, batch={batch_size}, lr={lr} "
+    f"-> Estandarizados para comparabilidad de tesis: épocas={STD_EPOCHS}, batch={STD_BATCH_SIZE} (acum=4), lr={STD_LR}"
+  )
+  return {"epochs": STD_EPOCHS, "batch_size": STD_BATCH_SIZE, "learning_rate": STD_LR}
 
 
 def _build_training_records(
