@@ -119,7 +119,14 @@ class LogitDistillationTrainer(Trainer):
     if self.teacher_model is not None:
       self.teacher_model.eval()
 
-  def compute_loss(self, model, inputs, return_outputs=False):
+  def compute_loss(
+      self,
+      model,
+      inputs,
+      return_outputs=False,
+      num_items_in_batch=None,
+      **kwargs,
+  ):
     # 1. Forward del modelo Estudiante
     outputs = model(**inputs)
     student_logits = outputs.logits
