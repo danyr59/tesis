@@ -48,6 +48,11 @@ class Settings:
   LORA_ALPHA = int(os.getenv("LORA_ALPHA", "16"))
   LORA_DROPOUT = float(os.getenv("LORA_DROPOUT", "0.05"))
 
+  # Destilación de conocimiento basada en Logits (Logit Knowledge Distillation)
+  USE_LOGIT_DISTILLATION = os.getenv("USE_LOGIT_DISTILLATION", "true").lower() == "true"
+  KD_TEMPERATURE = float(os.getenv("KD_TEMPERATURE", "2.0"))
+  KD_ALPHA = float(os.getenv("KD_ALPHA", "0.5"))
+
   # Paths de salida
   SYNTHETIC_DATA_DIR = "./data/synthetic"
   SYNTHETIC_CSV_NAME = "synthetic_series.csv"

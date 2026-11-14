@@ -96,12 +96,12 @@ input_code_dir = Path("/kaggle/input/proyecto-tesis-codigo")
 git_exitoso = False
 try:
     if (PROJECT_ROOT / ".git").exists():
-        print("🔄 Actualizando repositorio existente desde GitHub (rama kaggle_experimentos)...")
-        !git -C {PROJECT_ROOT} fetch origin kaggle_experimentos
-        !git -C {PROJECT_ROOT} reset --hard origin/kaggle_experimentos
+        print("🔄 Actualizando repositorio existente desde GitHub (rama kaggle_experimentos_logit)...")
+        !git -C {PROJECT_ROOT} fetch origin kaggle_experimentos_logit
+        !git -C {PROJECT_ROOT} reset --hard origin/kaggle_experimentos_logit
         git_exitoso = (pipeline_dir / "teacher_agent").exists()
     elif not pipeline_dir.exists():
-        print("📥 Clonando repositorio desde GitHub (rama kaggle_experimentos)...")
+        print("📥 Clonando repositorio desde GitHub (rama kaggle_experimentos_logit)...")
         gh_token = None
         try:
             from kaggle_secrets import UserSecretsClient
@@ -111,10 +111,10 @@ try:
             
         if gh_token:
             print("🔑 Usando GITHUB_TOKEN para clonar repositorio...")
-            !GIT_TERMINAL_PROMPT=0 git clone -b kaggle_experimentos https://oauth2:{gh_token}@github.com/danyr59/tesis_antes.git {PROJECT_ROOT}
+            !GIT_TERMINAL_PROMPT=0 git clone -b kaggle_experimentos_logit https://oauth2:{gh_token}@github.com/danyr59/tesis_antes.git {PROJECT_ROOT}
         else:
             print("ℹ️ Clonando con credenciales públicas (GIT_TERMINAL_PROMPT=0)...")
-            !GIT_TERMINAL_PROMPT=0 git clone -b kaggle_experimentos https://github.com/danyr59/tesis_antes.git {PROJECT_ROOT}
+            !GIT_TERMINAL_PROMPT=0 git clone -b kaggle_experimentos_logit https://github.com/danyr59/tesis_antes.git {PROJECT_ROOT}
         git_exitoso = (pipeline_dir / "teacher_agent").exists()
 except Exception as e_git:
     print(f"ℹ️ Git clone/pull no disponible: {e_git}")
@@ -396,6 +396,13 @@ os.environ["LORA_ALPHA"] = "16"                    # Multiplicador escalar alpha
 os.environ["LORA_DROPOUT"] = "0.05"                # Dropout aplicado a las capas LoRA
 
 # -----------------------------------------------------------------------------
+# 7. DESTILACIÓN BASADA EN LOGITS (KNOWLEDGE DISTILLATION HINTON)
+# -----------------------------------------------------------------------------
+os.environ["USE_LOGIT_DISTILLATION"] = "true"      # Activa pérdida mixta CE + KL
+os.environ["KD_TEMPERATURE"] = "2.0"               # Temperatura de suavizado de logits (Hinton)
+os.environ["KD_ALPHA"] = "0.5"                     # Ponderación: 50% Hard Loss (CE) + 50% Soft Loss (KL)
+
+# -----------------------------------------------------------------------------
 # DIAGNÓSTICO Y VERIFICACIÓN EN CONSOLA
 # -----------------------------------------------------------------------------
 print("=" * 80)
@@ -408,6 +415,7 @@ categorias = {
     "🔍 RAG": ["RAG_TOP_K"],
     "📈 Generación": ["SYNTHETIC_NUM_SERIES", "SYNTHETIC_POINTS_PER_SERIES", "SYNTHETIC_CHUNK_SERIES", "SYNTHETIC_CHUNK_POINTS", "LLM_MAX_NEW_TOKENS"],
     "⚡ LoRA": ["LORA_R", "LORA_ALPHA", "LORA_DROPOUT"],
+    "🧪 Logit KD": ["USE_LOGIT_DISTILLATION", "KD_TEMPERATURE", "KD_ALPHA"],
 }
 
 for cat, vars_list in categorias.items():
@@ -442,10 +450,11 @@ print("=" * 80)"""))
 # =========================================================================
 # Escenarios en cola para ejecutar en esta sesión:
 # Opciones disponibles: "E1" a "E9"
-ESCENARIOS_A_CORRER = ["E3"]
+ESCENARIOS_A_CORRER = ["E1"]
 
 # Lista de perfiles a ejecutar por cada escenario:
-PERFILES_A_CORRER = ["P1", "P2", "P3", "P4", "P5", "P6"]
+# Para comparar Logit Distillation vs SFT: ["P1", "P2", "P3"]
+PERFILES_A_CORRER = ["P1", "P2", "P3"]
 
 # Si es False, salta automáticamente cualquier perfil que ya tenga métricas guardadas
 # (ideal si se reinicia la sesión o para retomar sin repetir trabajo previo)
@@ -550,7 +559,28 @@ purgar_memoria("Estado inicial")"""))
     structured_prompt = teacher.interpret_request(perf_info["query"])
     teacher_response = teacher.process_request(structured_prompt)
     
-    # PURGA DEL MAESTRO
+    # -------------------------------------------------------------------------
+    # FASE 2: NACE EL ESTUDIANTE (Destilación LoRA + Logits y Síntesis)
+    # -------------------------------------------------------------------------
+    print("\\n[Fase 2] Inicializando Estudiante con Logit Distillation...")
+    from pipeline.student_agent.agent import StudentAgent
+    student = StudentAgent()
+    
+    current_dataset = teacher_response.get("seed_dataset", [])
+    if not current_dataset:
+        print("❌ Error: No se obtuvieron semillas del Maestro.")
+        return None
+        
+    teacher_active_model = getattr(teacher.llm, "model", None) if hasattr(teacher, "llm") else None
+    
+    final_model_path = student.fine_tune(
+        current_dataset,
+        teacher_response.get("metadata_summary", {}),
+        iteration=0,
+        teacher_model=teacher_active_model,
+    )
+    
+    # PURGA DEL MAESTRO (Ya cumplió su rol en razonamiento y en logits)
     print("\\n[Fase 1] Purgando Maestro de VRAM...")
     if hasattr(teacher, "embedder"):
         del teacher.embedder
@@ -560,23 +590,7 @@ purgar_memoria("Estado inicial")"""))
         if hasattr(teacher.llm, "tokenizer"): del teacher.llm.tokenizer
         del teacher.llm
     del teacher
-    purgar_memoria("Maestro destruido")
-    
-    # -------------------------------------------------------------------------
-    # FASE 2: NACE EL ESTUDIANTE (Destilación LoRA y Síntesis)
-    # -------------------------------------------------------------------------
-    print("\\n[Fase 2] Inicializando Estudiante...")
-    from pipeline.student_agent.agent import StudentAgent
-    student = StudentAgent()
-    
-    current_dataset = teacher_response.get("seed_dataset", [])
-    if not current_dataset:
-        print("❌ Error: No se obtuvieron semillas del Maestro.")
-        return None
-        
-    final_model_path = student.fine_tune(
-        current_dataset, teacher_response.get("metadata_summary", {}), iteration=0
-    )
+    purgar_memoria("Maestro destruido tras Logit Distillation")
     
     csv_temp_path = student.generate_final_series(
         current_dataset, structured_prompt, final_model_path

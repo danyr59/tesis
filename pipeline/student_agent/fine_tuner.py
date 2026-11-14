@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import gc
 import json
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import torch
+import torch.nn.functional as F
 from datasets import Dataset
 
 # Parche de compatibilidad para evitar el ImportError de torchao (<0.16.0 en Kaggle)
@@ -94,6 +96,92 @@ def _build_training_records(
   return records
 
 
+class LogitDistillationTrainer(Trainer):
+  """Trainer de Hugging Face con pérdida híbrida de Knowledge Distillation (Hinton, 2015).
+  
+  Combina:
+  1. Cross-Entropy (Hard Loss): aprendizaje supervisado sobre tokens reales.
+  2. Kullback-Leibler Divergence (Soft Loss): transferencia de probabilidades suaves del Maestro.
+  """
+
+  def __init__(
+      self,
+      *args,
+      teacher_model=None,
+      temperature: float = 2.0,
+      alpha: float = 0.5,
+      **kwargs,
+  ):
+    super().__init__(*args, **kwargs)
+    self.teacher_model = teacher_model
+    self.temperature = temperature
+    self.alpha = alpha
+    if self.teacher_model is not None:
+      self.teacher_model.eval()
+
+  def compute_loss(self, model, inputs, return_outputs=False):
+    # 1. Forward del modelo Estudiante
+    outputs = model(**inputs)
+    student_logits = outputs.logits
+
+    # 2. Hard Loss (Cross-Entropy clásica sobre los tokens de entrenamiento)
+    loss_ce = outputs.loss
+    if loss_ce is None:
+      shift_logits = student_logits[..., :-1, :].contiguous()
+      shift_labels = inputs["labels"][..., 1:].contiguous()
+      loss_ce = F.cross_entropy(
+          shift_logits.view(-1, shift_logits.size(-1)),
+          shift_labels.view(-1),
+          ignore_index=-100,
+      )
+
+    # 3. Soft Loss (Divergencia KL sobre los logits del Maestro)
+    if self.teacher_model is not None:
+      with torch.no_grad():
+        teacher_device = next(self.teacher_model.parameters()).device
+        teacher_inputs = {"input_ids": inputs["input_ids"].to(teacher_device)}
+        if "attention_mask" in inputs and inputs["attention_mask"] is not None:
+          teacher_inputs["attention_mask"] = inputs["attention_mask"].to(teacher_device)
+
+        teacher_outputs = self.teacher_model(**teacher_inputs)
+        teacher_logits = teacher_outputs.logits.to(student_logits.device)
+
+      # Alinear longitud de secuencia
+      min_len = min(student_logits.size(1), teacher_logits.size(1))
+      s_logits_sl = student_logits[:, :min_len, :]
+      t_logits_sl = teacher_logits[:, :min_len, :]
+
+      # Verificar dimensiones de vocabulario
+      v_s = s_logits_sl.size(-1)
+      v_t = t_logits_sl.size(-1)
+
+      if v_s == v_t:
+        loss_kd = (
+            F.kl_div(
+                F.log_softmax(s_logits_sl / self.temperature, dim=-1),
+                F.softmax(t_logits_sl / self.temperature, dim=-1),
+                reduction="batchmean",
+            )
+            * (self.temperature ** 2)
+        )
+      else:
+        min_v = min(v_s, v_t)
+        loss_kd = (
+            F.kl_div(
+                F.log_softmax(s_logits_sl[:, :, :min_v] / self.temperature, dim=-1),
+                F.softmax(t_logits_sl[:, :, :min_v] / self.temperature, dim=-1),
+                reduction="batchmean",
+            )
+            * (self.temperature ** 2)
+        )
+
+      loss = ((1.0 - self.alpha) * loss_ce) + (self.alpha * loss_kd)
+    else:
+      loss = loss_ce
+
+    return (loss, outputs) if return_outputs else loss
+
+
 def run_lora_fine_tune(
     base_model,
     tokenizer,
@@ -102,17 +190,19 @@ def run_lora_fine_tune(
     reasoning_text: str,
     continue_from_adapter: Optional[str] = None,
     hyperparams_json: Optional[Dict[str, Any]] = None,
+    teacher_model=None,
 ) -> str:
-  """Entrena adapter LoRA y devuelve la ruta guardada.
+  """Entrena adapter LoRA (con soporte opcional de Logit Distillation) y devuelve la ruta guardada.
 
     Args:
-        base_model: modelo base (sin adaptador)
+        base_model: modelo base estudiante (sin adaptador)
         tokenizer: tokenizador asociado
         seed_dataset: lista de semillas
         metadata_summary: metadatos
         reasoning_text: texto con hiperparámetros
         continue_from_adapter: ruta de un adaptador previo para continuar entrenando
         hyperparams_json: parámetros extraídos en JSON (opcional)
+        teacher_model: modelo maestro activo (opcional, para extraer logits directamente)
   """
   if not seed_dataset:
     raise ValueError("No hay semillas para fine-tuning.")
@@ -190,8 +280,61 @@ def run_lora_fine_tune(
   if hasattr(model, "config") and hasattr(model.config, "use_cache"):
       model.config.use_cache = False
 
-  trainer = Trainer(model=model, args=args, train_dataset=tokenized)
+  # Si se solicita Logit Distillation y no se pasó teacher_model desde afuera, cargarlo temporalmente
+  temp_teacher_loaded = False
+  if teacher_model is None and Settings.USE_LOGIT_DISTILLATION:
+    teacher_path = Settings.get_teacher_model_path()
+    print(f"[FineTuner] [Logit Distillation] Cargando Maestro ({teacher_path}) en 4-bit para extracción de logits...")
+    try:
+      from transformers import BitsAndBytesConfig
+      bnb_cfg = (
+          BitsAndBytesConfig(
+              load_in_4bit=True,
+              bnb_4bit_quant_type="nf4",
+              bnb_4bit_compute_dtype=torch.bfloat16 if torch.cuda.is_available() else torch.float32,
+              bnb_4bit_use_double_quant=True,
+          )
+          if BitsAndBytesConfig
+          else None
+      )
+      teacher_model = AutoModelForCausalLM.from_pretrained(
+          teacher_path,
+          quantization_config=bnb_cfg if torch.cuda.is_available() else None,
+          device_map="auto" if torch.cuda.is_available() else None,
+          torch_dtype=torch.bfloat16 if torch.cuda.is_available() else torch.float32,
+      )
+      teacher_model.eval()
+      temp_teacher_loaded = True
+      print("✅ [FineTuner] Maestro cargado con éxito para Logit Distillation.")
+    except Exception as e_load:
+      print(f"[FineTuner] ⚠️ No se pudo cargar Maestro para logits: {e_load}. Fallback a SFT estándar.")
+      teacher_model = None
+      temp_teacher_loaded = False
+
+  # Instanciar el Trainer correspondiente (Logit KD vs SFT tradicional)
+  if Settings.USE_LOGIT_DISTILLATION and teacher_model is not None:
+    print(f"[FineTuner] 🎯 Activando LogitDistillationTrainer (Temp={Settings.KD_TEMPERATURE}, Alpha={Settings.KD_ALPHA})")
+    trainer = LogitDistillationTrainer(
+        model=model,
+        args=args,
+        train_dataset=tokenized,
+        teacher_model=teacher_model,
+        temperature=Settings.KD_TEMPERATURE,
+        alpha=Settings.KD_ALPHA,
+    )
+  else:
+    print("[FineTuner] ℹ️ Usando Trainer estándar (SFT supervisado sin logits).")
+    trainer = Trainer(model=model, args=args, train_dataset=tokenized)
+
   trainer.train()
+
+  # Si cargamos un Teacher temporal, destruirlo y purgar VRAM inmediatamente
+  if temp_teacher_loaded and teacher_model is not None:
+    print("[FineTuner] Purgando Maestro temporal de VRAM...")
+    del teacher_model
+    if torch.cuda.is_available():
+      torch.cuda.empty_cache()
+    gc.collect()
 
   if hasattr(model, "config") and hasattr(model.config, "use_cache"):
       model.config.use_cache = True

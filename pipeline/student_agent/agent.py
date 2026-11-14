@@ -123,9 +123,9 @@ class StudentAgent:
             query_changed = False
 
 
-    def fine_tune(self, seed_dataset: List[dict], metadata_summary: dict,  iteration: int) -> str:
+    def fine_tune(self, seed_dataset: List[dict], metadata_summary: dict, iteration: int = 0, teacher_model=None) -> str:
         print(
-            f"\n[{self.__class__.__name__}] Destilación (LoRA) con {len(seed_dataset)} semillas...")
+            f"\n[{self.__class__.__name__}] Destilación (LoRA + Logits) con {len(seed_dataset)} semillas...")
         prompt = f"""Eres el Estudiante. Dataset semilla: {len(seed_dataset)} ejemplos.
 Metadatos: {json.dumps(metadata_summary, ensure_ascii=False)}
 
@@ -166,6 +166,7 @@ RECUERDA PONER LOS VALORES
             reasoning_text=reasoning,
             continue_from_adapter=self.lora_adapter_path if iteration > 1 else None,
             hyperparams_json=values,
+            teacher_model=teacher_model,
         )
         self.lora_adapter_path = adapter_path
 
