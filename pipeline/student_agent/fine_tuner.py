@@ -153,36 +153,45 @@ class LogitDistillationTrainer(Trainer):
         teacher_outputs = self.teacher_model(**teacher_inputs)
         teacher_logits = teacher_outputs.logits.to(student_logits.device)
 
+      # Shift para Causal LM: predecir el siguiente token
+      s_logits_shift = student_logits[..., :-1, :].contiguous()
+      t_logits_shift = teacher_logits[..., :-1, :].contiguous()
+
       # Alinear longitud de secuencia
-      min_len = min(student_logits.size(1), teacher_logits.size(1))
-      s_logits_sl = student_logits[:, :min_len, :]
-      t_logits_sl = teacher_logits[:, :min_len, :]
+      min_len = min(s_logits_shift.size(1), t_logits_shift.size(1))
+      s_logits_sl = s_logits_shift[:, :min_len, :]
+      t_logits_sl = t_logits_shift[:, :min_len, :]
 
       # Verificar dimensiones de vocabulario
       v_s = s_logits_sl.size(-1)
       v_t = t_logits_sl.size(-1)
+      min_v = min(v_s, v_t)
+      if v_s != min_v or v_t != min_v:
+        s_logits_sl = s_logits_sl[:, :, :min_v]
+        t_logits_sl = t_logits_sl[:, :, :min_v]
 
-      if v_s == v_t:
-        loss_kd = (
-            F.kl_div(
-                F.log_softmax(s_logits_sl / self.temperature, dim=-1),
-                F.softmax(t_logits_sl / self.temperature, dim=-1),
-                reduction="batchmean",
-            )
-            * (self.temperature ** 2)
-        )
+      # CRÍTICO PARA ESTABILIDAD NUMÉRICA:
+      # Calcular log_softmax y softmax en FLOAT32 para evitar underflow/overflow con vocabularios grandes (|V|=151646)
+      s_log_probs = F.log_softmax(s_logits_sl.float() / self.temperature, dim=-1)
+      t_probs = F.softmax(t_logits_sl.float() / self.temperature, dim=-1)
+
+      # Divergencia KL por token individual: forma (batch, seq)
+      kl_per_token = F.kl_div(s_log_probs, t_probs, reduction="none").sum(dim=-1)
+
+      # Normalización por token activo (excluyendo tokens de padding)
+      if "attention_mask" in inputs and inputs["attention_mask"] is not None:
+        mask = inputs["attention_mask"][..., 1:].contiguous()[:, :min_len].float()
+        kl_per_token = kl_per_token * mask
+        num_valid_tokens = mask.sum().clamp(min=1.0)
+        loss_kd = (kl_per_token.sum() / num_valid_tokens) * (self.temperature ** 2)
       else:
-        min_v = min(v_s, v_t)
-        loss_kd = (
-            F.kl_div(
-                F.log_softmax(s_logits_sl[:, :, :min_v] / self.temperature, dim=-1),
-                F.softmax(t_logits_sl[:, :, :min_v] / self.temperature, dim=-1),
-                reduction="batchmean",
-            )
-            * (self.temperature ** 2)
-        )
+        loss_kd = kl_per_token.mean() * (self.temperature ** 2)
 
-      loss = ((1.0 - self.alpha) * loss_ce) + (self.alpha * loss_kd)
+      # Protección contra NaN / Inf para mantener la estabilidad del adaptador LoRA
+      if torch.isnan(loss_kd) or torch.isinf(loss_kd):
+        loss_kd = torch.tensor(0.0, device=student_logits.device, dtype=loss_ce.dtype)
+
+      loss = ((1.0 - self.alpha) * loss_ce) + (self.alpha * loss_kd.to(loss_ce.dtype))
     else:
       loss = loss_ce
 
@@ -256,7 +265,11 @@ def run_lora_fine_tune(
       max_length=512,
       padding="max_length",
     )
-    tokenized["labels"] = tokenized["input_ids"].copy()
+    pad_id = tokenizer.pad_token_id
+    labels = []
+    for seq in tokenized["input_ids"]:
+      labels.append([(t if t != pad_id else -100) for t in seq])
+    tokenized["labels"] = labels
     return tokenized
 
   ds = Dataset.from_list(records)
