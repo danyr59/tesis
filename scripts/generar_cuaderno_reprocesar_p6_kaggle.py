@@ -62,13 +62,53 @@ if torch.cuda.is_available():
     # =========================================================================
     # CELDA 3: CLONAR REPOSITORIO
     # =========================================================================
-    cells.append(md("""## 2. Clonar Repositorio del Proyecto (Rama `kaggle_experimentos`)"""))
-    cells.append(code("""REPO_DIR = Path("/kaggle/working/proyecto_tesis")
+    cells.append(md("""## 2. Clonar Repositorio del Proyecto (Rama `kaggle_experimentos`)
+> Como el repositorio es privado, se requiere autenticación con un **GitHub Personal Access Token (PAT)**.
+> Puedes configurarlo en Kaggle en **Add-ons -> Secrets -> GITHUB_TOKEN**, o pegarlo directamente en la variable `token_github` abajo."""))
+    cells.append(code("""import os
+import shutil
+from pathlib import Path
+
+REPO_DIR = Path("/kaggle/working/proyecto_tesis")
 if REPO_DIR.exists():
     shutil.rmtree(REPO_DIR)
 
-!git clone -b kaggle_experimentos https://github.com/danyr59/tesis_antes.git /kaggle/working/proyecto_tesis
-%cd /kaggle/working/proyecto_tesis"""))
+# 1. Obtener token de GitHub (Secrets o manual)
+gh_token = None
+try:
+    from kaggle_secrets import UserSecretsClient
+    secrets = UserSecretsClient()
+    for secret_key in ["GITHUB_TOKEN", "GH_TOKEN", "github_token"]:
+        try:
+            gh_token = secrets.get_secret(secret_key)
+            if gh_token:
+                print(f"🔑 Token de GitHub cargado desde Kaggle Secrets ({secret_key}).")
+                break
+        except Exception:
+            pass
+except Exception:
+    pass
+
+# Si no usas Kaggle Secrets, puedes pegar tu token aquí (ej: "ghp_..."):
+token_manual_gh = ""
+if not gh_token and token_manual_gh:
+    gh_token = token_manual_gh
+    print("🔑 Usando token de GitHub configurado manualmente.")
+
+# 2. Clonar repositorio con GIT_TERMINAL_PROMPT=0 para evitar bloqueos interactivos
+if gh_token:
+    print("📥 Clonando repositorio privado desde GitHub...")
+    !GIT_TERMINAL_PROMPT=0 git clone -b kaggle_experimentos https://oauth2:{gh_token}@github.com/danyr59/tesis_antes.git /kaggle/working/proyecto_tesis
+else:
+    print("⚠️ No se detectó GITHUB_TOKEN. Intentando clonación pública...")
+    !GIT_TERMINAL_PROMPT=0 git clone -b kaggle_experimentos https://github.com/danyr59/tesis_antes.git /kaggle/working/proyecto_tesis
+
+if REPO_DIR.exists():
+    %cd /kaggle/working/proyecto_tesis
+    print("✅ Repositorio preparado en /kaggle/working/proyecto_tesis")
+else:
+    print("❌ ERROR: No se pudo clonar el repositorio.")
+    print("💡 Al ser un repositorio privado, necesitas añadir tu GITHUB_TOKEN en Kaggle Secrets (Add-ons -> Secrets) o pegarlo en 'token_manual_gh'.")"""))
 
     # =========================================================================
     # CELDA 4: AUTENTICACIÓN HUGGING FACE
