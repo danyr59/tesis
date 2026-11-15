@@ -363,7 +363,12 @@ class Predictor:
                     ax = axes[j]
                     col_name = names[j]
                     feat_metrics = result.per_feature.get(col_name, {})
-                    r2_str = f" | R²={feat_metrics['r2']:.4f} | MAE={feat_metrics['mae']:.4f}" if feat_metrics else ""
+                    if feat_metrics:
+                        feat_r2 = feat_metrics.get('r2', 0.0)
+                        feat_r2_str = f"{feat_r2:.4f}" if feat_r2 > -10 else f"{feat_r2:.2e}"
+                        r2_str = f" | R²={feat_r2_str} | MAE={feat_metrics.get('mae', 0.0):.4f}"
+                    else:
+                        r2_str = ""
                     ax.plot(acts[:, j], label=f"Real ({col_name})", alpha=0.8, linewidth=1)
                     ax.plot(preds[:, j], label=f"Predicción ({col_name})", alpha=0.8, linestyle="--", linewidth=1)
                     ax.set_title(f"{col_name}{r2_str}", fontsize=12)
@@ -372,14 +377,15 @@ class Predictor:
                     ax.grid(True, alpha=0.3)
 
                 axes[-1].set_xlabel("Paso temporal")
+                r2_display = f"{result.r2:.4f}" if result.r2 > -10 else f"{result.r2:.2e}"
                 metrics_text = (
-                    f"Promedio Macro — RMSE={result.rmse:.4f}  MAE={result.mae:.4f}  "
-                    f"MAPE={result.mape:.2f}%  R²={result.r2:.4f}"
+                    f"Promedio Macro (Global) — RMSE={result.rmse:.4f}  MAE={result.mae:.4f}  "
+                    f"MAPE={result.mape:.2f}%  R²={r2_display}"
                 )
                 fig.suptitle(title, fontsize=14)
-                fig.text(0.5, 0.01, metrics_text, ha="center", fontsize=10, style="italic")
+                fig.text(0.5, 0.015, metrics_text, ha="center", fontsize=10, style="italic")
 
-            plt.tight_layout(rect=[0, 0.03, 1, 0.97] if preds.ndim > 1 and preds.shape[1] > 1 else [0, 0.03, 1, 1])
+            plt.tight_layout(rect=[0, 0.05, 1, 0.96] if preds.ndim > 1 and preds.shape[1] > 1 else [0, 0.03, 1, 1])
 
             if output_path:
                 Path(output_path).parent.mkdir(parents=True, exist_ok=True)

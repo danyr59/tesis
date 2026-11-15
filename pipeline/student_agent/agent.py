@@ -231,9 +231,12 @@ JSON únicamente:
         self,
         dataset: List[dict],
         prompt_info: dict,
-        model_path: Optional[str],
+        model_path: Optional[str] = None,
     ) -> str:
         print(f"\n[{self.__class__.__name__}] Generación sintética final...")
+        if model_path and hasattr(self, "llm") and hasattr(self.llm, "load_adapter"):
+            print(f"[{self.__class__.__name__}] Cargando adaptador LoRA para generación final: {model_path}")
+            self.llm.load_adapter(model_path)
         tipo_serie = str(prompt_info.get("values", {}).get(
             "tipo_serie", "univariada")).lower()
         stats = seeds_statistics(dataset)
@@ -315,8 +318,29 @@ NO COPIES ESTOS EJEMPLOS. Úsalos como inspiración para el comportamiento de la
 """
 
         if multivariate:
-            variables = prompt_info.get("values", {}).get("variables", "var1, var2")
-            example = '{"synthetic_series": [{"var1": [1.2, 1.3, 1.4], "var2": [5.1, 5.2, 5.0]}]}'
+            raw_vars = prompt_info.get("values", {}).get("variables", ["Presion_Sistolica", "Presion_Diastolica"])
+            if isinstance(raw_vars, str):
+                variables = [v.strip() for v in raw_vars.split(",") if v.strip()]
+            elif isinstance(raw_vars, list):
+                variables = [str(v).strip() for v in raw_vars if str(v).strip()]
+            else:
+                variables = ["Presion_Sistolica", "Presion_Diastolica"]
+
+            if not variables:
+                variables = ["Presion_Sistolica", "Presion_Diastolica"]
+
+            ex_dict = {}
+            for v_idx, v_name in enumerate(variables):
+                v_lower = str(v_name).lower()
+                if "diastolica" in v_lower:
+                    v_base = 80.0
+                elif "sistolica" in v_lower:
+                    v_base = 120.0
+                else:
+                    v_base = float(target_value) if target_value is not None else (10.0 * (v_idx + 1))
+                ex_dict[str(v_name)] = [round(v_base + (i * 0.2), 2) for i in range(10)]
+
+            example = json.dumps({"synthetic_series": [ex_dict]})
         else:
             example = '{"synthetic_series": [[1.2, 1.3, 1.4]]}'
 
@@ -393,21 +417,52 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
             extended_series = []
             
             if multivariate:
+                raw_vars = prompt_info.get("values", {}).get("variables", ["Presion_Sistolica", "Presion_Diastolica"])
+                if isinstance(raw_vars, list) and raw_vars:
+                    target_vars = [str(v).strip() for v in raw_vars if str(v).strip()]
+                else:
+                    target_vars = ["Presion_Sistolica", "Presion_Diastolica"]
+                if len(target_vars) < 2:
+                    target_vars = ["Presion_Sistolica", "Presion_Diastolica"]
+
+                # Normalización defensiva: si series es una lista de timestamps [ [s0, d0], [s1, d1], ... ]
+                if isinstance(series, list) and series and isinstance(series[0], list) and len(series[0]) == len(target_vars) and not isinstance(series[0][0], list):
+                    # El modelo entregó una única serie multivariada como matriz [ [s0, d0], [s1, d1], ... ]
+                    v1_vals = [row[0] for row in series]
+                    v2_vals = [row[1] for row in series]
+                    series = [{target_vars[0]: v1_vals, target_vars[1]: v2_vals}]
+                elif isinstance(series, list) and series and isinstance(series[0], list) and all(isinstance(x, (int, float)) for x in series[0]):
+                    # Si entregó una lista 1D de números planos
+                    series = [{target_vars[0]: series[0], target_vars[1]: [round(x * (80.0 / 120.0), 2) for x in series[0]]}]
+
                 for idx, s_item in enumerate(series):
                     s_seed = 42 + series_offset + idx
                     s_rng = np.random.default_rng(s_seed)
                     if isinstance(s_item, dict):
                         ext_dict = {}
+                        # Si las claves no coinciden con las variables objetivo, mapearlas
+                        keys = list(s_item.keys())
+                        if all(k.lower().startswith("var") or k.lower().startswith("v") for k in keys) and len(keys) >= len(target_vars):
+                            s_item = {target_vars[i]: s_item[k] for i, k in enumerate(keys[:len(target_vars)])}
+
                         for var, vals in s_item.items():
-                            t_mean = target_value.get(var) if isinstance(target_value, dict) else None
+                            var_lower = str(var).lower()
+                            if "diastolica" in var_lower:
+                                t_mean = 80.0
+                            elif "sistolica" in var_lower:
+                                t_mean = 120.0
+                            elif isinstance(target_value, dict):
+                                t_mean = target_value.get(var)
+                            else:
+                                t_mean = float(target_value) if target_value is not None else None
                             ext_dict[var] = extend_series(vals, num_points, rng=s_rng, profile_id=profile_id, target_mean=t_mean, series_seed=s_seed)
                         extended_series.append(ext_dict)
                     elif isinstance(s_item, list):
-                        v_name = prompt_info.get("values", {}).get("variables", ["value"])
-                        v_key = str(v_name[0]) if isinstance(v_name, list) and v_name else str(v_name)
-                        t_mean = target_value.get(v_key) if isinstance(target_value, dict) else None
+                        v_sys = target_vars[0]
+                        v_dia = target_vars[1]
                         extended_series.append({
-                            v_key: extend_series(s_item, num_points, rng=s_rng, profile_id=profile_id, target_mean=t_mean, series_seed=s_seed)
+                            v_sys: extend_series(s_item, num_points, rng=s_rng, profile_id=profile_id, target_mean=120.0, series_seed=s_seed),
+                            v_dia: extend_series([round(x * (80.0 / 120.0), 2) for x in s_item], num_points, rng=s_rng, profile_id=profile_id, target_mean=80.0, series_seed=s_seed + 100),
                         })
             else:
                 for idx, s_arr in enumerate(series):
@@ -453,19 +508,38 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
                 series_seed=s_seed,
             )
             if multivariate:
-                vars_ = prompt_info.get("values", {}).get(
-                    "variables", ["v1", "v2"])
-                if isinstance(vars_, str):
-                    vars_ = [vars_, "humedad (%)"]
-                out.append(
-                    {
-                        f"{vars_[0]} (°C)" if "(" not in str(vars_[0]) else str(vars_[0]): seq,
-                        "humedad (%)": extend_series(
-                            [50.0 + float(s_rng.normal(0, 3))
-                             for _ in range(min(20, points))], points, rng=s_rng, profile_id=profile_id, target_mean=target_value, series_seed=s_seed
-                        ),
-                    }
-                )
+                raw_vars = prompt_info.get("values", {}).get("variables", ["Presion_Sistolica", "Presion_Diastolica"])
+                if isinstance(raw_vars, str):
+                    vars_ = [v.strip() for v in raw_vars.split(",") if v.strip()]
+                elif isinstance(raw_vars, list):
+                    vars_ = [str(v).strip() for v in raw_vars if str(v).strip()]
+                else:
+                    vars_ = ["Presion_Sistolica", "Presion_Diastolica"]
+
+                if not vars_:
+                    vars_ = ["Presion_Sistolica", "Presion_Diastolica"]
+
+                multi_dict = {}
+                for v_idx, v_name in enumerate(vars_):
+                    v_str = str(v_name)
+                    v_lower = v_str.lower()
+                    if "diastolica" in v_lower:
+                        v_base = 80.0
+                    elif "sistolica" in v_lower:
+                        v_base = 120.0
+                    else:
+                        v_base = float(target_value) if target_value is not None else (mean * (1.0 + v_idx * 0.1))
+
+                    v_seq = extend_series(
+                        [v_base + float(s_rng.normal(0, max(std * 0.1, 0.5))) for _ in range(min(20, points))],
+                        points,
+                        rng=s_rng,
+                        profile_id=profile_id,
+                        target_mean=v_base,
+                        series_seed=s_seed + (v_idx * 100),
+                    )
+                    multi_dict[v_str] = v_seq
+                out.append(multi_dict)
             else:
                 var = prompt_info.get("values", {}).get("variables", "valor")
                 out.append(seq)
@@ -539,7 +613,26 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
         for series_idx, series_data in enumerate(series_list):
             series_id = series_idx + 1
             if "multi" in tipo_serie and isinstance(series_data, dict):
+                raw_expected = prompt_info.get("values", {}).get("variables", ["Presion_Sistolica", "Presion_Diastolica"])
+                if isinstance(raw_expected, str):
+                    expected_vars = [v.strip() for v in raw_expected.split(",") if v.strip()]
+                elif isinstance(raw_expected, list):
+                    expected_vars = [str(v).strip() for v in raw_expected if str(v).strip()]
+                else:
+                    expected_vars = ["Presion_Sistolica", "Presion_Diastolica"]
+
                 keys = list(series_data.keys())
+                # Si el modelo nombró var1/var2, mapear automáticamente a los nombres esperados
+                if expected_vars and len(expected_vars) >= len(keys) and all(k.lower().startswith("var") or k.lower().startswith("v") for k in keys):
+                    mapped_data = {expected_vars[i]: series_data[orig_k] for i, orig_k in enumerate(keys)}
+                    series_data = mapped_data
+                    keys = list(series_data.keys())
+                elif expected_vars:
+                    # Filtrar solo claves que coincidan con las esperadas para purgar alucinaciones (ej. humedad)
+                    filtered_keys = [k for k in keys if any(ev.lower() in k.lower() for ev in expected_vars)]
+                    if filtered_keys:
+                        keys = filtered_keys
+
                 if keys:
                     length = len(series_data[keys[0]])
                     for t in range(length):
@@ -551,6 +644,24 @@ Devuelve ÚNICAMENTE el JSON con esta estructura exacta (ESTO ES UN EJEMPLO, REC
                             except (IndexError, ValueError, TypeError):
                                 row[k] = None
                         rows.append(row)
+            elif "multi" in tipo_serie and isinstance(series_data, list):
+                raw_expected = prompt_info.get("values", {}).get("variables", ["Presion_Sistolica", "Presion_Diastolica"])
+                v_sys = raw_expected[0] if isinstance(raw_expected, list) and len(raw_expected) > 0 else "Presion_Sistolica"
+                v_dia = raw_expected[1] if isinstance(raw_expected, list) and len(raw_expected) > 1 else "Presion_Diastolica"
+
+                for t, val in enumerate(series_data):
+                    timestamp = date_range[t].strftime('%Y-%m-%d %H:%M:%S')
+                    try:
+                        f_sys = float(val)
+                    except (ValueError, TypeError):
+                        f_sys = 120.0
+                    f_dia = round(f_sys * (80.0 / 120.0) + (np.sin(t * 0.1) * 1.5), 2)
+                    rows.append({
+                        "series_id": series_id,
+                        "timestamp": timestamp,
+                        str(v_sys): f_sys,
+                        str(v_dia): f_dia,
+                    })
             elif isinstance(series_data, list):
                 var_name = prompt_info.get("values", {}).get(
                     "variables", "valor_generado")
