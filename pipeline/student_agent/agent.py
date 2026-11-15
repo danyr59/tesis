@@ -11,7 +11,6 @@ import torch
 from pipeline.config.settings import Settings
 from pipeline.numeric_pipeline import run_numeric_pipeline
 from pipeline.student_agent.fine_tuner import run_lora_fine_tune
-from pipeline.teacher_agent.agent import TeacherAgent
 from pipeline.utils.llm_client import LLMClient, extract_json_from_text
 from pipeline.utils.series_utils import (
     extend_series,

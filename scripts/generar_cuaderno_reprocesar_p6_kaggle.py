@@ -43,7 +43,7 @@ Este cuaderno permite regenerar y evaluar el perfil **P6_MULTIVARIADO** para tod
     cells.append(md("""## 1. Instalación de Dependencias y Preparación del Entorno"""))
     cells.append(code("""# Desinstalar torchao incompatible preinstalado en Kaggle (0.10.0 vs >=0.16.0 requerido por peft)
 !pip uninstall -y torchao
-!pip install -q -U "transformers>=4.45.0" "peft>=0.13.0" accelerate bitsandbytes datasets matplotlib evaluate
+!pip install -q -U "transformers>=4.45.0" "peft>=0.13.0" accelerate bitsandbytes datasets matplotlib evaluate chromadb
 
 import os
 import gc
