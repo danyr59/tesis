@@ -183,7 +183,7 @@ def locate_dataset(provided_path: str = None) -> Path:
 
 def cargar_datos(ruta: Path, max_samples: int = None) -> list:
     items = []
-    print(f"📖 Leyendo dataset desde: {ruta}")
+    print(f"[INFO] Leyendo dataset desde: {ruta}")
     with open(ruta, "r", encoding="utf-8") as f:
         for idx, linea in enumerate(f):
             if max_samples and idx >= max_samples:
@@ -258,9 +258,9 @@ def main():
         try:
             from huggingface_hub import login
             login(token=args.hf_token)
-            print("🔑 Autenticado en Hugging Face Hub con éxito.")
+            print("[INFO] Autenticado en Hugging Face Hub.")
         except Exception as e:
-            print(f"⚠️ Advertencia en autenticación HF: {e}")
+            print(f"[WARN] Error en autenticacion HF: {e}")
 
     # Directorio de salida
     if args.output_dir:
@@ -270,29 +270,29 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     print("=" * 70)
-    print("🚀 FINETUNING DEL MODELO MAESTRO DOCENTE")
+    print("FINETUNING DEL MODELO MAESTRO DOCENTE")
     print("=" * 70)
-    print(f"  • Modelo Base:         {model_id}")
-    print(f"  • Familia:             {family}")
-    print(f"  • Épocas:              {args.epochs}")
-    print(f"  • Batch Size:          {args.batch_size} (Grad Accum: {args.grad_accum})")
-    print(f"  • Learning Rate:       {args.lr}")
-    print(f"  • Longitud Máx:        {args.max_seq_length} tokens")
-    print(f"  • Directorio Salida:   {output_dir}")
+    print(f"  - Modelo Base:         {model_id}")
+    print(f"  - Familia:             {family}")
+    print(f"  - Epocas:              {args.epochs}")
+    print(f"  - Batch Size:          {args.batch_size} (Grad Accum: {args.grad_accum})")
+    print(f"  - Learning Rate:       {args.lr}")
+    print(f"  - Longitud Max:        {args.max_seq_length} tokens")
+    print(f"  - Directorio Salida:   {output_dir}")
     print("=" * 70)
 
     # 2. Cargar y procesar dataset
     dataset_path = locate_dataset(args.dataset)
     raw_data = cargar_datos(dataset_path, max_samples=args.max_samples)
-    print(f"📊 Registros procesados: {len(raw_data)}")
+    print(f"[INFO] Registros procesados: {len(raw_data)}")
     if not raw_data:
-        print("❌ Error: El dataset no contiene registros válidos.")
+        print("[ERROR] El dataset no contiene registros validos.")
         sys.exit(1)
 
     ds_estructurado = Dataset.from_list([formatear_instruccion(x) for x in raw_data])
 
     # 3. Descargar y configurar Tokenizador
-    print(f"\n📥 Descargando tokenizador para {model_id}...")
+    print(f"\n[INFO] Descargando tokenizador para {model_id}...")
     tokenizer = AutoTokenizer.from_pretrained(
         model_id,
         trust_remote_code=True,
@@ -312,7 +312,7 @@ def main():
             padding=False,
         )
 
-    print("🔄 Tokenizando secuencias de entrenamiento...")
+    print("[INFO] Tokenizando secuencias de entrenamiento...")
     tokenized_dataset = ds_estructurado.map(
         tokenize_fn,
         batched=True,
@@ -333,7 +333,7 @@ def main():
         model_kwargs["attn_implementation"] = attn_impl
 
     if load_in_4bit:
-        print("⚡ Habilitando BitsAndBytes 4-bit NF4 con doble cuantización...")
+        print("[INFO] Habilitando BitsAndBytes 4-bit NF4 con doble cuantizacion...")
         bnb_config = BitsAndBytesConfig(
             load_in_4bit=True,
             bnb_4bit_quant_type="nf4",
@@ -343,17 +343,17 @@ def main():
         model_kwargs["quantization_config"] = bnb_config
         model_kwargs["device_map"] = {"": 0}
     elif use_cuda:
-        print("⚡ Cargando en GPU con precisión float16...")
+        print("[INFO] Cargando en GPU con precision float16...")
         model_kwargs["torch_dtype"] = torch.float16
         model_kwargs["device_map"] = "auto"
     elif torch.backends.mps.is_available():
-        print("🍎 Dispositivo detectado: Apple Silicon MPS...")
+        print("[INFO] Dispositivo detectado: Apple Silicon MPS...")
         model_kwargs["torch_dtype"] = torch.float32
     else:
-        print("💻 Cargando en CPU con precisión float32...")
+        print("[INFO] Cargando en CPU con precision float32...")
         model_kwargs["torch_dtype"] = torch.float32
 
-    print(f"📥 Cargando modelo base {model_id}...")
+    print(f"[INFO] Cargando modelo base {model_id}...")
     base_model = AutoModelForCausalLM.from_pretrained(model_id, **model_kwargs)
 
     if load_in_4bit:
@@ -371,7 +371,7 @@ def main():
     )
 
     peft_model = get_peft_model(base_model, lora_config)
-    print("\n🎯 Parámetros entrenables vs congelados:")
+    print("\nParametros entrenables vs congelados:")
     peft_model.print_trainable_parameters()
 
     # 6. Preparar Trainer
@@ -411,29 +411,29 @@ def main():
     )
 
     # 7. Ejecutar Entrenamiento
-    print("\n🏁 Iniciando ciclo de optimización LoRA...")
+    print("\nIniciando ciclo de optimizacion LoRA...")
     gc.collect()
     if use_cuda:
         torch.cuda.empty_cache()
 
     trainer.train()
-    print("🎉 Entrenamiento completado.")
+    print("Entrenamiento completado.")
 
     # 8. Guardar Adaptadores y Tokenizador
-    print(f"\n💾 Guardando adaptadores en: {output_dir}")
+    print(f"\nGuardando adaptadores en: {output_dir}")
     peft_model.save_pretrained(str(output_dir))
     tokenizer.save_pretrained(str(output_dir))
-    print("✅ Adaptadores y tokenizador guardados satisfactoriamente.")
+    print("[OK] Adaptadores y tokenizador guardados satisfactoriamente.")
 
     # 9. Subir a Hugging Face Hub (opcional)
     if args.push_to_hub:
-        print(f"☁️ Subiendo adaptadores a Hugging Face Hub: {args.push_to_hub}...")
+        print(f"[INFO] Subiendo adaptadores a Hugging Face Hub: {args.push_to_hub}...")
         try:
             peft_model.push_to_hub(args.push_to_hub, token=args.hf_token)
             tokenizer.push_to_hub(args.push_to_hub, token=args.hf_token)
-            print(f"🚀 Adaptador publicado con éxito en https://huggingface.co/{args.push_to_hub}")
+            print(f"[OK] Adaptador publicado en https://huggingface.co/{args.push_to_hub}")
         except Exception as e:
-            print(f"⚠️ Error al subir al Hub: {e}")
+            print(f"[WARN] Error al subir al Hub: {e}")
 
 if __name__ == "__main__":
     main()

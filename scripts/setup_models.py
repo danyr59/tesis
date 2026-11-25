@@ -38,7 +38,7 @@ def setup_models():
         ignore_patterns=["*.msgpack", "*.h5", "*.ot"]
     )
 
-    print("\n--- ¡Todo listo! Modelos descargados y verificados ---")
+    print("\n--- Modelos descargados y verificados ---")
     print(f"Profesor: {teacher_path}")
     print(f"Estudiante: {student_path}")
 

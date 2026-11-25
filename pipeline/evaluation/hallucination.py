@@ -55,7 +55,7 @@ class HallucinationReport:
     is_clean: bool = True
 
     def summary(self) -> str:
-        status = "🟢 LIMPIO" if self.is_clean else "🔴 ALUCINACIONES DETECTADAS"
+        status = "[LIMPIO]" if self.is_clean else "[ALUCINACIONES DETECTADAS]"
         lines = [
             f"=== REPORTE DE ALUCINACIONES: {status} ===",
             f"Total predicciones:    {self.total_predictions}",

@@ -129,24 +129,104 @@ proyecto_tesis/
 
 ## 🧠 Catálogo de Modelos Docentes y Recomendaciones de Selección
 
-El marco neuro-simbólico fue validado rigurosamente sobre tres familias fundacionales de última generación. Para facilitar la experimentación sin costo de entrenamiento previo, se disponen de **adaptadores LoRA preentrenados y curados** alojados en repositorios públicos oficiales en Kaggle:
+El marco neuro-simbólico fue validado rigurosamente sobre tres familias fundacionales de última generación. Para facilitar la experimentación sin costo de cómputo previo, se disponen de **adaptadores LoRA preentrenados y curados** alojados en repositorios públicos oficiales en Kaggle:
 
 | Familia Docente | Modelo Maestro Oficial | Parámetros | Ventana de Contexto | Adaptador Preentrenado en Kaggle | Estudiante Recomendado |
 | :---: | :--- | :---: | :---: | :--- | :--- |
-| **Qwen 2.5** | `Qwen/Qwen2.5-7B-Instruct` | 7.61B | 128k tokens | [`danielrangelsanch/maestro-qwen-adapter`](https://www.kaggle.com/datasets/danielrangelsanch/maestro-qwen-adapter) | `Qwen2.5-1.5B-Instruct` |
-| **LLaMA 3.1** | `meta-llama/Llama-3.1-8B-Instruct` | 8.03B | 128k tokens | [`danielrangelsanch/maestro-llama-adapter`](https://www.kaggle.com/datasets/danielrangelsanch/maestro-llama-adapter) | `Llama-3.2-1B-Instruct` |
-| **Gemma 2** | `google/gemma-2-9b-it` | 9.24B | 8k tokens (*SWA*) | [`danielrangelsanch/maestro-gemma-adapter`](https://www.kaggle.com/datasets/danielrangelsanch/maestro-gemma-adapter) | `Gemma-2-2b-it` |
+| **Qwen 2.5** | `Qwen/Qwen2.5-7B-Instruct` | 7.61B | 128k tokens | [`danielrangelsanch/maestro-qwen-adapter`](https://www.kaggle.com/datasets/danielrangelsanch/maestro-qwen-adapter) | `Qwen/Qwen2.5-1.5B-Instruct` |
+| **LLaMA 3.1** | `meta-llama/Llama-3.1-8B-Instruct` | 8.03B | 128k tokens | [`danielrangelsanch/maestro-llama-adapter`](https://www.kaggle.com/datasets/danielrangelsanch/maestro-llama-adapter) | `meta-llama/Llama-3.2-1B-Instruct` |
+| **Gemma 2** | `google/gemma-2-9b-it` | 9.24B | 8k tokens (*SWA*) | [`danielrangelsanch/maestro-gemma-adapter`](https://www.kaggle.com/datasets/danielrangelsanch/maestro-gemma-adapter) | `google/gemma-2-2b-it` |
 
-### 💡 Pautas Clave de Selección y Cómputo:
-1. **Cota de Tamaño Recomendada ($\le 7\text{B}-9\text{B}$):** Se aconseja utilizar modelos docentes de **máximo 7 u 8 billones de parámetros** (hasta 9B en Gemma) y discentes de **0.5B a 3B**. Esta calibración permite operar dentro del presupuesto estricto de **$\le 7.20$\,GB de VRAM** en GPUs comerciales mediante cuantización QLoRA de 4 bits.
-2. **⚠️ Evitar Modelos de Razonamiento (Chain-of-Thought):**
-   > [!WARNING]
-   > **NO emplear modelos de razonamiento tipo DeepSeek-R1, QwQ u homólogos.**
-   > Estos modelos emiten cadenas verborreicas de pensamiento no estructurado delimitadas por etiquetas `<think> ... </think>` antes de su respuesta final. Dicho comportamiento **rompe la sintaxis estricta del esquema JSON** requerida por el Agente Maestro, satura la ventana de contexto de generación y causa fallas de deserialización y desbordamiento de VRAM. Se debe utilizar siempre variantes convencionales de seguimiento de instrucciones (**`Instruct`** o **`it`**).
-3. **Modelos Fuera del Catálogo:** Si deseas utilizar un modelo docente diferente a los tres evaluados, el sistema operará con el modelo base y RAG, o puedes entrenar un nuevo adaptador ejecutando:
-   ```bash
-   python scripts/finetune_maestro.py --model <id_del_modelo>
-   ```
+---
+
+### ⚙️ Guía de Dimensionamiento y Presupuesto de Hardware (VRAM)
+
+Si decides utilizar modelos distintos a los predeterminados, selecciona los tamaños siguiendo esta matriz de compatibilidad según tu hardware disponible:
+
+| Hardware / VRAM | Modelo Docente Máximo | Modelo Estudiante Recomendado | Modo de Cuantización | Consumo VRAM Pico |
+| :--- | :---: | :---: | :---: | :---: |
+| **GPU de Consumo (8 GB)** | $\le 7\text{B}$ / $8\text{B}$ parámetros | $\le 1.5\text{B}$ parámetros | 4-bit NF4 (BitsAndBytes) | $\approx 5.8 - 7.2\text{ GB}$ |
+| **GPU Media (12 - 16 GB)** | $\le 8\text{B}$ / $9\text{B}$ parámetros | $\le 3\text{B}$ parámetros | 4-bit NF4 o FP16 | $\approx 8.5 - 11.0\text{ GB}$ |
+| **GPU Alta / Servidor ($\ge 24\text{ GB}$)** | $\le 14\text{B}$ parámetros | $\le 7\text{B}$ parámetros | FP16 / BF16 nativo | $\approx 16.0 - 22.0\text{ GB}$ |
+| **Apple Silicon (MPS $\ge 16\text{ GB}$)** | $\le 7\text{B}$ / $8\text{B}$ parámetros | $\le 1.5\text{B}$ parámetros | FP32 / FP16 unificado | $\approx 10.0\text{ GB}$ RAM |
+| **Solo CPU ($\ge 32\text{ GB}$ RAM)** | $\le 7\text{B}$ parámetros | $\le 1.5\text{B}$ parámetros | FP32 (Inferencia lenta) | $\approx 18.0\text{ GB}$ RAM |
+
+> [!IMPORTANT]
+> **¿Por qué la cota recomendada es $\le 7\text{B}-8\text{B}$ para el Maestro y $\le 1.5\text{B}-3\text{B}$ para el Estudiante?**
+> 1. **Presupuesto térmico y memoria:** Permite la orquestación secuencial completa en una única GPU comercial de 8 GB (como NVIDIA RTX 3070/4060 o Kaggle T4) sin desbordamiento de memoria (*Out of Memory*).
+> 2. **Rendimiento morfológico:** Los modelos de 7B/8B Instruct poseen capacidad semántica óptima para interpretar dominios físicos y cotas analíticas sin necesidad de recurrir a modelos de 70B.
+> 3. **Velocidad de destilación:** El estudiante ligero (1B-1.5B) aprende los patrones temporales en menos de 3 minutos de inferencia QLoRA.
+
+---
+
+### ⚠️ Advertencia Crítica: Modelos de Razonamiento (Chain-of-Thought)
+
+> [!WARNING]
+> **NO utilizar modelos de razonamiento como DeepSeek-R1, QwQ-32B o variantes similares con pensamiento implícito.**
+> 
+> **Razón técnica:** Estos modelos emiten cadenas no estructuradas de pensamiento reflexivo delimitadas por etiquetas `<think> ... </think>` antes de dar su respuesta final. En nuestra arquitectura:
+> - **Rompe la extracción JSON:** El parser sintáctico del Agente Maestro espera un objeto JSON directo con las cotas físicas $[y_{\min}, y_{\max}]$ y el perfil temporal. El preámbulo de pensamiento corrompe la deserialización (`json.loads`).
+> - **Agotamiento de contexto:** Los tokens de pensamiento consumen la ventana de contexto de generación, provocando truncamiento de la serie morfológica.
+> 
+> **Recomendación estricta:** Emplear únicamente modelos convencionales de alineación instructiva que finalicen en **`Instruct`** (Qwen, LLaMA, Mistral) o **`-it`** (Gemma).
+
+---
+
+### 🎓 Cómo Hacer Fine-Tuning a un Nuevo Modelo Docente (Paso a Paso)
+
+Si deseas utilizar un modelo docente que **no** pertenece a los 3 preevaluados (por ejemplo `mistralai/Mistral-7B-Instruct-v0.3`, `microsoft/Phi-3-mini-4k-instruct` o entrenar tu propia variante de Qwen/LLaMA):
+
+#### Opción A: Entrenamiento Local por CLI (`scripts/finetune_maestro.py`)
+
+El script implementa optimización supervisada eficiente mediante **QLoRA en 4 bits (NF4 con doble cuantización)**, requiriendo únicamente $\approx 6\text{ GB}$ de VRAM:
+
+```bash
+# Ejemplo: Fine-tuning del modelo docente con el dataset TSQA
+python scripts/finetune_maestro.py \
+    --model Qwen/Qwen2.5-7B-Instruct \
+    --dataset data/time_series_generation.jsonl \
+    --epochs 3 \
+    --batch_size 2 \
+    --grad_accum 4 \
+    --lr 2e-4 \
+    --max_seq_length 1024 \
+    --lora_r 16 \
+    --lora_alpha 32 \
+    --output_dir models/teacher_adapters/nuevo_maestro
+```
+
+**Parámetros clave explicados:**
+- `--model`: Identificador del modelo en Hugging Face Hub (o ruta local a los pesos).
+- `--dataset`: Ruta al archivo `.jsonl` con los pares instrucción-serie de entrenamiento (por defecto busca en `data/`).
+- `--epochs`: Número de épocas de ajuste supervisado (recomendado: 3 a 5).
+- `--batch_size` y `--grad_accum`: Tamaño de lote por paso (2) y pasos de acumulación de gradiente (4), resultando en un *batch size* efectivo de $2 \times 4 = 8$.
+- `--lora_r` y `--lora_alpha`: Rango intrínseco de LoRA ($r=16$) y factor de escala ($\alpha=32$).
+- `--output_dir`: Directorio donde se guardarán los pesos del adaptador (`adapter_model.safetensors` y `adapter_config.json`).
+- `--push_to_hub` *(opcional)*: Sube automáticamente el adaptador entrenado a tu cuenta de Hugging Face Hub.
+
+#### Opción B: Entrenamiento Gratuito en la Nube (Kaggle con GPU T4)
+
+Si no cuentas con GPU local, puedes ejecutar cualquiera de los cuadernos preparados en [`notebooks_kaggle/`](notebooks_kaggle/):
+- **`01_finetuning_maestro_qwen_kaggle.ipynb`**
+- **`02_finetuning_maestro_llama_kaggle.ipynb`**
+- **`03_finetuning_maestro_gemma_kaggle.ipynb`**
+
+Estos cuadernos clonan el repositorio, cargan el dataset, ejecutan el fine-tuning QLoRA en $\approx 25$ minutos y empaquetan el adaptador resultante en un archivo `.zip` listo para descargar.
+
+#### Cómo Vincular el Nuevo Modelo al Pipeline en `.env`
+
+Una vez generado el adaptador, simplemente actualiza tu archivo `.env`:
+
+```env
+# Configuración del nuevo docente
+TEACHER_MODEL_ID=Qwen/Qwen2.5-7B-Instruct
+TEACHER_MODEL_PATH_ADAPTER=./models/teacher_adapters/nuevo_maestro
+
+# Configuración del estudiante discente
+STUDENT_MODEL_ID=Qwen/Qwen2.5-1.5B-Instruct
+```
+
+El pipeline detectará automáticamente la ruta del adaptador y cargará los pesos durante la etapa del Agente Maestro sin requerir cambios en el código fuente.
 
 ---
 

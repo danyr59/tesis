@@ -54,7 +54,7 @@ class JudgmentResult:
     hallucination_score: float = 0.0  # 0 = sin alucinaciones
 
     def summary(self) -> str:
-        status = "✅ APROBADO" if self.approved else "❌ RECHAZADO"
+        status = "[APROBADO]" if self.approved else "[RECHAZADO]"
         lines = [
             f"=== VEREDICTO DEL JUEZ: {status} ===",
             f"Confianza global:      {self.confidence_score:.2%}",

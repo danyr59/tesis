@@ -103,29 +103,29 @@ def main():
         if alt_path.exists():
             jsonl_path = alt_path
         else:
-            print(f"❌ Error: No se encontró el dataset en '{jsonl_path}' ni en '{alt_path}'.")
+            print(f"[ERROR] No se encontro el dataset en '{jsonl_path}' ni en '{alt_path}'.")
             print("Coloca el dataset TSQA en 'data/time_series_generation.jsonl' para continuar.")
             sys.exit(1)
 
     device = get_optimal_device()
-    print(f"🚀 Dispositivo de cómputo para embeddings: {device}")
-    print(f"📂 Cargando modelo de embeddings: {args.embedding_model}...")
+    print(f"[INFO] Dispositivo de computo para embeddings: {device}")
+    print(f"[INFO] Cargando modelo de embeddings: {args.embedding_model}...")
     model = SentenceTransformer(args.embedding_model, device=device)
 
-    print(f"🗄️ Inicializando cliente ChromaDB persistente en: {args.db_path}...")
+    print(f"[INFO] Inicializando cliente ChromaDB en: {args.db_path}...")
     db_path = Path(args.db_path)
     db_path.parent.mkdir(parents=True, exist_ok=True)
     client = chromadb.PersistentClient(path=str(db_path))
 
     try:
         client.delete_collection(args.collection)
-        print(f"Colección previa '{args.collection}' eliminada para indexación limpia.")
+        print(f"Coleccion previa '{args.collection}' eliminada para indexacion limpia.")
     except Exception:
         pass
 
     collection = client.create_collection(name=args.collection)
 
-    print(f"📄 Procesando dataset desde: {jsonl_path}...")
+    print(f"[INFO] Procesando dataset desde: {jsonl_path}...")
     lines_buffer = []
     entries_buffer = []
     total_indexed = 0
@@ -188,7 +188,7 @@ def main():
             lines_buffer.clear()
             entries_buffer.clear()
 
-    print(f"\n✅ Índice RAG construido con éxito: {collection.count()} documentos en '{args.db_path}' (colección: '{args.collection}').")
+    print(f"\n[OK] Indice RAG construido: {collection.count()} documentos en '{args.db_path}' (coleccion: '{args.collection}').")
 
 if __name__ == "__main__":
     main()
