@@ -99,7 +99,11 @@ class Settings:
 
   @classmethod
   def get_teacher_model_path_adapter(cls) -> str:
-    env_path = os.getenv("TEACHER_MODEL_PATH_ADAPTERS", os.getenv("TEACHER_ADAPTERS_PATH"))
+    env_path = (
+      os.getenv("TEACHER_MODEL_PATH_ADAPTERS")
+      or os.getenv("TEACHER_MODEL_PATH_ADAPTER")
+      or os.getenv("TEACHER_ADAPTERS_PATH")
+    )
     if env_path and os.path.exists(env_path):
       return env_path
 

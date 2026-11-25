@@ -65,8 +65,8 @@ CATALOGO_MAESTROS = {
 
 RAG_DATASET_CONFIG = {
     "kaggle_handle": "danielrangelsanch/rag-maestro",
-    "description": "Base de datos vectorial ChromaDB (corpus TSQA, 50 semillas empíricas reales)",
-    "target_dir": REPO_ROOT / "rag" / "maestro",
+    "description": "Base de datos vectorial ChromaDB (corpus TSQA, 50 semillas empiricas reales)",
+    "target_dir": Path(os.getenv("RAG_DB_PATH", os.getenv("CHROMA_DB_PATH", str(REPO_ROOT / "rag" / "maestro")))).resolve(),
     "check_file": "chroma.sqlite3",
 }
 

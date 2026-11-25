@@ -204,14 +204,17 @@ python scripts/finetune_maestro.py \
 - `--output_dir`: Directorio donde se guardarán los pesos del adaptador (`adapter_model.safetensors` y `adapter_config.json`).
 - `--push_to_hub` *(opcional)*: Sube automáticamente el adaptador entrenado a tu cuenta de Hugging Face Hub.
 
-#### Opción B: Entrenamiento Gratuito en la Nube (Kaggle con GPU T4)
+#### Opción B: Entrenamiento en la Nube (Kaggle con GPU T4)
 
-Si no cuentas con GPU local, puedes ejecutar cualquiera de los cuadernos preparados en [`notebooks_kaggle/`](notebooks_kaggle/):
+Si deseas reentrenar los maestros en la nube o adaptar una nueva arquitectura, dispones de los cuadernos preparados en [`notebooks_kaggle/`](notebooks_kaggle/):
 - **`01_finetuning_maestro_qwen_kaggle.ipynb`**
 - **`02_finetuning_maestro_llama_kaggle.ipynb`**
 - **`03_finetuning_maestro_gemma_kaggle.ipynb`**
 
-Estos cuadernos clonan el repositorio, cargan el dataset, ejecutan el fine-tuning QLoRA en $\approx 25$ minutos y empaquetan el adaptador resultante en un archivo `.zip` listo para descargar.
+> [!TIP]
+> **Duración y Costo Computacional (4 a 6 horas por Maestro):**
+> En Kaggle con acelerador NVIDIA Tesla T4/P100, el ciclo completo de fine-tuning QLoRA sobre el corpus TSQA toma **entre 4 y 6 horas por modelo docente**.
+> **Por esta razón, se recomienda fuertemente utilizar los adaptadores oficiales ya preentrenados y alojados en KaggleHub** (descargables en segundos mediante `python scripts/download_assets.py`), reservando el reentrenamiento únicamente para experimentaciones con nuevas arquitecturas docentes.
 
 #### Cómo Vincular el Nuevo Modelo al Pipeline en `.env`
 

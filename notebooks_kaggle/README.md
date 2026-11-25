@@ -9,10 +9,10 @@ Este directorio contiene los Jupyter Notebooks optimizados para ejecutarse en **
 | Cuaderno | Propósito | Hardware Recomendado | Tiempo Estimado |
 | :--- | :--- | :--- | :--- |
 | **`00_crear_rag_kaggle.ipynb`** | **Indexación Vectorial (RAG):** Procesa el corpus TSQA y genera la base de datos ChromaDB persistente (`all-mpnet-base-v2`) comprimiéndola para descarga o conexión como dataset. | GPU T4 / P100 o CPU | ~10-15 min |
-| **`01_finetuning_maestro_qwen_kaggle.ipynb`** | Fine-Tuning QLoRA (4-bit) de `Qwen/Qwen2.5-7B-Instruct` como Agente Maestro sobre corpus TSQA. | GPU T4 / P100 (16 GB) | ~45 min (3 épocas) |
-| **`02_finetuning_maestro_llama_kaggle.ipynb`** | Fine-Tuning QLoRA (4-bit) de `meta-llama/Llama-3.1-8B-Instruct` como Agente Maestro. | GPU T4 / P100 (16 GB) | ~50 min (3 épocas) |
-| **`03_finetuning_maestro_gemma_kaggle.ipynb`** | Fine-Tuning QLoRA (4-bit) de `google/gemma-2-9b-it` como Agente Maestro. | GPU T4 / P100 (16 GB) | ~60 min (3 épocas) |
-| **`orquestador_experimentos_kaggle.ipynb`** | **Orquestador Principal:** Ejecuta de forma secuencial la matriz completa de 54 experimentos ($9 \text{ escenarios} \times 6 \text{ perfiles}$), con purga forzada de tensores entre el Maestro y los Estudiantes. | GPU T4 x2 / P100 (16 GB) | ~4.5 - 6 horas |
+| **`01_finetuning_maestro_qwen_kaggle.ipynb`** | Fine-Tuning QLoRA (4-bit) de `Qwen/Qwen2.5-7B-Instruct` como Agente Maestro sobre corpus TSQA. | GPU T4 / P100 (16 GB) | ~4 - 5 horas (3 épocas) |
+| **`02_finetuning_maestro_llama_kaggle.ipynb`** | Fine-Tuning QLoRA (4-bit) de `meta-llama/Llama-3.1-8B-Instruct` como Agente Maestro. | GPU T4 / P100 (16 GB) | ~4.5 - 5.5 horas (3 épocas) |
+| **`03_finetuning_maestro_gemma_kaggle.ipynb`** | Fine-Tuning QLoRA (4-bit) de `google/gemma-2-9b-it` como Agente Maestro. | GPU T4 / P100 (16 GB) | ~5 - 6 horas (3 épocas) |
+| **`orquestador_experimentos_kaggle.ipynb`** | **Orquestador Principal:** Ejecuta de forma secuencial la matriz completa de 54 experimentos ($9 \text{ escenarios} \times 6 \text{ perfiles}$), con purga forzada de tensores entre el Maestro y los Estudiantes. | GPU T4 x2 / P100 (16 GB) | ~4.5 - 6 horas (por bloque) |
 
 ---
 
