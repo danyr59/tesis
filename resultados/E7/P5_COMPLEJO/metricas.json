@@ -1,0 +1,32 @@
+{
+  "escenario": "E7_gemma_gemma",
+  "tipo_escenario": "Intra-Familia",
+  "perfil": "P5_COMPLEJO",
+  "teacher": "google/gemma-2-9b-it",
+  "student": "google/gemma-2-2b-it",
+  "downstream": {
+    "r2": 0.9830010444927116,
+    "mape": 1305381.230749474,
+    "rmse": 25.91094579748079,
+    "mae": 9.911233969742776
+  },
+  "juez": {
+    "aprobado": true,
+    "confianza": 0.925,
+    "score_alucinacion": 0.07499999999999996
+  },
+  "alucinaciones": {
+    "tasa_alucinacion": 0.002631578947368421,
+    "total_predictions": 1140,
+    "total_hallucinations": 3,
+    "range_violations": 0,
+    "temporal_violations": 2,
+    "correlation_violations": 0,
+    "statistical_violations": 1,
+    "is_clean": false
+  },
+  "eficiencia": {
+    "tiempo_segundos": 1840.12,
+    "vram_pico_gb": 7.15
+  }
+}

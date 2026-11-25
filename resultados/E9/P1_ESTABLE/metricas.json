@@ -1,0 +1,32 @@
+{
+  "escenario": "E9_gemma_llama",
+  "tipo_escenario": "Cross-Family",
+  "perfil": "P1_ESTABLE",
+  "teacher": "google/gemma-2-9b-it",
+  "student": "meta-llama/Llama-3.2-1B-Instruct",
+  "downstream": {
+    "r2": 0.4616779828615565,
+    "mape": 0.12149036930824655,
+    "rmse": 0.10580943601959046,
+    "mae": 0.0842010886754583
+  },
+  "juez": {
+    "aprobado": true,
+    "confianza": 1.0,
+    "score_alucinacion": 0.0
+  },
+  "alucinaciones": {
+    "tasa_alucinacion": 0.0008771929824561404,
+    "total_predictions": 1140,
+    "total_hallucinations": 1,
+    "range_violations": 0,
+    "temporal_violations": 0,
+    "correlation_violations": 0,
+    "statistical_violations": 1,
+    "is_clean": false
+  },
+  "eficiencia": {
+    "tiempo_segundos": 1264.02,
+    "vram_pico_gb": 7.2
+  }
+}

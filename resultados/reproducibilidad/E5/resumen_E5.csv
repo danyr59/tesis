@@ -1,0 +1,2 @@
+Escenario,Perfil,R² (LSTM),MAPE (%),RMSE,MAE,Juez,Tasa Aluc. (%),VRAM Pico (GB),Tiempo (s)
+E5_llama_qwen,P3_TEND_ESTAC,0.6542,4.09%,204.93,162.53,APROBADO,0.09%,5.00,977.5

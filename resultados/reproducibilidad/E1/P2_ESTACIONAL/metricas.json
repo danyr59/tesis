@@ -1,0 +1,32 @@
+{
+  "escenario": "E1_qwen_qwen",
+  "tipo_escenario": "Intra-Familia",
+  "perfil": "P2_ESTACIONAL",
+  "teacher": "Qwen/Qwen2.5-7B-Instruct",
+  "student": "Qwen/Qwen2.5-1.5B-Instruct",
+  "downstream": {
+    "r2": 0.6564413786981258,
+    "mape": 4.268321959798853,
+    "rmse": 752.8131007645495,
+    "mae": 598.8428164394388
+  },
+  "juez": {
+    "aprobado": true,
+    "confianza": 1.0,
+    "score_alucinacion": 0.0
+  },
+  "alucinaciones": {
+    "tasa_alucinacion": 0.0008771929824561404,
+    "total_predictions": 1140,
+    "total_hallucinations": 1,
+    "range_violations": 0,
+    "temporal_violations": 0,
+    "correlation_violations": 0,
+    "statistical_violations": 1,
+    "is_clean": false
+  },
+  "eficiencia": {
+    "tiempo_segundos": 811.73,
+    "vram_pico_gb": 3.62
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "escenario": "E2_qwen_llama",
+  "tipo_escenario": "Cross-Family",
+  "perfil": "P5_COMPLEJO",
+  "teacher": "Qwen/Qwen2.5-7B-Instruct",
+  "student": "meta-llama/Llama-3.2-1B-Instruct",
+  "downstream": {
+    "r2": 0.9830379928882257,
+    "mape": 2188974.870443331,
+    "rmse": 25.882310499043626,
+    "mae": 10.04562621864983
+  },
+  "juez": {
+    "aprobado": true,
+    "confianza": 0.925,
+    "score_alucinacion": 0.07499999999999996
+  },
+  "alucinaciones": {
+    "tasa_alucinacion": 0.002631578947368421,
+    "total_predictions": 1140,
+    "total_hallucinations": 3,
+    "range_violations": 0,
+    "temporal_violations": 2,
+    "correlation_violations": 0,
+    "statistical_violations": 1,
+    "is_clean": false
+  },
+  "eficiencia": {
+    "tiempo_segundos": 1237.23,
+    "vram_pico_gb": 4.8
+  }
+}

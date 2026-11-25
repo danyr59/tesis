@@ -1,0 +1,32 @@
+{
+  "escenario": "E4_llama_llama",
+  "tipo_escenario": "Intra-Familia",
+  "perfil": "P4_TEND_RUIDO",
+  "teacher": "meta-llama/Llama-3.1-8B-Instruct",
+  "student": "meta-llama/Llama-3.2-1B-Instruct",
+  "downstream": {
+    "r2": 0.018408652495607303,
+    "mape": 3390016.468049444,
+    "rmse": 34.49392483059345,
+    "mae": 27.395171650118364
+  },
+  "juez": {
+    "aprobado": true,
+    "confianza": 0.7625,
+    "score_alucinacion": 0.23750000000000004
+  },
+  "alucinaciones": {
+    "tasa_alucinacion": 0.0008771929824561404,
+    "total_predictions": 1140,
+    "total_hallucinations": 1,
+    "range_violations": 0,
+    "temporal_violations": 0,
+    "correlation_violations": 0,
+    "statistical_violations": 1,
+    "is_clean": false
+  },
+  "eficiencia": {
+    "tiempo_segundos": 802.48,
+    "vram_pico_gb": 4.83
+  }
+}

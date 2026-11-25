@@ -1,0 +1,2139 @@
+{
+  "escenario": "E9_gemma_llama",
+  "perfil": "P5_COMPLEJO",
+  "query": "Monitorear el consumo de ancho de banda en un centro de datos empresarial. Dominio: Telecomunicaciones y Servidores. Variable estricta: Únicamente 'Ancho_Banda_Gbps'. Perfil matemático: P5_COMPLEJO, con fuerte estacionalidad por horario laboral, alto ruido de tráfico y picos anómalos esporádicos por sobrecarga. Escala: promedio de 45 Gbps.",
+  "dominio": "servidores",
+  "structured_prompt": {
+    "values": {
+      "tema": "Monitoring the bandwidth usage in a corporate data center",
+      "dominio": "Telecommunications and Servers",
+      "localizacion": "Data Center",
+      "frecuencia": "Hourly",
+      "start_date": "2023-01-01",
+      "variables": [
+        "Ancho_Banda_Gbps"
+      ],
+      "target_value": 45.0,
+      "tipo_serie": "univariada",
+      "profile_id": "P5_COMPLEJO",
+      "num_series_configuradas": 10,
+      "puntos_por_serie_configurados": 100
+    },
+    "missing_parameters": [],
+    "pending_questions": [],
+    "justification": "The time series will show the bandwidth usage in a corporate data center. The profile is complex due to the presence of strong seasonality due to working hours, high noise from traffic, and occasional spikes due to overload.",
+    "suggested_search": "Bandwidth usage in data centers, network traffic patterns, data center overload",
+    "search_strategy": "Search for articles and research papers on bandwidth usage in data centers, network traffic patterns, and data center overload. Also, look for case studies of data center bandwidth usage and its impact on business operations.",
+    "confidence": 0.9
+  },
+  "metadata_summary": {
+    "count": 50,
+    "refinements_applied": [
+      "broaden_domain"
+    ],
+    "domain": "Telecommunications and Servers",
+    "rag_dataset": "TSQA",
+    "diversity_score": 0.3633333333333333
+  },
+  "seed_dataset": [
+    {
+      "id": "188919",
+      "metadata": {
+        "id": "188919",
+        "question": "Calculate and interpret the mean of this data set segment: [731.0, 632.0, 670.0, 537.0, 1008.0, 992.0, 581.0, 583.0, 465.0, 591.0, 379.0, 294.0, 243.0, 144.0, 146.0, 64.0, 62.0, 15.0, 7.0, 7.0, 4.0, 18.0, 61.0, 214.0].",
+        "response": "The mean is calculated by summing all values and dividing by the number of values: (731.0 + 632.0 + 670.0 + 537.0 + 1008.0 + 992.0 + 581.0 + 583.0 + 465.0 + 591.0 + 379.0 + 294.0 + 243.0 + 144.0 + 146.0 + 64.0 + 62.0 + 15.0 + 7.0 + 7.0 + 4.0 + 18.0 + 61.0 + 214.0) / 24 = 388.83 approximately. This indicates moderate central tendency given the high peaks and low troughs.",
+        "task_type": "statistical property",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              731.0,
+              632.0,
+              670.0,
+              537.0,
+              1008.0,
+              992.0,
+              581.0,
+              583.0,
+              465.0,
+              591.0,
+              379.0,
+              294.0,
+              243.0,
+              144.0,
+              146.0,
+              64.0,
+              62.0,
+              15.0,
+              7.0,
+              7.0,
+              4.0,
+              18.0,
+              61.0,
+              214.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "178787",
+      "metadata": {
+        "question": "Based on the data points [86.0, 152.0, 149.0, 173.0, 172.0, 124.0, 112.0, 85.0, 77.0, 92.0, 37.0, 34.0, 22.0, 9.0, 6.0, 8.0, 7.0, 10.0, 26.0, 62.0, 91.0, 84.0, 80.0, 100.0], what is the most notable trend? A) Steady increase, B) Steady decrease, C) Short increase followed by a long decrease, D) Short decrease followed by a long increase",
+        "domain": "Traffic",
+        "id": "178787",
+        "response": "C) Short increase followed by a long decrease. The series starts with an increase reaching 172.0, then drops significantly to 9.0, before a slight upward trend at the end.",
+        "task_type": "trend analysis"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              86.0,
+              152.0,
+              149.0,
+              173.0,
+              172.0,
+              124.0,
+              112.0,
+              85.0,
+              77.0,
+              92.0,
+              37.0,
+              34.0,
+              22.0,
+              9.0,
+              6.0,
+              8.0,
+              7.0,
+              10.0,
+              26.0,
+              62.0,
+              91.0,
+              84.0,
+              80.0,
+              100.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "192637",
+      "metadata": {
+        "task_type": "pattern summarization",
+        "id": "192637",
+        "question": "Examine the pattern in the data points [1494.0, 3317.0, 3075.0, 3008.0, 3527.0, 4366.0, 4807.0, 4460.0, 4756.0, 5487.0, 4792.0, 3198.0, 2338.0, 2089.0, 2297.0, 1437.0, 624.0, 278.0, 339.0, 347.0, 402.0, 329.0, 668.0, 1537.0]. What patterns or sequences dominate this dataset?",
+        "domain": "Traffic",
+        "response": "The pattern suggests initial fluctuations leading to growth and a pronounced peak followed by a significant drop. The initial point is in the mid-1000, peaks at 5487.0, and sharply decreases to the low-1500s and further down."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              1494.0,
+              3317.0,
+              3075.0,
+              3008.0,
+              3527.0,
+              4366.0,
+              4807.0,
+              4460.0,
+              4756.0,
+              5487.0,
+              4792.0,
+              3198.0,
+              2338.0,
+              2089.0,
+              2297.0,
+              1437.0,
+              624.0,
+              278.0,
+              339.0,
+              347.0,
+              402.0,
+              329.0,
+              668.0,
+              1537.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "175637",
+      "metadata": {
+        "question": "Calculate the average of the data points [187.0, 55.0, 13.0, 14.0, 37.0, 49.0, 96.0, 308.0, 856.0, 1545.0, 918.0, 623.0, 797.0, 1122.0, 1028.0, 1027.0, 1129.0, 1674.0, 2290.0, 2177.0, 1943.0, 884.0, 1172.0, 1279.0]? Options: A) 832.67 B) 960.42 C) 880.15 D) 1023.33.",
+        "domain": "Traffic",
+        "id": "175637",
+        "task_type": "basic calculations",
+        "response": "B) 960.42. To find the average, add all values together and divide by the number of values: (187.0 + 55.0 + 13.0 + 14.0 + 37.0 + ... + 1172.0 + 1279.0) / 24. The sum is 23041 and the average is 23041/24 = 960.42."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              187.0,
+              55.0,
+              13.0,
+              14.0,
+              37.0,
+              49.0,
+              96.0,
+              308.0,
+              856.0,
+              1545.0,
+              918.0,
+              623.0,
+              797.0,
+              1122.0,
+              1028.0,
+              1027.0,
+              1129.0,
+              1674.0,
+              2290.0,
+              2177.0,
+              1943.0,
+              884.0,
+              1172.0,
+              1279.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "172092",
+      "metadata": {
+        "task_type": "summary_statistic",
+        "question": "Calculate and interpret the mean of the data points [57.0, 4.0, 4.0, 0.0, 6.0, 3.0, 8.0, 28.0, 58.0, 95.0].",
+        "id": "172092",
+        "response": "Mean = (57.0 + 4.0 + 4.0 + 0.0 + 6.0 + 3.0 + 8.0 + 28.0 + 58.0 + 95.0) / 10 = 26.3. The mean suggests that the average data point value over this series is 26.3, indicating central tendency between lower and a few much higher values.",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              57.0,
+              4.0,
+              4.0,
+              0.0,
+              6.0,
+              3.0,
+              8.0,
+              28.0,
+              58.0,
+              95.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "174843",
+      "metadata": {
+        "task_type": "seasonality",
+        "question": "Analyze the following data points: [0.0, 8.0, 26.0, 91.0, 82.0, 72.0, 61.0, 61.0, 102.0, 91.0, 75.0, 88.0, 123.0, 137.0, 67.0, 60.0, 32.0, 13.0, 11.0, 2.0, 2.0, 3.0, 1.0, 1.0]. Does the data show evidence of seasonality? \n(a) Strong Seasonality \n(b) Weak Seasonality \n(c) No Seasonality",
+        "id": "174843",
+        "domain": "Traffic",
+        "response": "b) Weak Seasonality. The data shows some repeating patterns but the peaks and valleys are not perfectly regular, which indicates some weak seasonality."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.0,
+              8.0,
+              26.0,
+              91.0,
+              82.0,
+              72.0,
+              61.0,
+              61.0,
+              102.0,
+              91.0,
+              75.0,
+              88.0,
+              123.0,
+              137.0,
+              67.0,
+              60.0,
+              32.0,
+              13.0,
+              11.0,
+              2.0,
+              2.0,
+              3.0,
+              1.0,
+              1.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "185926",
+      "metadata": {
+        "task_type": "pattern identification",
+        "question": "What pattern best describes this data point set: [12.0, 64.0, 206.0, 734.0, 607.0, 774.0, 582.0, 1010.0, 946.0, 555.0, 673.0, 546.0, 586.0, 359.0, 226.0, 253.0]? A) Exponential growth B) Random walk C) Linear increase D) Initial increase followed by stabilization",
+        "response": "D) Initial increase followed by stabilization. The data demonstrates an initial sharp increase in values reaching a peak, followed by smaller oscillations around a relatively stable central trend.",
+        "id": "185926",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 16,
+            "serie": [
+              12.0,
+              64.0,
+              206.0,
+              734.0,
+              607.0,
+              774.0,
+              582.0,
+              1010.0,
+              946.0,
+              555.0,
+              673.0,
+              546.0,
+              586.0,
+              359.0,
+              226.0,
+              253.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "191580",
+      "metadata": {
+        "id": "191580",
+        "response": "The data shows an initial increasing trend from 90.0 to a peak of 989.0, followed by a general decreasing trend down to 51.0. The fluctuations suggest a peak followed by a decline over time.",
+        "domain": "Traffic",
+        "question": "Analyze the data points [90.0, 184.0, 279.0, 271.0, 375.0, 489.0, 970.0, 989.0, 701.0, 666.0, 772.0, 848.0, 730.0, 623.0, 514.0, 422.0, 355.0, 264.0, 142.0, 79.0, 29.0, 40.0, 39.0, 51.0] and describe the overall trend observed.",
+        "task_type": "trend_analysis"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              90.0,
+              184.0,
+              279.0,
+              271.0,
+              375.0,
+              489.0,
+              970.0,
+              989.0,
+              701.0,
+              666.0,
+              772.0,
+              848.0,
+              730.0,
+              623.0,
+              514.0,
+              422.0,
+              355.0,
+              264.0,
+              142.0,
+              79.0,
+              29.0,
+              40.0,
+              39.0,
+              51.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "179862",
+      "metadata": {
+        "domain": "Traffic",
+        "task_type": "pattern_recognition",
+        "question": "The pattern observed in the data [268.0, 101.0, 65.0, 49.0, 22.0, 14.0, 6.0, 4.0, 0.0, 0.0, 7.0, 19.0, 91.0, 247.0, 327.0, 153.0, 163.0, 131.0, 210.0, 294.0, 308.0, 175.0, 197.0, 382.0] is best described as: A) Linear trend B) Random walk C) Seasonal pattern D) Cycle",
+        "response": "D) Cycle. The data exhibits cyclical behaviors, starting with a gradual decline, hitting a low, then increasing significantly. This resembles cycles often seen in economic and financial time series.",
+        "id": "179862"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              268.0,
+              101.0,
+              65.0,
+              49.0,
+              22.0,
+              14.0,
+              6.0,
+              4.0,
+              0.0,
+              0.0,
+              7.0,
+              19.0,
+              91.0,
+              247.0,
+              327.0,
+              153.0,
+              163.0,
+              131.0,
+              210.0,
+              294.0,
+              308.0,
+              175.0,
+              197.0,
+              382.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "187022",
+      "metadata": {
+        "domain": "Traffic",
+        "id": "187022",
+        "task_type": "seasonality identification",
+        "response": "b) No, the series does not show a clear seasonal pattern. The data fluctuates considerably without a repeated interval or recognizable seasonal pattern across the selected points.",
+        "question": "Can you identify any seasonal pattern in this subset of data? [3.0, 11.0, 104.0, 613.0, 148.0, 545.0, 315.0, 977.0, 780.0, 1127.0, 1383.0, 901.0, 1150.0, 2134.0, 1786.0, 531.0, 263.0, 148.0, 141.0, 179.0, 112.0, 41.0, 17.0, 27.0]. Options: a) Yes, there is a winter peak pattern b) No, the series does not show a clear seasonal pattern c) Yes, there is a summer trough pattern"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              3.0,
+              11.0,
+              104.0,
+              613.0,
+              148.0,
+              545.0,
+              315.0,
+              977.0,
+              780.0,
+              1127.0,
+              1383.0,
+              901.0,
+              1150.0,
+              2134.0,
+              1786.0,
+              531.0,
+              263.0,
+              148.0,
+              141.0,
+              179.0,
+              112.0,
+              41.0,
+              17.0,
+              27.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "186092",
+      "metadata": {
+        "task_type": "cyclical_pattern",
+        "domain": "Traffic",
+        "id": "186092",
+        "response": "B) Regular peaks and troughs. The data alternates between increases and decreases at regular intervals, which demonstrates a cyclical pattern.",
+        "question": "In the data [152.0, 229.0, 211.0, 165.0, 202.0, 118.0, 107.0, 157.0, 166.0, 196.0], a cyclical pattern is best characterized by which sequence of events? A) Sharp decline only B) Regular peaks and troughs C) Linear increase D) Random occurrence"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              152.0,
+              229.0,
+              211.0,
+              165.0,
+              202.0,
+              118.0,
+              107.0,
+              157.0,
+              166.0,
+              196.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "191093",
+      "metadata": {
+        "question": "Identify the point of highest increase within the data [100.0, 22.0, 7.0, 17.0, 43.0, 37.0, 52.0, 91.0]. Which pair of numbers indicates this change? A) 7.0 to 17.0 B) 37.0 to 52.0 C) 52.0 to 91.0 D) 22.0 to 7.0",
+        "domain": "Traffic",
+        "task_type": "change_point_detection",
+        "response": "C) 52.0 to 91.0. The increase from 52.0 to 91.0 is the largest, suggesting a significant rise during this period.",
+        "id": "191093"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 8,
+            "serie": [
+              100.0,
+              22.0,
+              7.0,
+              17.0,
+              43.0,
+              37.0,
+              52.0,
+              91.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "171687",
+      "metadata": {
+        "task_type": "anomaly detection",
+        "question": "Identify the anomaly in the series [9.0, 8.0, 0.0, 1.0, 2.0, 0.0, 3.0, 8.0, 24.0, 33.0, 46.0, 128.0, 96.0, 103.0, 134.0, 145.0, 154.0, 125.0, 71.0, 39.0, 36.0, 28.0, 15.0, 11.0]. Options: A) 128.0, B) 39.0, C) 8.0",
+        "domain": "Traffic",
+        "id": "171687",
+        "response": "A) 128.0. The data point 128.0 is conspicuously higher than its immediate neighbors, suggesting it is an anomaly. This value does not align with the gradual increase from 24.0 up and the stabilization around the 70s and beyond."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              9.0,
+              8.0,
+              0.0,
+              1.0,
+              2.0,
+              0.0,
+              3.0,
+              8.0,
+              24.0,
+              33.0,
+              46.0,
+              128.0,
+              96.0,
+              103.0,
+              134.0,
+              145.0,
+              154.0,
+              125.0,
+              71.0,
+              39.0,
+              36.0,
+              28.0,
+              15.0,
+              11.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "170915",
+      "metadata": {
+        "question": "Provide a summary of the time series [2877.0, 3496.0, 2581.0, 1274.0, 520.0, 201.0, 123.0, 114.0, 106.0, 182.0]. What main patterns can be observed?",
+        "domain": "Traffic",
+        "task_type": "data_summarization",
+        "response": "The series posts a peak at 3496 before undergoing a substantial decline down to 106. This suggests a significant downturn after an initial peak. The series illustrates a volatile movement with a decisively downward trend.",
+        "id": "170915"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              2877.0,
+              3496.0,
+              2581.0,
+              1274.0,
+              520.0,
+              201.0,
+              123.0,
+              114.0,
+              106.0,
+              182.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "167151",
+      "metadata": {
+        "response": "The correct answer is (b) Decreasing. The data shows a downward trend from the beginning towards the middle, indicating a general decline before a partial recovery at the end.",
+        "task_type": "trend_analysis",
+        "question": "Based on the data points [2424.0, 2406.0, 1949.0, 1767.0, 1700.0, 1203.0, 785.0, 293.0, 76.0, 101.0, 118.0, 28.0, 68.0, 187.0, 328.0, 634.0, 679.0, 818.0, 780.0, 1854.0, 2323.0, 1972.0, 2046.0, 2090.0], what trend do you observe? (a) Increasing (b) Decreasing (c) Stable (d) Cyclical",
+        "id": "167151",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              2424.0,
+              2406.0,
+              1949.0,
+              1767.0,
+              1700.0,
+              1203.0,
+              785.0,
+              293.0,
+              76.0,
+              101.0,
+              118.0,
+              28.0,
+              68.0,
+              187.0,
+              328.0,
+              634.0,
+              679.0,
+              818.0,
+              780.0,
+              1854.0,
+              2323.0,
+              1972.0,
+              2046.0,
+              2090.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "176495",
+      "metadata": {
+        "task_type": "trend analysis",
+        "domain": "Traffic",
+        "question": "Analyze the data points [608.0, 744.0, 826.0, 851.0, 793.0, 732.0, 791.0, 777.0, 835.0, 1064.0, 1102.0, 1098.0, 1058.0, 796.0, 404.0, 421.0, 175.0, 187.0, 74.0, 64.0, 96.0, 109.0, 223.0, 346.0] and describe the main trend observed.",
+        "response": "The data shows an initial increase followed by a sudden drop. The trend initially involves a rise from 608.0 to a peak of 1102.0, then declines sharply back down to 346.0. This indicates a strong upward trend initially, but a significant downward trend emerges in the latter part.",
+        "id": "176495"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              608.0,
+              744.0,
+              826.0,
+              851.0,
+              793.0,
+              732.0,
+              791.0,
+              777.0,
+              835.0,
+              1064.0,
+              1102.0,
+              1098.0,
+              1058.0,
+              796.0,
+              404.0,
+              421.0,
+              175.0,
+              187.0,
+              74.0,
+              64.0,
+              96.0,
+              109.0,
+              223.0,
+              346.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "184564",
+      "metadata": {
+        "question": "What pattern is most prominent in these data points [13.31, 12.22, 10.84, 10.03, 11.22, 10.69, 12.12, 14.06, 16.16, 17.81, 18.69, 20.16, 20.91, 22.28, 24.41, 26.56, 30.38, 33.44, 35.78, 37.31, 36.59, 33.44, 31.0, 29.56]? A) Cyclical peaks and troughs B) Linear growth C) Rapid spikes and drops D) Exponential growth",
+        "id": "184564",
+        "domain": "Healthcare",
+        "task_type": "pattern_recognition",
+        "response": "B) Linear growth. The data shows a consistent pattern of linear growth with very few interruptions, suggesting linear rather than exponential growth."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              13.31,
+              12.22,
+              10.84,
+              10.03,
+              11.22,
+              10.69,
+              12.12,
+              14.06,
+              16.16,
+              17.81,
+              18.69,
+              20.16,
+              20.91,
+              22.28,
+              24.41,
+              26.56,
+              30.38,
+              33.44,
+              35.78,
+              37.31,
+              36.59,
+              33.44,
+              31.0,
+              29.56
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "165668",
+      "metadata": {
+        "question": "Review the following time series data points [124.0, 139.0, 202.0, 476.0, 474.0, 375.0, 168.0, 118.0, 45.0, 295.0, 1.0, 4.0, 0.0, 1.0, 8.0, 18.0, 144.0, 267.0, 680.0, 331.0, 132.0, 164.0, 323.0, 328.0] and describe the underlying trend you observe within this segment.",
+        "id": "165668",
+        "domain": "Traffic",
+        "response": "The data appears to exhibit a significant increase followed by a steep decline and another increase. Initially, there is an upward trend moving towards the highest point at 680, then falls drastically but subsequently shows a recovery by the end of this sequence. This indicates cyclic behavior with increased volatility.",
+        "task_type": "trend_analysis"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              124.0,
+              139.0,
+              202.0,
+              476.0,
+              474.0,
+              375.0,
+              168.0,
+              118.0,
+              45.0,
+              295.0,
+              1.0,
+              4.0,
+              0.0,
+              1.0,
+              8.0,
+              18.0,
+              144.0,
+              267.0,
+              680.0,
+              331.0,
+              132.0,
+              164.0,
+              323.0,
+              328.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "178780",
+      "metadata": {
+        "domain": "Traffic",
+        "question": "The following data points [212.0, 210.0, 300.0, 593.0, 772.0, 994.0, 1342.0, 1948.0, 2624.0, 1899.0, 2234.0, 2330.0] exhibit a clear seasonal pattern. True or False?",
+        "id": "178780",
+        "response": "False. The data does not show a clear repetitive pattern or seasonality. The increase appears more like a trend rather than seasonal fluctuations.",
+        "task_type": "seasonality_detection"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 12,
+            "serie": [
+              212.0,
+              210.0,
+              300.0,
+              593.0,
+              772.0,
+              994.0,
+              1342.0,
+              1948.0,
+              2624.0,
+              1899.0,
+              2234.0,
+              2330.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "181819",
+      "metadata": {
+        "task_type": "seasonality identification",
+        "domain": "Traffic",
+        "response": "Yes, possible seasonal patterns with two distinct periods where high values are clustered around the start (1012.0 to 2081.0) and a dip in the middle (183.0 to 964.0), suggesting a seasonal repeat.",
+        "id": "181819",
+        "question": "Do the data points [1012.0, 1978.0, 2389.0, 1777.0, 2162.0, 1826.0, 2081.0, 1434.0, 1244.0, 1059.0, 755.0, 504.0, 182.0, 107.0, 70.0, 37.0, 21.0, 19.0, 40.0, 131.0, 493.0, 958.0, 753.0, 953.0] show any seasonal patterns?"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              1012.0,
+              1978.0,
+              2389.0,
+              1777.0,
+              2162.0,
+              1826.0,
+              2081.0,
+              1434.0,
+              1244.0,
+              1059.0,
+              755.0,
+              504.0,
+              182.0,
+              107.0,
+              70.0,
+              37.0,
+              21.0,
+              19.0,
+              40.0,
+              131.0,
+              493.0,
+              958.0,
+              753.0,
+              953.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "168323",
+      "metadata": {
+        "domain": "Traffic",
+        "task_type": "statistical_property",
+        "id": "168323",
+        "question": "Which of the following statements is true about the dataset [653.0, 666.0, 367.0, 61.0, 72.0, 77.0, 7.0, 12.0, 4.0, 10.0, 55.0, 91.0, 158.0, 201.0, 273.0, 453.0, 478.0, 542.0, 578.0, 285.0, 695.0, 249.0, 602.0, 110.0]? A) The dataset is normally distributed. B) The dataset is positively skewed. C) The dataset is negatively skewed. D) The dataset is uniform.",
+        "response": "Correct answer: B) The dataset is positively skewed. The presence of many lower values as compared to few extremely high values (695.0, 666.0) indicates a long tail on the right, characterizing a positive skew."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              653.0,
+              666.0,
+              367.0,
+              61.0,
+              72.0,
+              77.0,
+              7.0,
+              12.0,
+              4.0,
+              10.0,
+              55.0,
+              91.0,
+              158.0,
+              201.0,
+              273.0,
+              453.0,
+              478.0,
+              542.0,
+              578.0,
+              285.0,
+              695.0,
+              249.0,
+              602.0,
+              110.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "171585",
+      "metadata": {
+        "response": "The trend starts with a decline from 410.0 to 10.0, followed by a gradual increase culminating at 2180.0. It later shows a decline towards 442.0. The series has repeated up and down cycles indicating volatility, but the overall trend after the trough around 10.0 to 22.0 is upward until a peak, followed by a decrease.",
+        "question": "Analyze the trend in the data points [410.0, 97.0, 39.0, 25.0, 10.0, 22.0, 42.0, 133.0, 385.0, 939.0, 1522.0, 841.0, 838.0, 946.0, 1087.0, 1059.0, 1047.0, 1206.0, 1640.0, 2180.0, 1341.0, 1041.0, 618.0, 442.0] and describe the overall trend in this series.",
+        "id": "171585",
+        "domain": "Traffic",
+        "task_type": "trend analysis"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              410.0,
+              97.0,
+              39.0,
+              25.0,
+              10.0,
+              22.0,
+              42.0,
+              133.0,
+              385.0,
+              939.0,
+              1522.0,
+              841.0,
+              838.0,
+              946.0,
+              1087.0,
+              1059.0,
+              1047.0,
+              1206.0,
+              1640.0,
+              2180.0,
+              1341.0,
+              1041.0,
+              618.0,
+              442.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "177372",
+      "metadata": {
+        "task_type": "data_synthesis",
+        "domain": "Traffic",
+        "question": "Synthesize the possible causes of fluctuations in the data points [356.0, 325.0, 217.0, 188.0, 137.0, 170.0, 133.0, 91.0, 28.0, 17.0, 14.0, 12.0, 1.0, 6.0, 17.0, 40.0, 66.0, 98.0, 181.0, 121.0, 151.0].",
+        "id": "177372",
+        "response": "Answer: The fluctuations might be due to seasonal demand cycles, economic conditions, or changes in external factors like competition or regulatory adjustments. The initial decrease, followed by fluctuations, could represent off-peak periods and supply chain responses."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 21,
+            "serie": [
+              356.0,
+              325.0,
+              217.0,
+              188.0,
+              137.0,
+              170.0,
+              133.0,
+              91.0,
+              28.0,
+              17.0,
+              14.0,
+              12.0,
+              1.0,
+              6.0,
+              17.0,
+              40.0,
+              66.0,
+              98.0,
+              181.0,
+              121.0,
+              151.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "172773",
+      "metadata": {
+        "id": "172773",
+        "task_type": "anomaly_detection",
+        "question": "Investigate the presence of anomalies within the series [1677.0, 2177.0, 2520.0, 2754.0, 2659.0, 2555.0, 2183.0, 1534.0, 1220.0, 1026.0, 693.0, 648.0, 472.0, 762.0, 110.0, 58.0, 39.0, 19.0, 70.0, 166.0, 497.0, 1037.0, 1244.0, 1590.0].",
+        "domain": "Traffic",
+        "response": "The clear anomaly in this dataset is at the very beginning with the values [2754.0, 2659.0]. There is a significant drop in the following numbers, suggesting these points do not fit with the gradual decrease observed in the remaining data."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              1677.0,
+              2177.0,
+              2520.0,
+              2754.0,
+              2659.0,
+              2555.0,
+              2183.0,
+              1534.0,
+              1220.0,
+              1026.0,
+              693.0,
+              648.0,
+              472.0,
+              762.0,
+              110.0,
+              58.0,
+              39.0,
+              19.0,
+              70.0,
+              166.0,
+              497.0,
+              1037.0,
+              1244.0,
+              1590.0
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              2754.0,
+              2659.0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "185122",
+      "metadata": {
+        "task_type": "statistical_property_calculation",
+        "question": "Calculate and interpret the mean of the selected data points [186.0, 322.0, 347.0, 442.0, 643.0, 1375.0, 1336.0, 791.0, 754.0, 965.0, 1370.0, 1379.0, 1255.0, 1214.0, 1147.0, 1311.0, 1294.0, 1035.0, 744.0, 700.0, 420.0, 330.0, 128.0, 90.0].",
+        "domain": "Traffic",
+        "response": "The mean is approximately 852.4, calculated by summing up all data points (20,457) and dividing by the number of data points (24). This suggests that on average, the data oscillates around this central point.",
+        "id": "185122"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              186.0,
+              322.0,
+              347.0,
+              442.0,
+              643.0,
+              1375.0,
+              1336.0,
+              791.0,
+              754.0,
+              965.0,
+              1370.0,
+              1379.0,
+              1255.0,
+              1214.0,
+              1147.0,
+              1311.0,
+              1294.0,
+              1035.0,
+              744.0,
+              700.0,
+              420.0,
+              330.0,
+              128.0,
+              90.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "180155",
+      "metadata": {
+        "task_type": "trend identification",
+        "question": "Analyze the data points [1050.0, 1577.0, 2539.0, 3049.0, 2011.0, 1868.0, 1891.0, 1867.0, 1117.0, 399.0, 311.0, 234.0, 103.0, 89.0, 44.0, 31.0, 19.0, 12.0, 7.0, 18.0, 99.0, 233.0, 615.0, 597.0] and describe the trend over these time periods.",
+        "id": "180155",
+        "response": "The data exhibits a general decreasing trend with some fluctuations. The values start high at 1050, peak at 3049, and then generally decrease towards the end at 597. The decrease is notable after the peak, although there are some increases, such as from 7 to 18 to 99.",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              1050.0,
+              1577.0,
+              2539.0,
+              3049.0,
+              2011.0,
+              1868.0,
+              1891.0,
+              1867.0,
+              1117.0,
+              399.0,
+              311.0,
+              234.0,
+              103.0,
+              89.0,
+              44.0,
+              31.0,
+              19.0,
+              12.0,
+              7.0,
+              18.0,
+              99.0,
+              233.0,
+              615.0,
+              597.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "172164",
+      "metadata": {
+        "id": "172164",
+        "response": "A) Cyclical. The data shows patterns of rises and falls over distinct intervals, indicating a cyclical pattern rather than random or strictly seasonal behavior.",
+        "question": "Identify the pattern that best describes the data points [53.0, 76.0, 174.0, 85.0, 71.0, 135.0, 126.0, 87.0, 69.0, 100.0, 82.0, 89.0, 57.0, 20.0, 13.0, 22.0, 19.0, 11.0, 4.0, 2.0, 5.0, 5.0, 5.0, 28.0]. A) Cyclical B) Random C) Linear D) Seasonal",
+        "domain": "Traffic",
+        "task_type": "cyclical_patterns"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              53.0,
+              76.0,
+              174.0,
+              85.0,
+              71.0,
+              135.0,
+              126.0,
+              87.0,
+              69.0,
+              100.0,
+              82.0,
+              89.0,
+              57.0,
+              20.0,
+              13.0,
+              22.0,
+              19.0,
+              11.0,
+              4.0,
+              2.0,
+              5.0,
+              5.0,
+              5.0,
+              28.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "173953",
+      "metadata": {
+        "id": "173953",
+        "domain": "Traffic",
+        "question": "Identify and describe the overall trend of the data points [1596.0, 1515.0, 1530.0, 1448.0, 1176.0, 1118.0, 736.0, 472.0, 290.0, 170.0, 103.0, 42.0, 34.0, 88.0, 205.0, 348.0, 584.0, 717.0, 1060.0, 1178.0, 1327.0, 1315.0, 1320.0, 1405.0].",
+        "response": "The data shows an overall decreasing trend initially, reaching its lowest point, followed by a gradual increasing trend towards the end. Initially, the values decrease significantly from 1596.0 to 34.0 and later increase to 1405.0, showcasing a typical U-shaped trend.",
+        "task_type": "trend_analysis"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              1596.0,
+              1515.0,
+              1530.0,
+              1448.0,
+              1176.0,
+              1118.0,
+              736.0,
+              472.0,
+              290.0,
+              170.0,
+              103.0,
+              42.0,
+              34.0,
+              88.0,
+              205.0,
+              348.0,
+              584.0,
+              717.0,
+              1060.0,
+              1178.0,
+              1327.0,
+              1315.0,
+              1320.0,
+              1405.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "174937",
+      "metadata": {
+        "task_type": "data summarization",
+        "question": "What is the most prevalent type of pattern in the data points [38.0, 12.0, 13.0, 19.0, 14.0, 19.0, 21.0, 14.0, 29.0, 14.0, 10.0, 26.0, 10.0, 12.0, 23.0, 15.0, 9.0, 19.0, 13.0, 15.0, 12.0, 7.0, 10.0, 10.0]? Options: A) Uptrend B) Downtrend C) Volatility D) Seasonality",
+        "domain": "Web",
+        "response": "C) Volatility. The values fluctuate without a consistent upward or downward trend, moving erratically between figures such as 10.0 and 19.0, indicating volatility is the most evident pattern.",
+        "id": "174937"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              38.0,
+              12.0,
+              13.0,
+              19.0,
+              14.0,
+              19.0,
+              21.0,
+              14.0,
+              29.0,
+              14.0,
+              10.0,
+              26.0,
+              10.0,
+              12.0,
+              23.0,
+              15.0,
+              9.0,
+              19.0,
+              13.0,
+              15.0,
+              12.0,
+              7.0,
+              10.0,
+              10.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "180937",
+      "metadata": {
+        "response": "Option (b) Cyclical pattern. The data points show periods of increase and decrease, suggesting a cyclical nature rather than random fluctuations or a strict seasonal pattern.",
+        "id": "180937",
+        "domain": "Traffic",
+        "task_type": "pattern identification",
+        "question": "What pattern emerges in the time series data points [376.0, 448.0, 328.0, 185.0, 265.0, 274.0, 190.0, 93.0, 62.0, 51.0, 46.0, 31.0, 8.0, 7.0, 4.0, 2.0, 1.0, 3.0, 3.0, 14.0, 35.0, 102.0, 113.0, 101.0]? (a) Seasonal pattern (b) Cyclical pattern (c) Random fluctuations (d) No pattern"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              376.0,
+              448.0,
+              328.0,
+              185.0,
+              265.0,
+              274.0,
+              190.0,
+              93.0,
+              62.0,
+              51.0,
+              46.0,
+              31.0,
+              8.0,
+              7.0,
+              4.0,
+              2.0,
+              1.0,
+              3.0,
+              3.0,
+              14.0,
+              35.0,
+              102.0,
+              113.0,
+              101.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "181834",
+      "metadata": {
+        "question": "Does the segment [98.0, 98.0, 88.0, 161.0, 208.0, 298.0, 470.0, 660.0, 684.0, 716.0, 588.0, 598.0, 556.0, 494.0, 435.0, 442.0, 287.0, 157.0, 121.0, 70.0, 51.0, 16.0, 19.0, 11.0] display any of the following seasonal patterns? A) Annual, B) Monthly, C) Daily, D) No seasonality observed.",
+        "id": "181834",
+        "task_type": "seasonality",
+        "response": "D) No seasonality observed. The data shows no consistent repeating pattern typical of seasonal series.",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              98.0,
+              98.0,
+              88.0,
+              161.0,
+              208.0,
+              298.0,
+              470.0,
+              660.0,
+              684.0,
+              716.0,
+              588.0,
+              598.0,
+              556.0,
+              494.0,
+              435.0,
+              442.0,
+              287.0,
+              157.0,
+              121.0,
+              70.0,
+              51.0,
+              16.0,
+              19.0,
+              11.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "188228",
+      "metadata": {
+        "response": "A) Increasing. The sequence starts at 126.0, experiences initial declines, but ultimately shows an increasing trend with peaks at 855.0 and then a gradual decline but still higher than the initial values.",
+        "task_type": "trend_analysis",
+        "question": "What is the overall trend in the data [126.0, 91.0, 39.0, 52.0, 29.0, 27.0, 18.0, 26.0, 23.0, 42.0, 84.0, 232.0, 407.0, 612.0, 855.0, 845.0, 863.0, 699.0, 489.0, 237.0, 183.0, 168.0, 155.0, 90.0]? A) Increasing B) Decreasing C) Stable D) Cyclical",
+        "domain": "Traffic",
+        "id": "188228"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              126.0,
+              91.0,
+              39.0,
+              52.0,
+              29.0,
+              27.0,
+              18.0,
+              26.0,
+              23.0,
+              42.0,
+              84.0,
+              232.0,
+              407.0,
+              612.0,
+              855.0,
+              845.0,
+              863.0,
+              699.0,
+              489.0,
+              237.0,
+              183.0,
+              168.0,
+              155.0,
+              90.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "163829",
+      "metadata": {
+        "response": "Correct answer: (a) Upward trend. Reasoning: Initially, the data shows a steep decline, but after reaching a low point, it exhibits a consistent upward trend towards the end of the sequence.",
+        "id": "163829",
+        "domain": "Traffic",
+        "question": "What best describes the trend of the following time series data?: [78.0, 64.0, 80.0, 69.0, 62.0, 34.0, 14.0, 13.0, 5.0, 4.0, 4.0, 6.0, 16.0, 20.0, 58.0, 76.0, 115.0, 150.0, 176.0, 159.0, 171.0, 168.0, 144.0, 103.0]. Options: (a) Upward trend, (b) Downward trend, (c) Cyclical pattern, (d) No clear trend.",
+        "task_type": "trend analysis"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              78.0,
+              64.0,
+              80.0,
+              69.0,
+              62.0,
+              34.0,
+              14.0,
+              13.0,
+              5.0,
+              4.0,
+              4.0,
+              6.0,
+              16.0,
+              20.0,
+              58.0,
+              76.0,
+              115.0,
+              150.0,
+              176.0,
+              159.0,
+              171.0,
+              168.0,
+              144.0,
+              103.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "183139",
+      "metadata": {
+        "task_type": "seasonality",
+        "id": "183139",
+        "question": "The dataset [1.0, 2.0, 0.0, 3.0, 8.0, 24.0, 33.0, 46.0, 128.0, 96.0, 103.0, 134.0, 145.0, 154.0, 125.0, 71.0, 39.0, 36.0, 28.0, 15.0, 11.0] demonstrates a seasonal pattern. True or False?",
+        "domain": "Traffic",
+        "response": "False. The dataset does not show clear seasonal patterns or regularly repeating cycles that occur at consistent intervals typical of seasonal trends. The variations observed are uneven and do not suggest seasonality."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 21,
+            "serie": [
+              1.0,
+              2.0,
+              0.0,
+              3.0,
+              8.0,
+              24.0,
+              33.0,
+              46.0,
+              128.0,
+              96.0,
+              103.0,
+              134.0,
+              145.0,
+              154.0,
+              125.0,
+              71.0,
+              39.0,
+              36.0,
+              28.0,
+              15.0,
+              11.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "191004",
+      "metadata": {
+        "response": "B) Skewed-right. The tail drops off more gradually on the lower end of the scale, indicating the data is skewed towards the right with a longer right tail.",
+        "task_type": "data_distribution",
+        "id": "191004",
+        "question": "What type of data distribution is most likely shown in [823.0, 733.0, 708.0, 774.0, 808.0, 893.0, 915.0, 907.0, 856.0, 639.0, 461.0, 375.0, 141.0, 98.0, 98.0, 88.0, 161.0, 208.0, 298.0, 470.0, 660.0, 684.0, 716.0, 704.0]? A) Skewed-left, B) Skewed-right, C) Normally distributed, D) Bimodal",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              823.0,
+              733.0,
+              708.0,
+              774.0,
+              808.0,
+              893.0,
+              915.0,
+              907.0,
+              856.0,
+              639.0,
+              461.0,
+              375.0,
+              141.0,
+              98.0,
+              98.0,
+              88.0,
+              161.0,
+              208.0,
+              298.0,
+              470.0,
+              660.0,
+              684.0,
+              716.0,
+              704.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "186882",
+      "metadata": {
+        "question": "Is the point 923.0 likely indicating a peak in the sequence [121.0, 189.0, 266.0, 534.0, 642.0, 860.0, 682.0, 927.0, 741.0, 720.0, 646.0, 812.0, 732.0, 754.0]?",
+        "response": "True. 923.0 is the highest value in the sequence, indicating a potential peak followed by a decline post-peak.",
+        "task_type": "data_point_interpretation",
+        "id": "186882",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 14,
+            "serie": [
+              121.0,
+              189.0,
+              266.0,
+              534.0,
+              642.0,
+              860.0,
+              682.0,
+              927.0,
+              741.0,
+              720.0,
+              646.0,
+              812.0,
+              732.0,
+              754.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "184976",
+      "metadata": {
+        "question": "Analyze the trend in the data points [270.0, 187.0, 186.0, 154.0, 171.0, 236.0, 274.0, 354.0, 314.0, 230.0, 119.0, 29.0, 20.0, 11.0, 5.0, 4.0, 20.0, 15.0, 40.0, 37.0, 91.0, 148.0, 203.0, 321.0].",
+        "task_type": "trend_analysis",
+        "domain": "Traffic",
+        "id": "184976",
+        "response": "Answer: The data points initially decrease, followed by a gradual increase, and then a rapid rise, eventually dropping again towards the end, indicating a cyclical trend. Initial decline suggests a downtrend, whereas the subsequent increase shows recovery and acceleration before another drop."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              270.0,
+              187.0,
+              186.0,
+              154.0,
+              171.0,
+              236.0,
+              274.0,
+              354.0,
+              314.0,
+              230.0,
+              119.0,
+              29.0,
+              20.0,
+              11.0,
+              5.0,
+              4.0,
+              20.0,
+              15.0,
+              40.0,
+              37.0,
+              91.0,
+              148.0,
+              203.0,
+              321.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "183818",
+      "metadata": {
+        "response": "The mean is calculated by summing all data points (9351.0) and dividing by the number of points (24), resulting in a mean of approximately 389.625. The median, which is the middle value of the ordered series, is 221.5: (224.0 + 219.0)/2. The median is found by ordering the data and finding the middle point(s).",
+        "question": "Given the data [35.0, 13.0, 11.0, 9.0, 6.0, 3.0, 6.0, 1.0, 3.0, 21.0, 305.0, 653.0, 1511.0, 750.0, 331.0, 265.0, 800.0, 829.0, 384.0, 404.0, 799.0, 1511.0, 590.0, 224.0], calculate the mean and identify the median value.",
+        "task_type": "statistical_analysis",
+        "id": "183818",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              35.0,
+              13.0,
+              11.0,
+              9.0,
+              6.0,
+              3.0,
+              6.0,
+              1.0,
+              3.0,
+              21.0,
+              305.0,
+              653.0,
+              1511.0,
+              750.0,
+              331.0,
+              265.0,
+              800.0,
+              829.0,
+              384.0,
+              404.0,
+              799.0,
+              1511.0,
+              590.0,
+              224.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "159417",
+      "metadata": {
+        "task_type": "anomaly_detection",
+        "question": "Examine the data points [314.0, 383.0, 390.0, 388.0, 295.0, 304.0, 313.0, 280.0, 125.0, 57.0, 4.0, 4.0, 0.0, 6.0] and identify the data anomaly.",
+        "id": "159417",
+        "domain": "Traffic",
+        "response": "The anomaly occurs between 280.0 and 125.0. The values drop significantly from a high level near the upper 300s down to 125.0 and eventually down to 0.0. This abrupt decrease signals an anomaly in the trend."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 14,
+            "serie": [
+              314.0,
+              383.0,
+              390.0,
+              388.0,
+              295.0,
+              304.0,
+              313.0,
+              280.0,
+              125.0,
+              57.0,
+              4.0,
+              4.0,
+              0.0,
+              6.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "187599",
+      "metadata": {
+        "question": "Does the time series pattern for data points [12.5, 17.0, 23.0, 29.5, 33.5, 38.5, 43.5, 51.0, 59.0, 69.5, 83.0, 97.0, 112.5, 126.5, 140.0, 152.5, 161.5, 168.0, 170.0, 170.0, 166.0, 157.0, 146.5, 133.5] resemble: (a) Linear Trend, (b) Exponential Growth, (c) Seasonal Pattern, or (d) Cyclical Pattern?",
+        "response": "The correct choice is (b) Exponential Growth. The data points show an accelerating increase from the start towards higher values as time progresses, with growth appearing to speed up exponentially until it peaks and starts tapering off, staying at higher levels momentarily before descending.",
+        "task_type": "pattern_recognition",
+        "id": "187599",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              12.5,
+              17.0,
+              23.0,
+              29.5,
+              33.5,
+              38.5,
+              43.5,
+              51.0,
+              59.0,
+              69.5,
+              83.0,
+              97.0,
+              112.5,
+              126.5,
+              140.0,
+              152.5,
+              161.5,
+              168.0,
+              170.0,
+              170.0,
+              166.0,
+              157.0,
+              146.5,
+              133.5
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "190965",
+      "metadata": {
+        "task_type": "seasonality detection",
+        "question": "Does the subset of data [399.0, 311.0, 234.0, 103.0, 89.0, 44.0, 31.0, 19.0, 12.0, 7.0, 18.0, 99.0, 233.0, 615.0, 597.0, 996.0, 1483.0, 2687.0, 3142.0, 2061.0, 1954.0, 1848.0, 2114.0, 1415.0] show any signs of seasonality?",
+        "response": "False. The subset does not exhibit clear patterns of seasonality. Seasonality involves repeating patterns at regular intervals, but this data does not show such periodicity; instead, it shows irregular fluctuations with peaks and troughs.",
+        "id": "190965",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              399.0,
+              311.0,
+              234.0,
+              103.0,
+              89.0,
+              44.0,
+              31.0,
+              19.0,
+              12.0,
+              7.0,
+              18.0,
+              99.0,
+              233.0,
+              615.0,
+              597.0,
+              996.0,
+              1483.0,
+              2687.0,
+              3142.0,
+              2061.0,
+              1954.0,
+              1848.0,
+              2114.0,
+              1415.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "166492",
+      "metadata": {
+        "question": "The data set [1.0, 2.0, 4.0, 3.0, 21.0, 53.0, 76.0, 174.0, 85.0, 71.0, 135.0, 126.0, 87.0, 69.0, 100.0, 82.0, 89.0, 57.0, 20.0, 13.0, 22.0, 19.0, 11.0, 4.0] exhibits clear seasonal patterns. True or False?",
+        "task_type": "seasonality_patterns",
+        "id": "166492",
+        "domain": "Traffic",
+        "response": "False. While there are ups and downs in the data, they do not exhibit a regular, repeated pattern characteristic of seasonality."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              1.0,
+              2.0,
+              4.0,
+              3.0,
+              21.0,
+              53.0,
+              76.0,
+              174.0,
+              85.0,
+              71.0,
+              135.0,
+              126.0,
+              87.0,
+              69.0,
+              100.0,
+              82.0,
+              89.0,
+              57.0,
+              20.0,
+              13.0,
+              22.0,
+              19.0,
+              11.0,
+              4.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "172834",
+      "metadata": {
+        "task_type": "trend analysis",
+        "response": "b) Decreasing. The data starts at a high of 393.0 and generally declines towards a low of 17.0, indicating a decreasing trend.",
+        "id": "172834",
+        "domain": "Traffic",
+        "question": "Given the data points [393.0, 699.0, 599.0, 430.0, 363.0, 415.0, 479.0, 578.0, 503.0, 446.0, 418.0, 313.0, 170.0, 71.0, 64.0, 25.0, 17.0, 14.0, 8.0, 24.0, 70.0, 185.0, 135.0, 219.0], what is the overall trend observed? a) Increasing b) Decreasing c) Stable d) Cyclical"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              393.0,
+              699.0,
+              599.0,
+              430.0,
+              363.0,
+              415.0,
+              479.0,
+              578.0,
+              503.0,
+              446.0,
+              418.0,
+              313.0,
+              170.0,
+              71.0,
+              64.0,
+              25.0,
+              17.0,
+              14.0,
+              8.0,
+              24.0,
+              70.0,
+              185.0,
+              135.0,
+              219.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "162587",
+      "metadata": {
+        "id": "162587",
+        "response": "B) 37.0. At this point, the series undergoes a noticeable decline following prior highs, indicating a change in trend.",
+        "domain": "Traffic",
+        "question": "In the data points [93.0, 64.0, 86.0, 106.0, 152.0, 149.0, 173.0, 172.0, 124.0, 112.0, 85.0, 77.0, 92.0, 37.0, 34.0, 22.0, 9.0, 6.0, 8.0, 7.0, 10.0, 26.0, 62.0, 91.0], which point represents a significant change in pattern? A) 173.0 B) 37.0 C) 26.0 D) 106.0",
+        "task_type": "change point detection"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              93.0,
+              64.0,
+              86.0,
+              106.0,
+              152.0,
+              149.0,
+              173.0,
+              172.0,
+              124.0,
+              112.0,
+              85.0,
+              77.0,
+              92.0,
+              37.0,
+              34.0,
+              22.0,
+              9.0,
+              6.0,
+              8.0,
+              7.0,
+              10.0,
+              26.0,
+              62.0,
+              91.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "170044",
+      "metadata": {
+        "question": "Summarize the following data points: [158.0, 70.0, 60.0, 32.0, 11.0, 10.0, 3.0, 10.0, 98.0, 625.0, 1895.0, 4940.0, 2350.0, 970.0, 805.0, 1085.0, 1190.0, 975.0, 1055.0, 2040.0, 2992.0, 1345.0, 448.0, 223.0]",
+        "task_type": "summarization",
+        "id": "170044",
+        "domain": "Traffic",
+        "response": "The data starts with moderate values, dips to a low range in the middle, spikes dramatically to an apex at 4940.0, and then declines. The series embodies a robust peak and then a gradual descending tendency."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              158.0,
+              70.0,
+              60.0,
+              32.0,
+              11.0,
+              10.0,
+              3.0,
+              10.0,
+              98.0,
+              625.0,
+              1895.0,
+              4940.0,
+              2350.0,
+              970.0,
+              805.0,
+              1085.0,
+              1190.0,
+              975.0,
+              1055.0,
+              2040.0,
+              2992.0,
+              1345.0,
+              448.0,
+              223.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "175763",
+      "metadata": {
+        "id": "175763",
+        "domain": "Traffic",
+        "task_type": "data_smoothing",
+        "question": "What smoothing techniques might one apply to the data set [908.0, 1511.0, 683.0, 250.0, 100.0, 75.0, 41.0, 25.0, 7.0, 0.0, 5.0, 1.0, 0.0, 17.0, 295.0, 593.0, 1402.0, 744.0, 337.0, 309.0, 987.0, 1010.0, 465.0, 430.0] to reduce noise and highlight trends more clearly?",
+        "response": "To reduce noise, one could apply moving averages or exponential smoothing to smooth out the data and better highlight the underlying trends. These methods work by averaging data points over a set window or weighting them to reduce the impact of outliers."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              908.0,
+              1511.0,
+              683.0,
+              250.0,
+              100.0,
+              75.0,
+              41.0,
+              25.0,
+              7.0,
+              0.0,
+              5.0,
+              1.0,
+              0.0,
+              17.0,
+              295.0,
+              593.0,
+              1402.0,
+              744.0,
+              337.0,
+              309.0,
+              987.0,
+              1010.0,
+              465.0,
+              430.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "175720",
+      "metadata": {
+        "domain": "Traffic",
+        "id": "175720",
+        "question": "Identify any anomalies in the time series data [195.0, 156.0, 126.0, 91.0, 39.0, 52.0, 29.0, 27.0, 18.0, 26.0, 23.0, 42.0, 84.0, 232.0, 407.0, 612.0, 855.0, 845.0, 863.0, 699.0, 489.0, 237.0, 183.0, 168.0].",
+        "task_type": "anomaly_detection",
+        "response": "The value 855.0 is anomalous as it is significantly higher compared to the preceding values and indicates a sudden spike. Observing the sequence, values increase gradually then sharply rise to 855. This stands out notably before dropping to 845."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              195.0,
+              156.0,
+              126.0,
+              91.0,
+              39.0,
+              52.0,
+              29.0,
+              27.0,
+              18.0,
+              26.0,
+              23.0,
+              42.0,
+              84.0,
+              232.0,
+              407.0,
+              612.0,
+              855.0,
+              845.0,
+              863.0,
+              699.0,
+              489.0,
+              237.0,
+              183.0,
+              168.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "183501",
+      "metadata": {
+        "task_type": "structural_change",
+        "id": "183501",
+        "question": "Have there been any apparent structural changes in the data series [675.0, 473.0, 359.0, 320.0, 186.0, 422.0, 520.0, 609.0, 656.0, 643.0, 666.0, 367.0, 61.0, 72.0, 77.0, 7.0, 12.0, 4.0, 10.0, 55.0, 91.0, 158.0, 201.0, 273.0]? If so, describe those changes.",
+        "response": "Yes, there appears to be a structural change from higher variability and peaks to more stable lower values towards the end. The initially high and fluctuating values shift dramatically into consistently low values, suggesting an underlying structural change in the data.",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              675.0,
+              473.0,
+              359.0,
+              320.0,
+              186.0,
+              422.0,
+              520.0,
+              609.0,
+              656.0,
+              643.0,
+              666.0,
+              367.0,
+              61.0,
+              72.0,
+              77.0,
+              7.0,
+              12.0,
+              4.0,
+              10.0,
+              55.0,
+              91.0,
+              158.0,
+              201.0,
+              273.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "167901",
+      "metadata": {
+        "domain": "Traffic",
+        "id": "167901",
+        "task_type": "summary statistics",
+        "question": "Calculate the mean and variance of the data points [98.0, 74.0, 114.0, 48.0, 14.0, 30.0, 59.0, 155.0, 236.0, 288.0, 521.0, 911.0, 825.0, 583.0, 484.0, 582.0, 778.0, 1090.0, 1293.0, 1227.0, 996.0, 959.0, 737.0, 490.0].",
+        "response": "The mean is the average of the numbers, calculated as the sum of all numbers divided by the count of numbers. The variance measures the dispersion and is calculated using the formula: sum((x_i - mean)^2) / (n-1). Mean = 51412 / 24 = 2142.17. Variance = sum of squared differences from the Mean / 23. Calculation values would be filled step by step."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              98.0,
+              74.0,
+              114.0,
+              48.0,
+              14.0,
+              30.0,
+              59.0,
+              155.0,
+              236.0,
+              288.0,
+              521.0,
+              911.0,
+              825.0,
+              583.0,
+              484.0,
+              582.0,
+              778.0,
+              1090.0,
+              1293.0,
+              1227.0,
+              996.0,
+              959.0,
+              737.0,
+              490.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "187349",
+      "metadata": {
+        "id": "187349",
+        "domain": "Traffic",
+        "task_type": "seasonal pattern",
+        "question": "Does the following set [4.0, 2.0, 59.0, 229.0, 707.0, 670.0, 621.0, 558.0, 1105.0, 899.0, 581.0, 578.0, 455.0, 522.0, 354.0, 205.0, 208.0, 460.0, 540.0] show signs of a seasonal pattern? A) Strong seasonal pattern B) Weak or no seasonal pattern C) Definite seasonal pattern every 4 steps D) Random fluctuations",
+        "response": "B) Weak or no seasonal pattern. The data does not display a repeating pattern at regular intervals that would indicate seasonality."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 19,
+            "serie": [
+              4.0,
+              2.0,
+              59.0,
+              229.0,
+              707.0,
+              670.0,
+              621.0,
+              558.0,
+              1105.0,
+              899.0,
+              581.0,
+              578.0,
+              455.0,
+              522.0,
+              354.0,
+              205.0,
+              208.0,
+              460.0,
+              540.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    }
+  ]
+}

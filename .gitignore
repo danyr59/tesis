@@ -1,76 +1,79 @@
-rag/
-models/
-data/
-.DS_Store
-.env
-__pycache__/
-*.pyc
-
-# Python bytecode y cachés
-**/__pycache__/
-*.py[cod]
-*.so
-
-# Archivos de entorno virtual
+# ── Entorno Virtual y Paquetes ──
+.venv/
 venv/
 env/
-.venv/
-.env
+*.egg-info/
+dist/
+build/
 
-# IDEs
+# ── Bytecode y Cachés de Python ──
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ── Variables de Entorno y Secretos ──
+.env
+.env.*
+!.env.example
+
+# ── IDEs y Editores ──
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# Modelos descargados (ocupan mucho espacio)
-models/
-
-# Datos generados o grandes (opcional, si no quieres subir ningún data)
-data/
-
-# RAG – base de vectores generada por scripts
-rag/maestro/
-
-# Logs
-*.log
-logs/
-
-# Archivos binarios o de serialización
-*.pkl
-*.pickle
-*.pt
-*.pth
-*.bin
-*.safetensors  # aunque los pesos suelen ignorarse, la carpeta models/ ya los cubre
-
-# Notebooks (si usas Jupyter)
-.ipynb_checkpoints/
-
-
-# Archivos de sistema
+# ── Archivos de Sistema Operativo ──
 .DS_Store
 Thumbs.db
 
-# Archivos comprimidos
+# ── Notebooks de Jupyter ──
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+
+# ── Modelos, Pesos y Checkpoints (Archivos Pesados Descargados al Vuelo) ──
+models/*
+!models/README.md
+!models/.gitkeep
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.ckpt
+
+# ── Base de Datos Vectorial RAG (ChromaDB Descargado al Vuelo) ──
+rag/*
+!rag/README.md
+!rag/.gitkeep
+
+
+
+# ── Datos Voluminosos y Series Generadas ──
+data/*
+!data/README.md
+!data/.gitkeep
+
+# ── Registros y Archivos Temporales ──
+*.log
+logs/
+*.tmp
+*.temp
+scratch_kaggle/
+
+# ── Archivos Comprimidos ──
 *.zip
 *.tar.gz
 *.7z
 
-# Archivos de caché de Hugging Face (si no quieres subir la caché global, pero normalmente está fuera del repo)
-# ~/.cache/huggingface/  # Esto va en .gitignore global del usuario, no del repo
-
-# Cualquier archivo temporal
-*.tmp
-*.temp
-
+# ── Documentos Externos y Tesis (Gestionados Aparte) ──
 externo/
-
-
 /tesis
 tesis.zip
 tesis_old/
-scratch_kaggle/
 /tesis_contexto
 /tesis_correcciones_profe

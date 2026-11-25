@@ -1,0 +1,2 @@
+Escenario,Perfil,R² (LSTM),MAPE (%),RMSE,MAE,Juez,Tasa Aluc. (%),VRAM Pico (GB),Tiempo (s)
+E3_qwen_gemma,P5_COMPLEJO,0.9827,1772634.21%,26.17,10.48,APROBADO,0.26%,5.76,1710.3

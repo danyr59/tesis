@@ -1,0 +1,2896 @@
+{
+  "escenario": "E6_llama_gemma",
+  "perfil": "P4_TEND_RUIDO",
+  "query": "Simular la cotización diaria de una acción tecnológica durante un ciclo correctivo de mercado. Dominio: Finanzas y Mercados. Variable estricta: Únicamente 'Precio_Accion'. Perfil matemático: P4_TENDENCIA_RUIDO, con tendencia fluctuante descendente y alto nivel de ruido o volatilidad, sin componentes estacionales. Escala: cotizando alrededor de 120 USD.",
+  "dominio": "finanzas",
+  "structured_prompt": {
+    "values": {
+      "tema": "Cotización de una acción tecnológica",
+      "dominio": "Finanzas y Mercados",
+      "localizacion": "Nacional",
+      "frecuencia": "Diaria",
+      "start_date": "2024-01-01",
+      "variables": [
+        "Precio_Accion"
+      ],
+      "target_value": 120.0,
+      "tipo_serie": "univariada",
+      "profile_id": "P4_TENDENCIA_RUIDO",
+      "num_series_configuradas": 20,
+      "puntos_por_serie_configurados": 400
+    },
+    "missing_parameters": [],
+    "pending_questions": [],
+    "justification": "The scenario involves simulating the daily stock price of a technology company during a market correction. The profile chosen is P4_TENDENCIA_RUIDO, which represents a time series with a fluctuating trend and high volatility.",
+    "suggested_search": "Simulate stock prices during a market correction",
+    "search_strategy": "Use a random walk model with a trend component to simulate the stock prices.",
+    "confidence": 0.9
+  },
+  "metadata_summary": {
+    "count": 44,
+    "refinements_applied": [
+      "adjust_frequency"
+    ],
+    "domain": "Finanzas y Mercados",
+    "rag_dataset": "TSQA",
+    "diversity_score": 0.4946022727272727
+  },
+  "seed_dataset": [
+    {
+      "id": "142116",
+      "metadata": {
+        "question": "The CFO’s comments during JWN's recent earnings call were: \"looking statements, so please refer to the slide with our safe harbor language. Participating in today's call are Erik Nordstrom, chief executive officer; Pete Nordstrom, president; and Cathy Smith, chief financial officer, who will provide a business update and discuss the company's third quarter performance.\nAnd now I'll turn the call over to Erik.\".\nAdditionally, the historical return of JWN two weeks prior to the earnings call was [-0.002123174340367462, -0.04539010090015838, 0.00445764616238975, -0.032544309574700336, 0.09480118770890322, 0.05726265092132787, -0.045574732971287446, 0.04429061895325215, 0.005301626745439325, -0.01779835847687461].\nYour goal is to predict whether JWN's stock price and return will increase or decrease the day after the earnings call.",
+        "task_type": "forecasting",
+        "response": "[-0.0463086943626172, 'down']",
+        "id": "142116",
+        "domain": "Finance"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.002123174340367462,
+              -0.04539010090015838,
+              0.00445764616238975,
+              -0.032544309574700336,
+              0.09480118770890322,
+              0.05726265092132787,
+              -0.045574732971287446,
+              0.04429061895325215,
+              0.005301626745439325,
+              -0.01779835847687461
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.0463086943626172,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "152713",
+      "metadata": {
+        "id": "152713",
+        "task_type": "forecasting",
+        "question": "The CFO’s comments during YUMC's recent earnings call were: \"looking statements, which are subject to future events and uncertainties. Actual results may differ materially from these forward\nAll forward-looking statements should be considered in conjunction with the cautionary statement in our earnings release and the risk factors included in our filings with the SEC. This call also includes certain non-GAAP financial measures. You should carefully consider the comparable GAAP measures. Reconciliation of non-GAAP and GAAP measures is included in our earnings release, which is available to the public through our investor relations website located at ir.yumchina.com.\nYou can also find a webcast of this call and a PowerPoint presentation on our IR website. Please note that during today's call, our year-over-year growth results exclude the impact of foreign currency, unless otherwise noted. Now I would like to turn the call over to Joey Wat, CEO of Yum! China. Joey?\".\nAdditionally, the historical return of YUMC two weeks prior to the earnings call was [0.0016073408966825742, 0.006189831828865788, -0.008658033114597341, 0.002758049901432358, 0.024524402214745056, -0.00469796601540029, 0.0047201410777715225, -0.013199108333730836, 0.021763751330517334, 0.07166628720006973].\nYour goal is to predict whether YUMC's stock price and return will increase or decrease the day after the earnings call.",
+        "domain": "Finance",
+        "response": "[0.0008281763179955881, 'up']"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.0016073408966825742,
+              0.006189831828865788,
+              -0.008658033114597341,
+              0.002758049901432358,
+              0.024524402214745056,
+              -0.00469796601540029,
+              0.0047201410777715225,
+              -0.013199108333730836,
+              0.021763751330517334,
+              0.07166628720006973
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.0008281763179955881,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "152364",
+      "metadata": {
+        "domain": "Finance",
+        "id": "152364",
+        "response": "[-0.7743694665599661, 'down']",
+        "task_type": "forecasting",
+        "question": "The CFO’s comments during MGNX's recent earnings call were: \"quarter corporate progress and financial results conference call in just a moment. All participants are in listen\".\nAdditionally, the historical return of MGNX two weeks prior to the earnings call was [0.013222027527540536, 0.017857092562801213, -0.0026990528121938473, 0.05209746087112288, -0.02122185978510005, 0.0295663470019758, 0.04467139499242467, -0.019548050443950804, -0.08660432745933311, 0.0006821438598856311].\nYour goal is to predict whether MGNX's stock price and return will increase or decrease the day after the earnings call."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.013222027527540536,
+              0.017857092562801213,
+              -0.0026990528121938473,
+              0.05209746087112288,
+              -0.02122185978510005,
+              0.0295663470019758,
+              0.04467139499242467,
+              -0.019548050443950804,
+              -0.08660432745933311,
+              0.0006821438598856311
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.7743694665599661,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "147804",
+      "metadata": {
+        "question": "The CFO’s comments during CMPS's recent earnings call were: \"quarter 2023 results conference call. Again, my name is Steve Schultz, senior vice president of investor relations at COMPASS Pathways. Today, I'm joined by Kabir Nath, our chief executive officer; Mary\nThe call is being recorded and will be available on the COMPASS Pathways investor relations website shortly after the conclusion of the call and will be archived for a period of 30 days. Before we begin, let me remind everyone that during the call today, the team will be making forward-looking statements within the meaning of the Private Securities Litigation Reform Act of 1995 as amended. You should not place undue reliance on these forward-looking statements. Actual events or results could differ materially from those expressed or implied by any forward-looking statements as a result of various risks, uncertainties, and other factors, including those risks and uncertainties described under the heading Risk Factors in our annual report on Form 10-K filed with the U.S.\nSecurities and Exchange Commission and in subsequent filings made by COMPASS with the SEC. Additionally, these forward-looking statements represent our views only as of today and should not be relied upon as representing our views as of any subsequent date. We specifically disclaim any obligation to update or revise any forward-looking statement even if our estimates or assumptions change. I will now hand the call over to Kabir Nath.\".\nAdditionally, the historical return of CMPS two weeks prior to the earnings call was [-0.010357783226233597, -0.032350156535064456, -0.024582104043710307, 0.009072595957228424, 0.017981952785786515, 0.04808643228364584, 0.09644191980706496, 0.056362070474984316, -0.16976551715630817].\nYour goal is to predict whether CMPS's stock price and return will increase or decrease the day after the earnings call.",
+        "response": "[0.11781879557346553, 'up']",
+        "domain": "Finance",
+        "task_type": "forecasting",
+        "id": "147804"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 9,
+            "serie": [
+              -0.010357783226233597,
+              -0.032350156535064456,
+              -0.024582104043710307,
+              0.009072595957228424,
+              0.017981952785786515,
+              0.04808643228364584,
+              0.09644191980706496,
+              0.056362070474984316,
+              -0.16976551715630817
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.11781879557346553,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "152325",
+      "metadata": {
+        "domain": "Finance",
+        "response": "[0.0572240554515997, 'up']",
+        "question": "The CFO’s comments during MNDY's recent earnings call were: \"CEOs of monday.com; and Eliran Glazer, monday.com's CFO. We released our results for the third quarter earlier today. You can find our quarterly shareholder letter, along with our investor presentation and a replay of today's webcast, under the news and events section of our IR website at ir.monday.com.\nCertain statements made on the call today will be forward-looking statements, which reflect management's best judgment based on the currently available information. These statements involve risks and uncertainties that may cause actual results to differ from our expectations. Please refer to our earnings release for more information on the specific factors that could cause actual results to differ materially from our forward-looking statements. Additionally, non-GAAP financial measures will be discussed on the call.\nReconciliations to our most directly comparable GAAP financial measures are available in the earnings release and the earnings presentation for today's call, which are posted on our investor relations website. Now, let me turn the call over to Roy.\".\nAdditionally, the historical return of MNDY two weeks prior to the earnings call was [0.0001539145362241534, -0.021001640445943104, 0.0032217195177786095, 0.03360232322745804, -0.015459294037058369, 0.09298031097064907, -0.0071126373720841185, -0.03858431257150363, 0.03371443720060041, 0.1049814960496156].\nYour goal is to predict whether MNDY's stock price and return will increase or decrease the day after the earnings call.",
+        "id": "152325",
+        "task_type": "forecasting"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.0001539145362241534,
+              -0.021001640445943104,
+              0.0032217195177786095,
+              0.03360232322745804,
+              -0.015459294037058369,
+              0.09298031097064907,
+              -0.0071126373720841185,
+              -0.03858431257150363,
+              0.03371443720060041,
+              0.1049814960496156
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.0572240554515997,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "151477",
+      "metadata": {
+        "question": "The CFO’s comments during MMC's recent earnings call were: \"\nWelcome, Pat. Also, with us today is Sarah DeWitt, head of investor relations. Marsh McLennan had a strong start to 2024. Our first quarter results were excellent, and we are well-positioned for another good year.\".\nAdditionally, the historical return of MMC two weeks prior to the earnings call was [0.02405980171432942, -0.006323607354331906, 0.0002447980599697974, -0.015416329573910481, -0.009891570866903954, -0.005622752629026118, -0.003786555146503612, -0.005220015705843517, 0.006775748754296762, 0.020797446113949958].\nYour goal is to predict whether MMC's stock price and return will increase or decrease the day after the earnings call.",
+        "response": "[0.003370882147208931, 'up']",
+        "task_type": "forecasting",
+        "domain": "Finance",
+        "id": "151477"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.02405980171432942,
+              -0.006323607354331906,
+              0.0002447980599697974,
+              -0.015416329573910481,
+              -0.009891570866903954,
+              -0.005622752629026118,
+              -0.003786555146503612,
+              -0.005220015705843517,
+              0.006775748754296762,
+              0.020797446113949958
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.003370882147208931,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "145435",
+      "metadata": {
+        "domain": "Finance",
+        "response": "[0.19499502919293143, 'up']",
+        "task_type": "forecasting",
+        "id": "145435",
+        "question": "The CFO’s comments during NET's recent earnings call were: \"founder and CEO; Michelle Zatlyn, co\nOur actual results may differ significantly from those projected or suggested in any of our forward-looking statements. These forward-looking statements apply as of today, and you should not rely on them as representing our views in the future. We undertake no obligation to update these statements after this call. For a more complete discussion of the risks and uncertainties that could impact our future operating results and financial condition, please see our filings with the SEC as well as in today's earnings press release. Unless otherwise noted, all numbers we talk about today other than revenue will be on an adjusted non-GAAP basis. You may find a reconciliation of GAAP to non-GAAP financial measures that are included in our earnings release on our Investor Relations website.\nFor historical periods, a GAAP to non-GAAP reconciliation can be found in the supplemental financial information referenced a few moments ago. We would also like to inform you that we will be participating in Baird's Software Silicon Slopes event on February 28th and the Morgan Stanley Technology, Media, and Telecom Conference on March 6th. Before wrapping up, please save the date for our Investor Day on Thursday, May 30th, which is being held in conjunction with our user conference Cloudflare Connect in New York City. A live webcast will also be accessible from our Investor Relations website. Now, I'd like to turn the call over to Matthew.\".\nAdditionally, the historical return of NET two weeks prior to the earnings call was [-0.020522847454796378, 0.051384419193075015, -0.01589565739947163, -0.04713110023944855, 0.00683103434897081, 0.038447108038519806, -0.022141582544093374, 0.009527303216702698, 0.021571298139807737, 0.08350328988468592].\nYour goal is to predict whether NET's stock price and return will increase or decrease the day after the earnings call."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.020522847454796378,
+              0.051384419193075015,
+              -0.01589565739947163,
+              -0.04713110023944855,
+              0.00683103434897081,
+              0.038447108038519806,
+              -0.022141582544093374,
+              0.009527303216702698,
+              0.021571298139807737,
+              0.08350328988468592
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.19499502919293143,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "152411",
+      "metadata": {
+        "domain": "Finance",
+        "task_type": "forecasting",
+        "question": "The CFO’s comments during ZTS's recent earnings call were: \"quarter and full\nFor a list and description of certain factors that could cause results to differ, I refer you to the forward-looking statements in today's press release and our SEC filings, including, but not limited to, our annual report on Form 10-K and our reports on Form 10-Q. Our remarks today will also include references to certain financial measures, which were not prepared in accordance with generally accepted accounting principles or U.S. GAAP. A reconciliation of these non-GAAP financial measures to the most directly comparable U.S.\nGAAP measures is included in the financial tables that accompany our earnings press release and the company's 8-K filing dated today, Tuesday, February 13th, 2024. We also cite operational results, which exclude the impact of foreign exchange. With that, I will turn the call over to Kristin.\".\nAdditionally, the historical return of ZTS two weeks prior to the earnings call was [-0.018910186313264243, 0.007081556729243044, -0.0005287863398352188, 0.0059775929728960175, 0.03139299650910443, 0.004843522454036853, -0.0067989060153476055, 0.008020391349982114, -0.0031927445260502285, -0.06711066082348904].\nYour goal is to predict whether ZTS's stock price and return will increase or decrease the day after the earnings call.",
+        "id": "152411",
+        "response": "[0.0032154440524549965, 'up']"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.018910186313264243,
+              0.007081556729243044,
+              -0.0005287863398352188,
+              0.0059775929728960175,
+              0.03139299650910443,
+              0.004843522454036853,
+              -0.0067989060153476055,
+              0.008020391349982114,
+              -0.0031927445260502285,
+              -0.06711066082348904
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.0032154440524549965,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "143800",
+      "metadata": {
+        "question": "The CFO’s comments during MNKD's recent earnings call were: \"K report filed with the Securities and Exchange Commission this afternoon, the earning release, and the slides prepared for this presentation. Joining us today from MannKind are chief executive officer, Michael Castagna; and chief financial officer, Steve Binder. I will now turn the conference over to Mr. Castagna.\nPlease go ahead, sir.\".\nAdditionally, the historical return of MNKD two weeks prior to the earnings call was [0.05882347166332158, 0.030555593452336938, -0.016172491148951362, -0.0136986820351932, 0.0, -0.0027777752022684066, -0.011142050921826518, 0.008450696279642456, 0.05586593629775094].\nYour goal is to predict whether MNKD's stock price and return will increase or decrease the day after the earnings call.",
+        "id": "143800",
+        "response": "[0.037037065069791986, 'up']",
+        "task_type": "forecasting",
+        "domain": "Finance"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 9,
+            "serie": [
+              0.05882347166332158,
+              0.030555593452336938,
+              -0.016172491148951362,
+              -0.0136986820351932,
+              0.0,
+              -0.0027777752022684066,
+              -0.011142050921826518,
+              0.008450696279642456,
+              0.05586593629775094
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.037037065069791986,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "150289",
+      "metadata": {
+        "domain": "Finance",
+        "response": "[-0.040178435758340014, 'down']",
+        "id": "150289",
+        "task_type": "forecasting",
+        "question": "The CFO’s comments during AMAT's recent earnings call were: \"looking statements, which are subject to risks and uncertainties that could cause our actual results to differ. Information concerning the risks and uncertainties is contained in Applied's most recent form 10\nToday's call also includes non-GAAP financial measures. Reconciliations to GAAP measures are found in today's earnings press release and in our quarterly earnings materials, which are available on our website at ir.appliedmaterials.com. Before we begin, I have a calendar announcement. On Tuesday evening, December 12th, Applied will lead a panel on the Future of Logic near the IEDM Conference in San Francisco.\nJoining us will be leading technology executives from Intel, Samsung, and TSMC, along with Google, Qualcomm, Synopsis, and the EV Group. There won't be a webcast, so we hope you'll join us in San Francisco. And with that introduction, I'd like to turn the call over to Gary Dickerson.\".\nAdditionally, the historical return of AMAT two weeks prior to the earnings call was [0.008952609213884744, 0.004364799739480674, 0.009831958059016932, 0.017567369532833776, -0.007349385774529593, 0.0524550321005981, -0.006238293888149449, 0.028983505792717246, 0.008372335012742926, -0.003604281676448662].\nYour goal is to predict whether AMAT's stock price and return will increase or decrease the day after the earnings call."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.008952609213884744,
+              0.004364799739480674,
+              0.009831958059016932,
+              0.017567369532833776,
+              -0.007349385774529593,
+              0.0524550321005981,
+              -0.006238293888149449,
+              0.028983505792717246,
+              0.008372335012742926,
+              -0.003604281676448662
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.040178435758340014,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "153820",
+      "metadata": {
+        "domain": "Finance",
+        "id": "153820",
+        "response": "[-0.15344292363406498, 'down']",
+        "task_type": "forecasting",
+        "question": "The CFO’s comments during COIN's recent earnings call were: \"founder and CEO; Emilie Choi, president and COO; Alesia Haas, CFO; and Paul Grewal, chief legal officer. I hope you've all had the opportunity to read our shareholder letter, which was published on our investor relations website earlier today. Before we get started, I'd like to remind you that during today's call, we may make forward\nInformation concerning risks, uncertainties, and other factors that could cause these results to differ is included in our SEC filings. Our discussion today will also include certain non-GAAP financial measures. Reconciliations to the most directly comparable GAAP financial measures are provided in the shareholder letter on our investor relations website. Non-GAAP financial measures should be considered in addition to, not as a substitute for, GAAP measures.\nWe are once again using the Say Technologies platform to enable our shareholders to ask questions. In addition, we'll take live questions from our research analysts. And with that, I'll turn it over to Brian for opening comments.\".\nAdditionally, the historical return of COIN two weeks prior to the earnings call was [-0.029836558850115935, 0.07840357495050787, -0.02947189180915355, -0.014037057752502857, -0.055951065283894486, 0.05142518153610509, -0.019697888237907524, 0.05394075877650173, 0.016473842934036975, -0.03605571354322745].\nYour goal is to predict whether COIN's stock price and return will increase or decrease the day after the earnings call."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.029836558850115935,
+              0.07840357495050787,
+              -0.02947189180915355,
+              -0.014037057752502857,
+              -0.055951065283894486,
+              0.05142518153610509,
+              -0.019697888237907524,
+              0.05394075877650173,
+              0.016473842934036975,
+              -0.03605571354322745
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.15344292363406498,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "151890",
+      "metadata": {
+        "response": "[-0.23851613690776208, 'down']",
+        "id": "151890",
+        "domain": "Finance",
+        "task_type": "forecasting",
+        "question": "The CFO’s comments during MDB's recent earnings call were: \"looking statements, including statements related to our market and future growth opportunities.\nOur expectations for the macroeconomic environment in fiscal 2025 and the impact of AI, the benefits of our product platform, our competitive landscape, customer behaviors, our financial guidance and our planned investments and growth opportunities. These statements are subject to a variety of risks and uncertainties, including the results of operation and financial conditions that could cause actual results to differ materially from our expectations. For a discussion of material risks and uncertainties that could affect our actual results, please refer to the risk factors described in our annual report on Form 10-K for the period ended January 31, 2024, that was filed with the SEC on March 15, 2024. Any forward-looking statements made on this call reflect our views only as of today and we undertake no obligation to update them, except as required by law.\nAdditionally, we will discuss non-GAAP financial measures on this conference call. Please refer to the tables in our earnings release on the Investor Relations portion of our website. For a reconciliation of these measures to the most directly comparable GAAP financial measures. With that, I'd like to turn the call over to Dev.\".\nAdditionally, the historical return of MDB two weeks prior to the earnings call was [0.0023787773071441976, -0.007577793816655909, -0.007472622828252451, -0.010896377593818563, -0.01688442793436251, -0.015316184902261831, -0.039686639418932135, -0.005567781810119743, -0.07182847072015597].\nYour goal is to predict whether MDB's stock price and return will increase or decrease the day after the earnings call."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 9,
+            "serie": [
+              0.0023787773071441976,
+              -0.007577793816655909,
+              -0.007472622828252451,
+              -0.010896377593818563,
+              -0.01688442793436251,
+              -0.015316184902261831,
+              -0.039686639418932135,
+              -0.005567781810119743,
+              -0.07182847072015597
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.23851613690776208,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "143045",
+      "metadata": {
+        "domain": "Finance",
+        "question": "The CFO’s comments during DDOG's recent earnings call were: \"founder and CEO; and David Obstler, Datadog's CFO. During this call, we will make forward\nThe words anticipate, believe, continue, estimate, expect, intend, will, and similar expressions are intended to identify forward-looking statements or similar indications of future expectations. These statements reflect our views only as of today and are subject to a variety of risks and uncertainties that could cause actual results to differ materially. For a discussion of the material risks and other important factors that could affect our actual results, please refer to our Form 10-Q for the quarter ended June 30, 2023. Additional information will be made available in our upcoming Form 10-Q for the fiscal quarter ended September 30, 2023 and other filings with the SEC.\nThis information is also available on the investor relations section of our website, along with a replay of this call. We will also discuss non-GAAP financial measures, which are reconciled to their most directly comparable GAAP financial measures in the tables in our earnings release, which is available at investors.datadoghq.com. With that, I'd like to turn the call over to Olivier.\".\nAdditionally, the historical return of DDOG two weeks prior to the earnings call was [-0.07136358102554141, -0.010663012087714363, 0.011892951808162744, -0.015548440723817336, 0.013182409032686637, -0.01681603935257936, -0.01073658710030334, 0.03533572851139666, -0.030351021891544816, 0.28472649940374684].\nYour goal is to predict whether DDOG's stock price and return will increase or decrease the day after the earnings call.",
+        "task_type": "forecasting",
+        "response": "[-0.021624257832335125, 'down']",
+        "id": "143045"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.07136358102554141,
+              -0.010663012087714363,
+              0.011892951808162744,
+              -0.015548440723817336,
+              0.013182409032686637,
+              -0.01681603935257936,
+              -0.01073658710030334,
+              0.03533572851139666,
+              -0.030351021891544816,
+              0.28472649940374684
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.021624257832335125,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "147920",
+      "metadata": {
+        "id": "147920",
+        "response": "[0.05380200900093435, 'up']",
+        "task_type": "forecasting",
+        "question": "The CFO’s comments during DKNG's recent earnings call were: \"GAAP measures to the most directly comparable GAAP measures are available in our earnings release and presentation, which can be found on our website and in our quarterly report on Form 10\nI will now turn the call over to Jason Robins.\".\nAdditionally, the historical return of DKNG two weeks prior to the earnings call was [-0.0031956997822021327, 0.016276198762758654, -0.008735758756355017, 0.005875194306771858, 0.04964713818329991, -0.008115054026212487, -0.028517939243052792, 0.006255974806109954, 0.028933502948409018, -0.028119895858673027].\nYour goal is to predict whether DKNG's stock price and return will increase or decrease the day after the earnings call.",
+        "domain": "Finance"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.0031956997822021327,
+              0.016276198762758654,
+              -0.008735758756355017,
+              0.005875194306771858,
+              0.04964713818329991,
+              -0.008115054026212487,
+              -0.028517939243052792,
+              0.006255974806109954,
+              0.028933502948409018,
+              -0.028119895858673027
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.05380200900093435,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "151723",
+      "metadata": {
+        "question": "The CFO’s comments during PTON's recent earnings call were: \"CEOs, Karen Boone and Chris Bruzzo; as well as chief financial officer, Liz Coddington. Our comments and responses to your questions reflect management's views as of today only and will include statements related to our business that are forward\nActual results may differ materially from those contained in or implied by these forward-looking statements due to risks and uncertainties associated with our business. For a discussion of the material risks and other important factors that could impact our actual results, please refer to our SEC filings and today's shareholder letter, both of which can be found on our investor relations website. During this call, we will discuss both GAAP and non-GAAP financial measures. A reconciliation of GAAP to non-GAAP financial measures is provided in today's shareholder letter.\nI'll now turn over the call to interim co-CEO, Karen Boone.\".\nAdditionally, the historical return of PTON two weeks prior to the earnings call was [0.0033557014762590764, -0.033444784051375964, 0.04498265443026672, -0.04635757197675372, 0.11458330228924885, 0.0, 0.006230523579077385, -0.009287916784092132, 0.04999995157122683, 0.3541667657120864].\nYour goal is to predict whether PTON's stock price and return will increase or decrease the day after the earnings call.",
+        "response": "[0.06373625268050587, 'up']",
+        "id": "151723",
+        "domain": "Finance",
+        "task_type": "forecasting"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.0033557014762590764,
+              -0.033444784051375964,
+              0.04498265443026672,
+              -0.04635757197675372,
+              0.11458330228924885,
+              0.0,
+              0.006230523579077385,
+              -0.009287916784092132,
+              0.04999995157122683,
+              0.3541667657120864
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.06373625268050587,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "150526",
+      "metadata": {
+        "domain": "Finance",
+        "task_type": "forecasting",
+        "id": "150526",
+        "question": "The CFO’s comments during MODG's recent earnings call were: \"quarter earnings conference call. I'm Katina Metzidakis, the company's vice president of investor relations and corporate communications. Joining me as speakers on today's call are Chip Brewer, our president and chief executive officer; and Brian Lynch, our chief financial officer and chief legal officer.\nEarlier today, the company issued a press release announcing its first-quarter financial results. We've also published an updated presentation. Our earnings presentation as well as the earnings press release are both available on the company's Investor Relations website under the Financial Results tab. Most of the financial numbers reported and discussed on today's call are based on U.S.\ngenerally accepted accounting principles. In the instances where we report non-GAAP measures, we identify the non-GAAP measures in the presentation and reconcile the measures to the corresponding GAAP measures in accordance with Regulation G. Please note that this call will include forward-looking statements that involve risks and uncertainties that could cause actual results to differ materially from management's current expectations. We encourage you to review the safe harbor statements contained in the presentation and the press release for a more complete description.\nAnd with that, I would now like to turn the call over to Mr. Chip Brewer.\".\nAdditionally, the historical return of MODG two weeks prior to the earnings call was [-0.02843016251364494, 0.008269727241263514, 0.0353311957390916, -0.023765959370800394, -0.00998756532549816, 0.017654460216416812, -0.008674064122841774, 0.02812504768371582, 0.010334350663189218, -0.016245514087237845].\nYour goal is to predict whether MODG's stock price and return will increase or decrease the day after the earnings call.",
+        "response": "[-0.06727830922355282, 'down']"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.02843016251364494,
+              0.008269727241263514,
+              0.0353311957390916,
+              -0.023765959370800394,
+              -0.00998756532549816,
+              0.017654460216416812,
+              -0.008674064122841774,
+              0.02812504768371582,
+              0.010334350663189218,
+              -0.016245514087237845
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.06727830922355282,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "151313",
+      "metadata": {
+        "domain": "Finance",
+        "question": "The CFO’s comments during VRNS's recent earnings call were: \"quarter and full\nAfter preliminary remarks, we will open the call to a question-and-answer session. During this call, we may make statements related to our business that would be considered forward-looking statements under federal securities laws, including projections of future operating results for our first quarter and full year ending December 31st, 2024. Due to a number of factors, actual results may differ materially from those set forth in such statements. These factors are set forth in the earnings press release that we issued today under the section captioned Forward-Looking Statements, and these and other important risk factors are described more fully in our reports filed with the Securities and Exchange Commission.\nWe encourage all investors to read our SEC filings. These statements reflect our views only as of today and should not be relied upon as representing our views as of any subsequent date. Varonis expressly disclaims any application or undertaking to release publicly any updates or revisions to any forward-looking statements made herein. Additionally, non-GAAP financial measures will be discussed on this conference call.\nA reconciliation to the most directly comparable GAAP financial measures is also available in our fourth-quarter 2023 earnings press release and investor presentation, which can be found at www.varonis.com in the Investor Relations section. Lastly, please note that a webcast of today's call is available on our website in the Investor Relations section. With that, I'd like to turn the call over to our chief executive officer, Yaki Faitelson. Yaki?\".\nAdditionally, the historical return of VRNS two weeks prior to the earnings call was [-0.0048405108253049, 0.0, 0.0064116939744061074, -0.006151115476298763, 0.017241351687839135, 0.008909166521812617, -0.03338357154582572, 0.020944710435330194, -0.008948054346199052, 0.0028628290806445023].\nYour goal is to predict whether VRNS's stock price and return will increase or decrease the day after the earnings call.",
+        "id": "151313",
+        "task_type": "forecasting",
+        "response": "[0.06719362092833014, 'up']"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.0048405108253049,
+              0.0,
+              0.0064116939744061074,
+              -0.006151115476298763,
+              0.017241351687839135,
+              0.008909166521812617,
+              -0.03338357154582572,
+              0.020944710435330194,
+              -0.008948054346199052,
+              0.0028628290806445023
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.06719362092833014,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "155166",
+      "metadata": {
+        "task_type": "forecasting",
+        "response": "[-0.03740305081534634, 'down']",
+        "question": "The CFO’s comments during PANW's recent earnings call were: \"and\nDuring the course of today's call, we may make forward-looking statements and projections regarding the company's business operations and financial performance. These statements are made today, are subject to a number of risks and uncertainties that could cause our actual results to differ from those forward-looking statements. Please review our press release and recent SEC filings for a description of these risks and uncertainties. We assume no obligation to update any forward-looking statements made in the presentations today.\nWe will also refer to non-GAAP financial measures. These measures should not be considered as a substitute for financial measures prepared in accordance with GAAP. The most directly comparable GAAP financial metrics and reconciliations are in the press release and the appendix to the investor presentation. Unless otherwise noted specifically, all results and comparisons are on a fiscal year-over-year basis.\nWe also note that management is scheduled to participate in the Bank of America Global Technology Conference in June. I will now turn the call over to Nikesh.\".\nAdditionally, the historical return of PANW two weeks prior to the earnings call was [0.016468648131327646, -0.008215433812203243, -0.024223610116273164, 0.00608782666899943, 0.016068843109159126, -0.002349020529621604, 0.03574981254167775, 0.014280197715441867, 0.003377761627444853, 0.018625083518885477].\nYour goal is to predict whether PANW's stock price and return will increase or decrease the day after the earnings call.",
+        "id": "155166",
+        "domain": "Finance"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.016468648131327646,
+              -0.008215433812203243,
+              -0.024223610116273164,
+              0.00608782666899943,
+              0.016068843109159126,
+              -0.002349020529621604,
+              0.03574981254167775,
+              0.014280197715441867,
+              0.003377761627444853,
+              0.018625083518885477
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.03740305081534634,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "148183",
+      "metadata": {
+        "domain": "Finance",
+        "question": "The CFO’s comments during SNCY's recent earnings call were: \"looking statements. Our remarks today may include forward\nActual results may differ materially. We encourage you to review the risk factors and cautionary statements outlined in our earnings release and on our most recent SEC filings. We assume no obligation to update any forward-looking statement. You can find our third quarter 2024 earnings press release on the Investor Relations portion of our website at ir.suncountry.com.\nWith that said, I'd like to turn it over to Jude.\".\nAdditionally, the historical return of SNCY two weeks prior to the earnings call was [0.08406305006422699, 0.024232648462169326, 0.005520480531506555, -0.007843167174096166, -0.02529641932601079, 0.023519867286897922, 0.033280513478811224, -0.0352760766482092, 0.015898236127033005, 0.09937405980433556].\nYour goal is to predict whether SNCY's stock price and return will increase or decrease the day after the earnings call.",
+        "response": "[0.07473310864630989, 'up']",
+        "task_type": "forecasting",
+        "id": "148183"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.08406305006422699,
+              0.024232648462169326,
+              0.005520480531506555,
+              -0.007843167174096166,
+              -0.02529641932601079,
+              0.023519867286897922,
+              0.033280513478811224,
+              -0.0352760766482092,
+              0.015898236127033005,
+              0.09937405980433556
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.07473310864630989,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "145445",
+      "metadata": {
+        "id": "145445",
+        "task_type": "forecasting",
+        "domain": "Finance",
+        "question": "The CFO’s comments during MGNX's recent earnings call were: \"only moment\".\nAdditionally, the historical return of MGNX two weeks prior to the earnings call was [0.002020248336801478, 0.0, 0.020161270940217024, -0.01976282722596967, 0.04032254188043427, 0.011627896231359847, 0.013409995110135187, -0.034026432823559216, 0.03913890490010363, 0.024482131043652933].\nYour goal is to predict whether MGNX's stock price and return will increase or decrease the day after the earnings call.",
+        "response": "[0.17095584899934768, 'up']"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.002020248336801478,
+              0.0,
+              0.020161270940217024,
+              -0.01976282722596967,
+              0.04032254188043427,
+              0.011627896231359847,
+              0.013409995110135187,
+              -0.034026432823559216,
+              0.03913890490010363,
+              0.024482131043652933
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.17095584899934768,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "149294",
+      "metadata": {
+        "response": "[0.008080037816100116, 'up']",
+        "task_type": "forecasting",
+        "question": "The CFO’s comments during EPAM's recent earnings call were: \"looking statements. These statements are subject to risks and uncertainties as described in the company's earnings release and SEC filings. Additionally, all references to reported results that are non\nWith that said, I'd like to now turn the call over to Ark.\".\nAdditionally, the historical return of EPAM two weeks prior to the earnings call was [0.002614578941597445, 0.006140932550440237, -0.01651273816381804, -0.0011901674140722962, 0.013618167530961234, 0.016542121767421092, 0.017635901034915413, 0.012784585024909534, -0.001362492374121227, -0.2699438406752174].\nYour goal is to predict whether EPAM's stock price and return will increase or decrease the day after the earnings call.",
+        "id": "149294",
+        "domain": "Finance"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.002614578941597445,
+              0.006140932550440237,
+              -0.01651273816381804,
+              -0.0011901674140722962,
+              0.013618167530961234,
+              0.016542121767421092,
+              0.017635901034915413,
+              0.012784585024909534,
+              -0.001362492374121227,
+              -0.2699438406752174
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.008080037816100116,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "151781",
+      "metadata": {
+        "id": "151781",
+        "domain": "Finance",
+        "question": "The CFO’s comments during AMPL's recent earnings call were: \"founder of Amplitude; and Andrew Casey, chief financial officer.\nDuring today's call, management will make forward-looking statements, including statements regarding our financial outlook for the fourth quarter and full year 2024, the expected performance of our products, our expected quarterly and long-term growth investments, and our overall future prospects. These forward-looking statements are based on current information, assumptions, and expectations and are subject to risks and uncertainties, some of which are beyond our control that could cause actual results to differ materially from those described in these statements. Further information on the risks that could cause actual results to differ is included in our filings with the Securities and Exchange Commission. You are cautioned not to place undue reliance on these forward-looking statements, and we assume no obligation to update these statements after today's call, except as required by law.\nCertain financial measures used on today's call are expressed in a non-GAAP basis. We use these non-GAAP financial measures internally to facilitate analysis of our financial and business trends and for internal planning and forecasting purposes. These non-GAAP financial measures have limitations and should not be used in isolation from or as a substitute for financial information prepared in accordance with GAAP. A reconciliation between these GAAP and non-GAAP financial measures is included in our earnings press release, which can be found on Investor Relations website at investors.amplitude.com With that I'll hand the call over to Spenser.\".\nAdditionally, the historical return of AMPL two weeks prior to the earnings call was [0.00885934950960765, -0.010976886011418774, 0.025527140554231886, -0.003246724427955372, -0.023887108156089853, 0.03448280617454813, -0.0021505868122021488, 0.01508624432663952, 0.0583864316645788, 0.05215641827102191].\nYour goal is to predict whether AMPL's stock price and return will increase or decrease the day after the earnings call.",
+        "response": "[-0.057197277491594645, 'down']",
+        "task_type": "forecasting"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.00885934950960765,
+              -0.010976886011418774,
+              0.025527140554231886,
+              -0.003246724427955372,
+              -0.023887108156089853,
+              0.03448280617454813,
+              -0.0021505868122021488,
+              0.01508624432663952,
+              0.0583864316645788,
+              0.05215641827102191
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.057197277491594645,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "146402",
+      "metadata": {
+        "domain": "Finance",
+        "response": "[0.010724016595968333, 'up']",
+        "task_type": "forecasting",
+        "id": "146402",
+        "question": "The CFO’s comments during EPAM's recent earnings call were: \"looking statements. These statements are subject to risks and uncertainties as described in the company's earnings release and SEC filings. Additionally, all references to reported results that are non\nWith that said, I will now turn the call over to Ark.\".\nAdditionally, the historical return of EPAM two weeks prior to the earnings call was [0.01887614016428718, -0.004785642032790194, 0.01747292679987278, 0.006644509495741691, -0.0008831982387103032, -0.027682129341485395, -0.03225037234321004, 0.021804715263828767, 0.007306660602333093, -0.08171203658766946].\nYour goal is to predict whether EPAM's stock price and return will increase or decrease the day after the earnings call."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.01887614016428718,
+              -0.004785642032790194,
+              0.01747292679987278,
+              0.006644509495741691,
+              -0.0008831982387103032,
+              -0.027682129341485395,
+              -0.03225037234321004,
+              0.021804715263828767,
+              0.007306660602333093,
+              -0.08171203658766946
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.010724016595968333,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "153135",
+      "metadata": {
+        "response": "[0.019229789402174013, 'up']",
+        "domain": "Finance",
+        "question": "The CFO’s comments during VRTX's recent earnings call were: \"looking statements on this call that are subject to the risks and uncertainties discussed in detail in today's press release and in our filings with the Securities and Exchange Commission.\nThese statements, including, without limitation, those regarding Vertex's marketed medicines for cystic fibrosis, sickle cell disease, and beta-thalassemia, our pipeline Vertex' anticipated acquisition of Alpine Immune Sciences, and Vertex's future financial performance are based on management's current assumptions. Actual outcomes and events could differ materially. I would also note that select financial results and guidance that we will review on the call this evening are presented on a non-GAAP basis. In addition, the impact of foreign exchange is presented inclusive of our foreign exchange risk management program.\nI will now turn the call over to Reshma.\".\nAdditionally, the historical return of VRTX two weeks prior to the earnings call was [0.012477470661209411, -0.010249176011831729, -0.007635486286127535, -0.0005531838419673418, -0.0032202846531089735, -0.0085563214134029, 0.023751984796293257, -0.004923685567722269, 0.0022990376392866274, 0.0035404744072875527].\nYour goal is to predict whether VRTX's stock price and return will increase or decrease the day after the earnings call.",
+        "id": "153135",
+        "task_type": "forecasting"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.012477470661209411,
+              -0.010249176011831729,
+              -0.007635486286127535,
+              -0.0005531838419673418,
+              -0.0032202846531089735,
+              -0.0085563214134029,
+              0.023751984796293257,
+              -0.004923685567722269,
+              0.0022990376392866274,
+              0.0035404744072875527
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.019229789402174013,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "143422",
+      "metadata": {
+        "id": "143422",
+        "task_type": "forecasting",
+        "domain": "Finance",
+        "question": "The CFO’s comments during TW's recent earnings call were: \"looking statements within the meaning of the Private Securities Litigation Reform Act of 1995.\nStatements related to among other things, our guidance and the ICD acquisition are forward-looking statements. Actual results may differ materially from these forward-looking statements. Information concerning factors that could cause actual results to differ from forward-looking statements is contained in our earnings release, earnings presentation and periodic reports filed with the SEC. In addition on today's call we will reference certain non-GAAP measures as well as certain market industry data.\nInformation regarding these non-GAAP measures including reconciliations to GAAP measures is in our earnings release and earnings presentation. Information regarding market and industry data including sources is in our earnings presentation. Now let me turn the call over to\".\nAdditionally, the historical return of TW two weeks prior to the earnings call was [-0.0005714526321546343, 0.01629505736821546, 0.010314092346341619, 0.00241300018198487, 0.009165779787988937, 0.0036697626896133873, 0.0043875439288343365, 0.0008191098672545305, -0.017004682332025456, -0.028769645897053775].\nYour goal is to predict whether TW's stock price and return will increase or decrease the day after the earnings call.",
+        "response": "[0.017620716687912097, 'up']"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.0005714526321546343,
+              0.01629505736821546,
+              0.010314092346341619,
+              0.00241300018198487,
+              0.009165779787988937,
+              0.0036697626896133873,
+              0.0043875439288343365,
+              0.0008191098672545305,
+              -0.017004682332025456,
+              -0.028769645897053775
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.017620716687912097,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "145852",
+      "metadata": {
+        "response": "[-0.07465825668339154, 'down']",
+        "domain": "Finance",
+        "task_type": "forecasting",
+        "id": "145852",
+        "question": "The CFO’s comments during VOXX's recent earnings call were: \"month results conference call. Yesterday, we filed our Form 10\nTheir remarks will be followed by questions and answers. As for today, I would like to remind everyone that, except for historical information contained herein, statements made on today's call and webcast that would constitute forward-looking statements are based on currently available information. The company assumes no responsibility to update any such forward-looking statements, and I'd like to point you to the risk factors associated with our business, which are detailed in our Form 10-K for the period ended February 28th, 2023. Thank you for your continued support, and I would like to now turn the call over to Pat.\".\nAdditionally, the historical return of VOXX two weeks prior to the earnings call was [-0.006363608620383543, -0.022872826442796645, -0.01591760968504463, -0.055185529122273036, -0.020141063121136837, -0.022610413535942286, 0.1009463738214702, 0.03629418383470151, -0.12350231386870936].\nYour goal is to predict whether VOXX's stock price and return will increase or decrease the day after the earnings call."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 9,
+            "serie": [
+              -0.006363608620383543,
+              -0.022872826442796645,
+              -0.01591760968504463,
+              -0.055185529122273036,
+              -0.020141063121136837,
+              -0.022610413535942286,
+              0.1009463738214702,
+              0.03629418383470151,
+              -0.12350231386870936
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.07465825668339154,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "145296",
+      "metadata": {
+        "question": "The CFO’s comments during PRTS's recent earnings call were: \"quarter conference call. Joining me today are David Meniane, chief executive officer; Ryan Lockwood, chief financial officer; and Michael Huffaker, chief operating officer. Before I turn it over to David to start the meeting, I have some important disclosures. The prepared remarks and responses to your questions could contain certain forward\nActual results may differ materially from those contained in or implied by these forward-looking statements due to risks and uncertainties associated with the business. For a discussion of the material risks and other important factors that could affect results, please refer to the CarParts.com annual report on Form 10-K and 10-Qs as filed with the SEC, both of which can be found on our Investor Relations website. On the call, both GAAP and non-GAAP financial measures will be discussed. A reconciliation of GAAP to non-GAAP financial measures is provided in the CarParts.com press release issued today.\nAnd with that, I would now like to turn the call over to David.\".\nAdditionally, the historical return of PRTS two weeks prior to the earnings call was [-0.07142859846015659, -0.0683760056755851, 0.009174302896359121, 0.027272700672307915, 0.0, -0.026548647359614486, 0.09090911061310525, 0.04166662527455389, -0.007999992370605447, -0.032258033504347416].\nYour goal is to predict whether PRTS's stock price and return will increase or decrease the day after the earnings call.",
+        "id": "145296",
+        "task_type": "forecasting",
+        "domain": "Finance",
+        "response": "[-0.15833337472544606, 'down']"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.07142859846015659,
+              -0.0683760056755851,
+              0.009174302896359121,
+              0.027272700672307915,
+              0.0,
+              -0.026548647359614486,
+              0.09090911061310525,
+              0.04166662527455389,
+              -0.007999992370605447,
+              -0.032258033504347416
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.15833337472544606,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "146300",
+      "metadata": {
+        "response": "[0.08836844058342419, 'up']",
+        "task_type": "forecasting",
+        "domain": "Finance",
+        "question": "The CFO’s comments during COIN's recent earnings call were: \"founder and CEO; Emilie Choi, president and COO; Alesia Haas, CFO; and Paul Grewal, chief legal officer. I hope you've all had the opportunity to read our shareholder letter, which was published on our investor relations website earlier today. Before we get started, I'd like to remind you that during today's call, we may make forward\nActual results may vary materially from today's statements. Information concerning risks, uncertainties, and other factors that could cause these results to differ is included in our SEC filings. Our discussion today will also include references to certain non-GAAP financial metrics. Reconciliations to the most directly comparable GAAP financial measures are provided in the shareholder letter on our investor relations website.\".\nAdditionally, the historical return of COIN two weeks prior to the earnings call was [0.0020938680019457756, -0.09224576734515255, 0.02122760271942048, 0.01903329795368025, 0.08585240749679413, 0.07121842492693231, 0.037467369952921104, -0.04697575374130891, 0.14238909879671957, 0.03298411974733462].\nYour goal is to predict whether COIN's stock price and return will increase or decrease the day after the earnings call.",
+        "id": "146300"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.0020938680019457756,
+              -0.09224576734515255,
+              0.02122760271942048,
+              0.01903329795368025,
+              0.08585240749679413,
+              0.07121842492693231,
+              0.037467369952921104,
+              -0.04697575374130891,
+              0.14238909879671957,
+              0.03298411974733462
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.08836844058342419,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "154280",
+      "metadata": {
+        "id": "154280",
+        "question": "The CFO’s comments during OCGN's recent earnings call were: \"nan\".\nAdditionally, the historical return of OCGN two weeks prior to the earnings call was [-0.005540177410500169, 0.0027855624931045764, 0.02222218358958372, -0.027173887075599312, 0.036312796842152606, 0.037735846025293895, -0.01818181677438857, 0.0052910161370118836, 0.010526337253750517, -0.039062540017766545].\nYour goal is to predict whether OCGN's stock price and return will increase or decrease the day after the earnings call.",
+        "domain": "Finance",
+        "response": "[-0.024390172986737957, 'down']",
+        "task_type": "forecasting"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.005540177410500169,
+              0.0027855624931045764,
+              0.02222218358958372,
+              -0.027173887075599312,
+              0.036312796842152606,
+              0.037735846025293895,
+              -0.01818181677438857,
+              0.0052910161370118836,
+              0.010526337253750517,
+              -0.039062540017766545
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.024390172986737957,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "148627",
+      "metadata": {
+        "question": "This dataset, sourced from the Kaggle web traffic forecasting competition, contains daily time series data representing the number of hits for 145,063 Wikipedia pages from July 1, 2015, to September 10, 2017. The input Time Series are [3544.0, 3460.0, 3775.0, 3418.0, 3618.0, 4155.0, 3704.0, 3771.0, 4888.0, 5039.0, 4136.0, 6809.0, 6101.0, 4761.0, 4587.0, 4600.0, 4087.0, 3926.0, 7010.0, 6008.0, 4379.0, 4254.0, 4028.0, 3772.0, 3758.0, 5426.0, 6377.0, 4458.0, 3934.0, 4329.0, 4188.0, 3677.0, 3781.0, 3698.0, 4162.0, 4795.0, 5461.0, 4509.0, 4698.0, 6009.0, 9080.0, 7062.0, 5128.0, 4786.0, 4568.0, 4300.0, 5471.0, 6739.0, 5552.0, 4923.0, 4635.0, 4289.0, 3878.0, 4215.0, 5274.0, 4873.0, 7477.0, 5141.0, 6519.0, 4894.0, 6004.0, 6584.0, 4973.0, 4413.0, 4145.0, 4288.0, 4017.0, 4179.0, 4958.0, 4425.0, 3967.0, 3643.0, 4446.0, 4042.0, 4801.0, 5786.0, 5384.0, 5030.0, 4327.0, 4932.0, 4550.0, 4769.0, 5647.0, 5534.0, 4752.0, 4124.0, 5218.0, 5378.0, 5262.0, 4964.0, 4380.0, 4178.0, 3819.0, 3959.0, 4166.0, 4624.0, 4507.0, 4056.0, 4143.0, 4756.0, 4120.0, 3937.0, 4404.0, 4965.0, 4426.0, 4044.0, 4279.0, 4801.0, 4042.0, 4141.0, 4346.0, 3919.0, 3864.0, 3762.0, 3567.0, 3796.0, 4685.0, 4553.0, 3986.0, 3703.0, 3754.0, 5670.0, 4244.0, 4174.0, 5168.0, 3972.0, 4169.0, 5422.0, 5490.0, 4788.0, 5246.0, 5511.0, 9994.0, 8599.0, 5755.0, 5601.0, 4018.0, 4278.0, 4365.0, 3834.0, 5733.0, 6497.0, 4574.0, 4281.0, 5119.0, 5200.0, 4591.0]. Please predict the next 31 time series point given information above.",
+        "domain": "Web",
+        "response": "Based on the given information, the predictions are [5189.0, 4252.0, 5281.0, 6244.0, 6234.0, 6987.0, 5466.0, 5288.0, 4742.0, 4971.0, 4205.0, 4580.0, 5123.0, 5087.0, 4880.0, 4348.0, 4413.0, 4194.0, 4671.0, 4969.0, 5402.0, 4755.0, 4980.0, 4314.0, 4008.0, 3981.0, 4857.0, 4395.0, 4531.0, 3536.0, 3780.0].",
+        "task_type": "forecasting",
+        "id": "148627"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 147,
+            "serie": [
+              3544.0,
+              3460.0,
+              3775.0,
+              3418.0,
+              3618.0,
+              4155.0,
+              3704.0,
+              3771.0,
+              4888.0,
+              5039.0,
+              4136.0,
+              6809.0,
+              6101.0,
+              4761.0,
+              4587.0,
+              4600.0,
+              4087.0,
+              3926.0,
+              7010.0,
+              6008.0,
+              4379.0,
+              4254.0,
+              4028.0,
+              3772.0,
+              3758.0,
+              5426.0,
+              6377.0,
+              4458.0,
+              3934.0,
+              4329.0,
+              4188.0,
+              3677.0,
+              3781.0,
+              3698.0,
+              4162.0,
+              4795.0,
+              5461.0,
+              4509.0,
+              4698.0,
+              6009.0,
+              9080.0,
+              7062.0,
+              5128.0,
+              4786.0,
+              4568.0,
+              4300.0,
+              5471.0,
+              6739.0,
+              5552.0,
+              4923.0,
+              4635.0,
+              4289.0,
+              3878.0,
+              4215.0,
+              5274.0,
+              4873.0,
+              7477.0,
+              5141.0,
+              6519.0,
+              4894.0,
+              6004.0,
+              6584.0,
+              4973.0,
+              4413.0,
+              4145.0,
+              4288.0,
+              4017.0,
+              4179.0,
+              4958.0,
+              4425.0,
+              3967.0,
+              3643.0,
+              4446.0,
+              4042.0,
+              4801.0,
+              5786.0,
+              5384.0,
+              5030.0,
+              4327.0,
+              4932.0,
+              4550.0,
+              4769.0,
+              5647.0,
+              5534.0,
+              4752.0,
+              4124.0,
+              5218.0,
+              5378.0,
+              5262.0,
+              4964.0,
+              4380.0,
+              4178.0,
+              3819.0,
+              3959.0,
+              4166.0,
+              4624.0,
+              4507.0,
+              4056.0,
+              4143.0,
+              4756.0,
+              4120.0,
+              3937.0,
+              4404.0,
+              4965.0,
+              4426.0,
+              4044.0,
+              4279.0,
+              4801.0,
+              4042.0,
+              4141.0,
+              4346.0,
+              3919.0,
+              3864.0,
+              3762.0,
+              3567.0,
+              3796.0,
+              4685.0,
+              4553.0,
+              3986.0,
+              3703.0,
+              3754.0,
+              5670.0,
+              4244.0,
+              4174.0,
+              5168.0,
+              3972.0,
+              4169.0,
+              5422.0,
+              5490.0,
+              4788.0,
+              5246.0,
+              5511.0,
+              9994.0,
+              8599.0,
+              5755.0,
+              5601.0,
+              4018.0,
+              4278.0,
+              4365.0,
+              3834.0,
+              5733.0,
+              6497.0,
+              4574.0,
+              4281.0,
+              5119.0,
+              5200.0,
+              4591.0
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 31,
+            "serie": [
+              5189.0,
+              4252.0,
+              5281.0,
+              6244.0,
+              6234.0,
+              6987.0,
+              5466.0,
+              5288.0,
+              4742.0,
+              4971.0,
+              4205.0,
+              4580.0,
+              5123.0,
+              5087.0,
+              4880.0,
+              4348.0,
+              4413.0,
+              4194.0,
+              4671.0,
+              4969.0,
+              5402.0,
+              4755.0,
+              4980.0,
+              4314.0,
+              4008.0,
+              3981.0,
+              4857.0,
+              4395.0,
+              4531.0,
+              3536.0,
+              3780.0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "152616",
+      "metadata": {
+        "task_type": "forecasting",
+        "question": "This dataset, sourced from the Kaggle web traffic forecasting competition, contains daily time series data representing the number of hits for 145,063 Wikipedia pages from July 1, 2015, to September 10, 2017. The input Time Series are [3086.0, 2673.0, 2634.0, 2102.0, 2339.0, 2726.0, 2721.0, 2485.0, 2560.0, 2287.0, 1902.0, 2091.0, 2349.0, 2442.0, 2418.0, 2346.0, 2220.0, 1841.0, 2041.0, 2662.0, 2514.0, 2491.0, 2783.0, 2466.0, 2066.0, 2401.0, 3423.0, 3975.0, 3590.0, 3481.0, 2782.0, 2276.0, 2513.0, 2599.0, 2949.0, 2756.0, 3092.0, 2949.0, 2444.0, 2810.0, 3171.0, 3425.0, 3635.0, 3332.0, 2896.0, 2757.0, 2680.0, 3441.0, 3493.0, 3702.0, 4012.0, 3845.0, 3073.0, 3561.0, 3748.0, 3738.0, 3750.0, 3475.0, 3716.0, 3036.0, 2839.0, 3653.0, 3666.0, 4018.0, 3991.0, 3852.0, 3523.0, 3683.0, 3952.0, 3984.0, 3867.0, 4234.0, 3991.0, 3649.0, 3764.0, 4377.0, 4823.0, 4662.0, 5070.0, 4434.0, 4070.0, 4080.0, 4690.0, 6795.0, 7141.0, 5792.0, 5283.0, 4865.0, 4846.0, 5484.0, 5753.0, 5039.0, 3552.0, 3148.0, 2879.0, 2942.0, 3567.0, 3604.0, 3773.0, 3654.0]. Please predict the next 31 time series point given information above.",
+        "response": "Based on the given information, the predictions are [3292.0, 2436.0, 3173.0, 4412.0, 3843.0, 3790.0, 4092.0, 3873.0, 9730.0, 5619.0, 4404.0, 4136.0, 3888.0, 3978.0, 3481.0, 2969.0, 4362.0, 6423.0, 4209.0, 3829.0, 3637.0, 3280.0, 2682.0, 3012.0, 3678.0, 3775.0, 3892.0, 3969.0, 3537.0, 2922.0, 3642.0].",
+        "domain": "Web",
+        "id": "152616"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 100,
+            "serie": [
+              3086.0,
+              2673.0,
+              2634.0,
+              2102.0,
+              2339.0,
+              2726.0,
+              2721.0,
+              2485.0,
+              2560.0,
+              2287.0,
+              1902.0,
+              2091.0,
+              2349.0,
+              2442.0,
+              2418.0,
+              2346.0,
+              2220.0,
+              1841.0,
+              2041.0,
+              2662.0,
+              2514.0,
+              2491.0,
+              2783.0,
+              2466.0,
+              2066.0,
+              2401.0,
+              3423.0,
+              3975.0,
+              3590.0,
+              3481.0,
+              2782.0,
+              2276.0,
+              2513.0,
+              2599.0,
+              2949.0,
+              2756.0,
+              3092.0,
+              2949.0,
+              2444.0,
+              2810.0,
+              3171.0,
+              3425.0,
+              3635.0,
+              3332.0,
+              2896.0,
+              2757.0,
+              2680.0,
+              3441.0,
+              3493.0,
+              3702.0,
+              4012.0,
+              3845.0,
+              3073.0,
+              3561.0,
+              3748.0,
+              3738.0,
+              3750.0,
+              3475.0,
+              3716.0,
+              3036.0,
+              2839.0,
+              3653.0,
+              3666.0,
+              4018.0,
+              3991.0,
+              3852.0,
+              3523.0,
+              3683.0,
+              3952.0,
+              3984.0,
+              3867.0,
+              4234.0,
+              3991.0,
+              3649.0,
+              3764.0,
+              4377.0,
+              4823.0,
+              4662.0,
+              5070.0,
+              4434.0,
+              4070.0,
+              4080.0,
+              4690.0,
+              6795.0,
+              7141.0,
+              5792.0,
+              5283.0,
+              4865.0,
+              4846.0,
+              5484.0,
+              5753.0,
+              5039.0,
+              3552.0,
+              3148.0,
+              2879.0,
+              2942.0,
+              3567.0,
+              3604.0,
+              3773.0,
+              3654.0
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 31,
+            "serie": [
+              3292.0,
+              2436.0,
+              3173.0,
+              4412.0,
+              3843.0,
+              3790.0,
+              4092.0,
+              3873.0,
+              9730.0,
+              5619.0,
+              4404.0,
+              4136.0,
+              3888.0,
+              3978.0,
+              3481.0,
+              2969.0,
+              4362.0,
+              6423.0,
+              4209.0,
+              3829.0,
+              3637.0,
+              3280.0,
+              2682.0,
+              3012.0,
+              3678.0,
+              3775.0,
+              3892.0,
+              3969.0,
+              3537.0,
+              2922.0,
+              3642.0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "146309",
+      "metadata": {
+        "domain": "Finance",
+        "response": "[-0.2149212500640515, 'down']",
+        "id": "146309",
+        "task_type": "forecasting",
+        "question": "The CFO’s comments during VYX's recent earnings call were: \"Walsh, our CFO.\nThis call is being recorded and webcast on the investor relations section of our website. Before we begin, please be advised that remarks today will contain forward-looking statements. These forward-looking statements are subject to risks and uncertainties and other factors which could cause actual results to differ materially from those expressed or implied by such forward-looking statements. For additional information on these factors, please refer to our earnings release and other reports filed with the SEC.\nWe caution you not to place undue reliance on these statements. Forward-looking statements during this call speak only as of the date of this call, and we undertake no obligation to update them. In addition, we will be discussing or providing certain non-GAAP financial measures today, which we believe are more reflective of our ongoing performance. For a full reconciliation of the non-GAAP financial measures discussed in this call to the most comparable GAAP measure in accordance with SEC regulations, please see our press release furnished as an exhibit to our Form 8-K file this afternoon and our supplemental materials available on the investor relations section of our website.\nAs a reminder, you will see the financials of the NCR Atleos business, which was spun off as an independent publicly traded company on October 16th, 2023 in the discontinued operations line within the P&L. With that, I would like to turn the call over to David.\".\nAdditionally, the historical return of VYX two weeks prior to the earnings call was [-0.036662448476267095, 0.009842557379092787, -0.027940240128866867, -0.022058818373300593, 0.028024596322963058, -0.023936147446166123, -0.014305179412900437, -0.011057349306114572, 0.020964306657133003].\nYour goal is to predict whether VYX's stock price and return will increase or decrease the day after the earnings call."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 9,
+            "serie": [
+              -0.036662448476267095,
+              0.009842557379092787,
+              -0.027940240128866867,
+              -0.022058818373300593,
+              0.028024596322963058,
+              -0.023936147446166123,
+              -0.014305179412900437,
+              -0.011057349306114572,
+              0.020964306657133003
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.2149212500640515,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "143379",
+      "metadata": {
+        "task_type": "forecasting",
+        "id": "143379",
+        "domain": "Finance",
+        "response": "[-0.003759424779028131, 'down']",
+        "question": "The CFO’s comments during AMPL's recent earnings call were: \"founder of Amplitude; Andrew Casey, chief financial officer; and Mike Dean, VP, corporate controller.\nDuring today's call, management will make forward-looking statements, including statements regarding our financial outlook for the third quarter and full year 2024, the expected performance of our products, our expected quarterly and long-term growth, investments, and our overall future prospects. These forward-looking statements are based on current information, assumptions, and expectations, and are subject to risks and uncertainties, some of which are beyond our control, that could cause actual results to differ materially from those described in these statements. Further information on the risks that could cause actual results to differ is included in our filings with the Securities and Exchange Commission. You are cautioned not to place undue reliance on these forward-looking statements and we assume no obligation to update these statements after today's call except as required by law.\nCertain financial measures used on today's call are expressed on a non-GAAP basis. We use these non-GAAP financial measures internally to facilitate analysis of our financial and business trends and for internal planning and forecasting purposes. These non-GAAP financial measures have limitations and should not be used in isolation from or as a substitute for financial information prepared in accordance with GAAP. A reconciliation between these GAAP and non-GAAP financial measures is included in our earnings press release, which can be found on our investor relations website at investors.Amplitude.com.\nWith that, I'll hand the call over to Spenser.\".\nAdditionally, the historical return of AMPL two weeks prior to the earnings call was [0.028136076471937166, -0.02508554795274298, 0.01286545663431049, -0.011547278239882774, -0.04205614400748858, -0.031707287572239395, -0.027707841995384563, 0.0012953664706754076, 0.0064683299626764335, 0.0257069156647316].\nYour goal is to predict whether AMPL's stock price and return will increase or decrease the day after the earnings call."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.028136076471937166,
+              -0.02508554795274298,
+              0.01286545663431049,
+              -0.011547278239882774,
+              -0.04205614400748858,
+              -0.031707287572239395,
+              -0.027707841995384563,
+              0.0012953664706754076,
+              0.0064683299626764335,
+              0.0257069156647316
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.003759424779028131,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "148762",
+      "metadata": {
+        "task_type": "forecasting",
+        "domain": "Web",
+        "response": "Based on the given information, the predictions are [2926.0, 3126.0, 3186.0, 2826.0, 2756.0, 2821.0, 3647.0, 4178.0, 4400.0, 4123.0, 3549.0, 3393.0, 3855.0, 3996.0, 3817.0, 4515.0, 4158.0, 3493.0, 3428.0, 3281.0, 3699.0, 4074.0, 4745.0, 3770.0, 3419.0, 3319.0, 3295.0, 3202.0, 3275.0, 3774.0, 3533.0].",
+        "id": "148762",
+        "question": "This dataset, sourced from the Kaggle web traffic forecasting competition, contains daily time series data representing the number of hits for 145,063 Wikipedia pages from July 1, 2015, to September 10, 2017. The input Time Series are [3404.0, 3637.0, 3485.0, 4076.0, 4241.0, 4517.0, 3986.0, 4749.0, 10606.0, 9996.0, 9239.0, 9675.0, 8236.0, 9623.0, 8609.0, 7073.0, 6882.0, 7482.0, 7776.0, 7423.0, 6703.0, 6528.0, 6226.0, 7933.0, 7535.0, 8417.0, 6638.0, 5807.0, 5155.0, 5192.0, 4968.0, 5618.0, 6045.0, 4981.0, 6044.0, 6401.0, 6067.0, 6129.0, 6899.0, 7676.0, 6000.0, 5459.0, 4652.0, 4821.0, 5084.0, 6044.0, 6647.0, 5713.0, 4581.0, 4544.0, 4069.0, 4006.0, 5126.0, 5452.0, 4782.0, 4080.0, 3920.0, 3617.0, 4082.0, 4166.0, 4868.0, 4374.0, 3666.0, 4059.0, 3560.0, 3797.0, 4202.0, 4901.0, 4470.0, 4034.0, 3401.0, 3328.0, 3838.0, 3954.0, 4395.0, 3853.0, 4892.0, 6282.0, 4869.0, 4356.0, 4488.0, 5360.0, 4382.0, 3732.0, 3506.0, 3379.0, 3435.0, 3472.0, 3735.0, 3387.0, 2968.0, 2925.0, 2853.0, 2753.0, 2930.0, 3451.0, 3110.0, 2907.0, 2873.0, 2584.0, 2565.0, 2976.0, 3297.0, 2954.0, 2688.0, 2380.0, 2558.0, 2746.0, 2914.0, 3057.0, 2853.0, 2988.0, 2672.0, 2492.0, 2788.0, 2817.0, 2815.0, 3032.0, 2677.0, 2522.0, 2374.0, 2250.0, 2295.0, 2706.0, 2875.0, 2450.0, 2500.0, 2564.0, 2550.0]. Please predict the next 31 time series point given information above."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 129,
+            "serie": [
+              3404.0,
+              3637.0,
+              3485.0,
+              4076.0,
+              4241.0,
+              4517.0,
+              3986.0,
+              4749.0,
+              10606.0,
+              9996.0,
+              9239.0,
+              9675.0,
+              8236.0,
+              9623.0,
+              8609.0,
+              7073.0,
+              6882.0,
+              7482.0,
+              7776.0,
+              7423.0,
+              6703.0,
+              6528.0,
+              6226.0,
+              7933.0,
+              7535.0,
+              8417.0,
+              6638.0,
+              5807.0,
+              5155.0,
+              5192.0,
+              4968.0,
+              5618.0,
+              6045.0,
+              4981.0,
+              6044.0,
+              6401.0,
+              6067.0,
+              6129.0,
+              6899.0,
+              7676.0,
+              6000.0,
+              5459.0,
+              4652.0,
+              4821.0,
+              5084.0,
+              6044.0,
+              6647.0,
+              5713.0,
+              4581.0,
+              4544.0,
+              4069.0,
+              4006.0,
+              5126.0,
+              5452.0,
+              4782.0,
+              4080.0,
+              3920.0,
+              3617.0,
+              4082.0,
+              4166.0,
+              4868.0,
+              4374.0,
+              3666.0,
+              4059.0,
+              3560.0,
+              3797.0,
+              4202.0,
+              4901.0,
+              4470.0,
+              4034.0,
+              3401.0,
+              3328.0,
+              3838.0,
+              3954.0,
+              4395.0,
+              3853.0,
+              4892.0,
+              6282.0,
+              4869.0,
+              4356.0,
+              4488.0,
+              5360.0,
+              4382.0,
+              3732.0,
+              3506.0,
+              3379.0,
+              3435.0,
+              3472.0,
+              3735.0,
+              3387.0,
+              2968.0,
+              2925.0,
+              2853.0,
+              2753.0,
+              2930.0,
+              3451.0,
+              3110.0,
+              2907.0,
+              2873.0,
+              2584.0,
+              2565.0,
+              2976.0,
+              3297.0,
+              2954.0,
+              2688.0,
+              2380.0,
+              2558.0,
+              2746.0,
+              2914.0,
+              3057.0,
+              2853.0,
+              2988.0,
+              2672.0,
+              2492.0,
+              2788.0,
+              2817.0,
+              2815.0,
+              3032.0,
+              2677.0,
+              2522.0,
+              2374.0,
+              2250.0,
+              2295.0,
+              2706.0,
+              2875.0,
+              2450.0,
+              2500.0,
+              2564.0,
+              2550.0
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 31,
+            "serie": [
+              2926.0,
+              3126.0,
+              3186.0,
+              2826.0,
+              2756.0,
+              2821.0,
+              3647.0,
+              4178.0,
+              4400.0,
+              4123.0,
+              3549.0,
+              3393.0,
+              3855.0,
+              3996.0,
+              3817.0,
+              4515.0,
+              4158.0,
+              3493.0,
+              3428.0,
+              3281.0,
+              3699.0,
+              4074.0,
+              4745.0,
+              3770.0,
+              3419.0,
+              3319.0,
+              3295.0,
+              3202.0,
+              3275.0,
+              3774.0,
+              3533.0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "141764",
+      "metadata": {
+        "question": "The CFO’s comments during NEP's recent earnings call were: \"quarter and full\nOur executive team will then be available to answer your questions. We will be making forward-looking statements during this call based on current expectations and assumptions, which are subject to risks and uncertainties. Actual results could differ materially from our forward-looking statements if any of our key assumptions are incorrect or because of other factors discussed in today's earnings news release and the comments made during this conference call and the Risk Factors section of the accompanying presentation or in our latest reports and filings with the Securities and Exchange Commission, each of which can be found on our websites, www.nexteraenergy.com and www.nexteraenergypartners.com. We do not undertake any duty to update any forward-looking statements.\nToday's presentation also includes references to non-GAAP financial measures. You should refer to the information contained in the slides accompanying today's presentation for definitional information and reconciliation of historical non-GAAP measures to the closest GAAP financial measure. With that, I will turn the call over to John.\".\nAdditionally, the historical return of NEP two weeks prior to the earnings call was [0.0006929657847478676, -0.03635729748759997, -0.040603710446807995, -0.0029961861114449206, -0.019909869866659324, 0.03372929832299154, 0.03262899763846283, -0.03698390894216019, 0.0887397812611408].\nYour goal is to predict whether NEP's stock price and return will increase or decrease the day after the earnings call.",
+        "task_type": "forecasting",
+        "domain": "Finance",
+        "response": "[-0.01335620584963848, 'down']",
+        "id": "141764"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 9,
+            "serie": [
+              0.0006929657847478676,
+              -0.03635729748759997,
+              -0.040603710446807995,
+              -0.0029961861114449206,
+              -0.019909869866659324,
+              0.03372929832299154,
+              0.03262899763846283,
+              -0.03698390894216019,
+              0.0887397812611408
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.01335620584963848,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "153700",
+      "metadata": {
+        "task_type": "forecasting",
+        "question": "This dataset, sourced from the Kaggle web traffic forecasting competition, contains daily time series data representing the number of hits for 145,063 Wikipedia pages from July 1, 2015, to September 10, 2017. The input Time Series are [338.0, 256.0, 292.0, 243.0, 273.0, 1024.0, 1458.0, 1492.0, 681.0, 322.0, 247.0, 321.0, 616.0, 513.0, 474.0, 560.0, 399.0, 294.0, 284.0, 519.0, 527.0, 434.0, 361.0, 324.0, 226.0, 280.0, 641.0, 726.0, 1086.0, 5401.0, 5371.0, 1443.0, 1064.0, 1099.0, 898.0, 1050.0, 664.0, 569.0, 443.0, 521.0, 826.0, 965.0, 725.0, 630.0, 537.0, 434.0, 428.0, 631.0, 782.0, 908.0, 768.0, 735.0, 525.0, 2276.0, 667.0, 606.0, 646.0, 633.0, 773.0, 542.0, 709.0, 887.0, 2153.0, 1920.0, 2610.0, 4434.0, 7191.0, 7880.0, 5444.0, 5520.0, 2884.0, 1937.0, 1562.0, 1285.0, 2555.0, 3464.0, 2335.0, 1707.0, 1811.0, 1464.0, 1265.0, 1205.0, 1524.0, 1418.0, 1128.0, 1166.0, 1039.0, 995.0, 1033.0, 1417.0, 1472.0, 1322.0, 1531.0, 1577.0, 1140.0, 1114.0, 1352.0, 1505.0, 1397.0, 1664.0, 2468.0, 2440.0, 2052.0, 3372.0, 4287.0, 4101.0, 5556.0, 17991.0, 26450.0, 30483.0, 23618.0, 13939.0, 10596.0, 9528.0, 9243.0, 9807.0, 10517.0, 8527.0, 9125.0, 7226.0, 5866.0, 5600.0, 5808.0, 6561.0, 6231.0, 5086.0, 4889.0, 4534.0, 4510.0, 4811.0, 5174.0, 4599.0, 3776.0, 3486.0, 3215.0, 2917.0, 3017.0, 3639.0, 3196.0, 2866.0, 2719.0, 2651.0, 2550.0, 2858.0, 3304.0, 3059.0, 2885.0, 3118.0, 2828.0, 3278.0, 3617.0, 3547.0, 3305.0, 3124.0, 3052.0, 2492.0, 3637.0, 3743.0, 3541.0, 3563.0]. Please predict the next 31 time series point given information above.",
+        "response": "Based on the given information, the predictions are [3446.0, 4781.0, 5683.0, 4889.0, 4866.0, 5258.0, 5165.0, 4391.0, 3870.0, 3266.0, 3063.0, 3365.0, 3259.0, 4613.0, 3502.0, 3246.0, 2762.0, 2544.0, 2856.0, 37004.0, 15896.0, 3747.0, 3345.0, 2985.0, 3089.0, 3697.0, 3910.0, 4035.0, 3688.0, 3615.0, 3877.0].",
+        "id": "153700",
+        "domain": "Web"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 160,
+            "serie": [
+              338.0,
+              256.0,
+              292.0,
+              243.0,
+              273.0,
+              1024.0,
+              1458.0,
+              1492.0,
+              681.0,
+              322.0,
+              247.0,
+              321.0,
+              616.0,
+              513.0,
+              474.0,
+              560.0,
+              399.0,
+              294.0,
+              284.0,
+              519.0,
+              527.0,
+              434.0,
+              361.0,
+              324.0,
+              226.0,
+              280.0,
+              641.0,
+              726.0,
+              1086.0,
+              5401.0,
+              5371.0,
+              1443.0,
+              1064.0,
+              1099.0,
+              898.0,
+              1050.0,
+              664.0,
+              569.0,
+              443.0,
+              521.0,
+              826.0,
+              965.0,
+              725.0,
+              630.0,
+              537.0,
+              434.0,
+              428.0,
+              631.0,
+              782.0,
+              908.0,
+              768.0,
+              735.0,
+              525.0,
+              2276.0,
+              667.0,
+              606.0,
+              646.0,
+              633.0,
+              773.0,
+              542.0,
+              709.0,
+              887.0,
+              2153.0,
+              1920.0,
+              2610.0,
+              4434.0,
+              7191.0,
+              7880.0,
+              5444.0,
+              5520.0,
+              2884.0,
+              1937.0,
+              1562.0,
+              1285.0,
+              2555.0,
+              3464.0,
+              2335.0,
+              1707.0,
+              1811.0,
+              1464.0,
+              1265.0,
+              1205.0,
+              1524.0,
+              1418.0,
+              1128.0,
+              1166.0,
+              1039.0,
+              995.0,
+              1033.0,
+              1417.0,
+              1472.0,
+              1322.0,
+              1531.0,
+              1577.0,
+              1140.0,
+              1114.0,
+              1352.0,
+              1505.0,
+              1397.0,
+              1664.0,
+              2468.0,
+              2440.0,
+              2052.0,
+              3372.0,
+              4287.0,
+              4101.0,
+              5556.0,
+              17991.0,
+              26450.0,
+              30483.0,
+              23618.0,
+              13939.0,
+              10596.0,
+              9528.0,
+              9243.0,
+              9807.0,
+              10517.0,
+              8527.0,
+              9125.0,
+              7226.0,
+              5866.0,
+              5600.0,
+              5808.0,
+              6561.0,
+              6231.0,
+              5086.0,
+              4889.0,
+              4534.0,
+              4510.0,
+              4811.0,
+              5174.0,
+              4599.0,
+              3776.0,
+              3486.0,
+              3215.0,
+              2917.0,
+              3017.0,
+              3639.0,
+              3196.0,
+              2866.0,
+              2719.0,
+              2651.0,
+              2550.0,
+              2858.0,
+              3304.0,
+              3059.0,
+              2885.0,
+              3118.0,
+              2828.0,
+              3278.0,
+              3617.0,
+              3547.0,
+              3305.0,
+              3124.0,
+              3052.0,
+              2492.0,
+              3637.0,
+              3743.0,
+              3541.0,
+              3563.0
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 31,
+            "serie": [
+              3446.0,
+              4781.0,
+              5683.0,
+              4889.0,
+              4866.0,
+              5258.0,
+              5165.0,
+              4391.0,
+              3870.0,
+              3266.0,
+              3063.0,
+              3365.0,
+              3259.0,
+              4613.0,
+              3502.0,
+              3246.0,
+              2762.0,
+              2544.0,
+              2856.0,
+              37004.0,
+              15896.0,
+              3747.0,
+              3345.0,
+              2985.0,
+              3089.0,
+              3697.0,
+              3910.0,
+              4035.0,
+              3688.0,
+              3615.0,
+              3877.0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "150513",
+      "metadata": {
+        "task_type": "forecasting",
+        "response": "Based on the given information, the predictions are [3770.0, 3754.0, 4462.0, 4606.0, 4401.0, 4394.0, 3976.0, 3200.0, 3422.0, 3811.0, 4004.0, 4123.0, 4176.0, 3818.0, 3428.0, 4261.0, 4746.0, 4331.0, 4099.0, 3799.0, 3634.0, 3317.0, 3501.0, 3975.0, 4431.0, 5040.0, 4834.0, 4624.0, 3933.0, 4188.0, 5333.0].",
+        "question": "This dataset, sourced from the Kaggle web traffic forecasting competition, contains daily time series data representing the number of hits for 145,063 Wikipedia pages from July 1, 2015, to September 10, 2017. The input Time Series are [4144.0, 4277.0, 4333.0, 3591.0, 3619.0, 4282.0, 4345.0, 4240.0, 4405.0, 4204.0, 3654.0, 3636.0, 4467.0, 6470.0, 4958.0, 4478.0, 4352.0, 3676.0, 3755.0, 4917.0, 5077.0, 4850.0, 4664.0, 4904.0, 3878.0, 5214.0, 7311.0, 5140.0, 4649.0, 4497.0, 4910.0, 5868.0, 6191.0, 6459.0, 5433.0, 4973.0, 5582.0, 6995.0, 5708.0, 5538.0, 5788.0, 6584.0, 6779.0, 8129.0, 12342.0, 9568.0, 9524.0, 13193.0, 11753.0, 10912.0, 9382.0, 9930.0, 8392.0, 8365.0, 9163.0, 7880.0, 8865.0, 8762.0, 8277.0, 8823.0, 8698.0, 9795.0, 8267.0, 8171.0, 7851.0, 7640.0, 6989.0, 7461.0, 7775.0, 7684.0, 7547.0, 7879.0, 7421.0, 5664.0, 5969.0, 6456.0, 6464.0, 6110.0, 5929.0, 5973.0, 5145.0, 5346.0, 5766.0, 6448.0, 5956.0, 6720.0, 6362.0, 5131.0, 5219.0, 5314.0, 5095.0, 5364.0, 5676.0, 5498.0, 4559.0, 4923.0, 4732.0, 5087.0, 5391.0, 5233.0, 5297.0, 4880.0, 4818.0, 5536.0, 5485.0, 8224.0, 5203.0, 4878.0, 6236.0, 4912.0, 5177.0, 7141.0, 6248.0, 5392.0, 5091.0, 3847.0, 3939.0, 4319.0, 4548.0, 4631.0, 5003.0, 4299.0, 4169.0, 3902.0, 4109.0, 4411.0, 4523.0, 4573.0, 4443.0]. Please predict the next 31 time series point given information above.",
+        "id": "150513",
+        "domain": "Web"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 129,
+            "serie": [
+              4144.0,
+              4277.0,
+              4333.0,
+              3591.0,
+              3619.0,
+              4282.0,
+              4345.0,
+              4240.0,
+              4405.0,
+              4204.0,
+              3654.0,
+              3636.0,
+              4467.0,
+              6470.0,
+              4958.0,
+              4478.0,
+              4352.0,
+              3676.0,
+              3755.0,
+              4917.0,
+              5077.0,
+              4850.0,
+              4664.0,
+              4904.0,
+              3878.0,
+              5214.0,
+              7311.0,
+              5140.0,
+              4649.0,
+              4497.0,
+              4910.0,
+              5868.0,
+              6191.0,
+              6459.0,
+              5433.0,
+              4973.0,
+              5582.0,
+              6995.0,
+              5708.0,
+              5538.0,
+              5788.0,
+              6584.0,
+              6779.0,
+              8129.0,
+              12342.0,
+              9568.0,
+              9524.0,
+              13193.0,
+              11753.0,
+              10912.0,
+              9382.0,
+              9930.0,
+              8392.0,
+              8365.0,
+              9163.0,
+              7880.0,
+              8865.0,
+              8762.0,
+              8277.0,
+              8823.0,
+              8698.0,
+              9795.0,
+              8267.0,
+              8171.0,
+              7851.0,
+              7640.0,
+              6989.0,
+              7461.0,
+              7775.0,
+              7684.0,
+              7547.0,
+              7879.0,
+              7421.0,
+              5664.0,
+              5969.0,
+              6456.0,
+              6464.0,
+              6110.0,
+              5929.0,
+              5973.0,
+              5145.0,
+              5346.0,
+              5766.0,
+              6448.0,
+              5956.0,
+              6720.0,
+              6362.0,
+              5131.0,
+              5219.0,
+              5314.0,
+              5095.0,
+              5364.0,
+              5676.0,
+              5498.0,
+              4559.0,
+              4923.0,
+              4732.0,
+              5087.0,
+              5391.0,
+              5233.0,
+              5297.0,
+              4880.0,
+              4818.0,
+              5536.0,
+              5485.0,
+              8224.0,
+              5203.0,
+              4878.0,
+              6236.0,
+              4912.0,
+              5177.0,
+              7141.0,
+              6248.0,
+              5392.0,
+              5091.0,
+              3847.0,
+              3939.0,
+              4319.0,
+              4548.0,
+              4631.0,
+              5003.0,
+              4299.0,
+              4169.0,
+              3902.0,
+              4109.0,
+              4411.0,
+              4523.0,
+              4573.0,
+              4443.0
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 31,
+            "serie": [
+              3770.0,
+              3754.0,
+              4462.0,
+              4606.0,
+              4401.0,
+              4394.0,
+              3976.0,
+              3200.0,
+              3422.0,
+              3811.0,
+              4004.0,
+              4123.0,
+              4176.0,
+              3818.0,
+              3428.0,
+              4261.0,
+              4746.0,
+              4331.0,
+              4099.0,
+              3799.0,
+              3634.0,
+              3317.0,
+              3501.0,
+              3975.0,
+              4431.0,
+              5040.0,
+              4834.0,
+              4624.0,
+              3933.0,
+              4188.0,
+              5333.0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "148075",
+      "metadata": {
+        "domain": "Web",
+        "question": "This dataset, sourced from the Kaggle web traffic forecasting competition, contains daily time series data representing the number of hits for 145,063 Wikipedia pages from July 1, 2015, to September 10, 2017. The input Time Series are [4213.0, 5419.0, 4253.0, 3429.0, 3269.0, 3733.0, 3971.0, 5099.0, 4783.0, 4000.0, 3587.0, 3268.0, 3542.0, 3344.0, 3359.0, 3438.0, 3095.0, 2923.0, 3488.0, 3811.0, 4136.0, 3877.0, 4410.0, 3863.0, 3800.0, 3615.0, 4701.0, 4493.0, 3998.0, 4044.0, 4002.0, 3201.0, 3239.0, 3193.0, 3528.0, 4468.0, 8753.0, 5421.0, 3999.0, 3896.0, 3908.0, 3732.0, 3591.0, 3625.0, 3803.0, 3531.0, 4070.0, 3853.0, 4035.0, 3998.0, 3624.0, 3585.0, 3161.0, 3698.0, 3921.0, 4175.0, 3835.0, 3550.0, 4059.0, 3459.0, 3467.0, 3440.0, 3430.0, 3189.0, 3150.0, 3286.0, 2902.0, 2918.0, 3224.0, 3312.0, 3263.0, 3417.0, 3399.0, 3016.0, 3093.0, 3210.0, 3664.0, 3768.0, 4512.0, 3705.0, 3560.0, 3895.0, 3958.0, 5356.0, 4868.0, 4263.0, 3677.0, 3266.0, 3266.0, 3270.0, 3640.0, 4046.0, 3206.0, 4324.0, 3107.0, 3233.0, 3181.0, 3374.0, 7610.0, 7525.0, 3450.0, 3151.0, 3167.0]. Please predict the next 32 time series point given information above.",
+        "response": "Based on the given information, the predictions are [3434.0, 3525.0, 3313.0, 3359.0, 3276.0, 2987.0, 3344.0, 3892.0, 3489.0, 3953.0, 3261.0, 3322.0, 3021.0, 3350.0, 3533.0, 3759.0, 4456.0, 4136.0, 3440.0, 2882.0, 3119.0, 4319.0, 3988.0, 3648.0, 3763.0, 4796.0, 3605.0, 3538.0, 4660.0, 5124.0, 4849.0, 4023.0].",
+        "id": "148075",
+        "task_type": "forecasting"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 103,
+            "serie": [
+              4213.0,
+              5419.0,
+              4253.0,
+              3429.0,
+              3269.0,
+              3733.0,
+              3971.0,
+              5099.0,
+              4783.0,
+              4000.0,
+              3587.0,
+              3268.0,
+              3542.0,
+              3344.0,
+              3359.0,
+              3438.0,
+              3095.0,
+              2923.0,
+              3488.0,
+              3811.0,
+              4136.0,
+              3877.0,
+              4410.0,
+              3863.0,
+              3800.0,
+              3615.0,
+              4701.0,
+              4493.0,
+              3998.0,
+              4044.0,
+              4002.0,
+              3201.0,
+              3239.0,
+              3193.0,
+              3528.0,
+              4468.0,
+              8753.0,
+              5421.0,
+              3999.0,
+              3896.0,
+              3908.0,
+              3732.0,
+              3591.0,
+              3625.0,
+              3803.0,
+              3531.0,
+              4070.0,
+              3853.0,
+              4035.0,
+              3998.0,
+              3624.0,
+              3585.0,
+              3161.0,
+              3698.0,
+              3921.0,
+              4175.0,
+              3835.0,
+              3550.0,
+              4059.0,
+              3459.0,
+              3467.0,
+              3440.0,
+              3430.0,
+              3189.0,
+              3150.0,
+              3286.0,
+              2902.0,
+              2918.0,
+              3224.0,
+              3312.0,
+              3263.0,
+              3417.0,
+              3399.0,
+              3016.0,
+              3093.0,
+              3210.0,
+              3664.0,
+              3768.0,
+              4512.0,
+              3705.0,
+              3560.0,
+              3895.0,
+              3958.0,
+              5356.0,
+              4868.0,
+              4263.0,
+              3677.0,
+              3266.0,
+              3266.0,
+              3270.0,
+              3640.0,
+              4046.0,
+              3206.0,
+              4324.0,
+              3107.0,
+              3233.0,
+              3181.0,
+              3374.0,
+              7610.0,
+              7525.0,
+              3450.0,
+              3151.0,
+              3167.0
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 32,
+            "serie": [
+              3434.0,
+              3525.0,
+              3313.0,
+              3359.0,
+              3276.0,
+              2987.0,
+              3344.0,
+              3892.0,
+              3489.0,
+              3953.0,
+              3261.0,
+              3322.0,
+              3021.0,
+              3350.0,
+              3533.0,
+              3759.0,
+              4456.0,
+              4136.0,
+              3440.0,
+              2882.0,
+              3119.0,
+              4319.0,
+              3988.0,
+              3648.0,
+              3763.0,
+              4796.0,
+              3605.0,
+              3538.0,
+              4660.0,
+              5124.0,
+              4849.0,
+              4023.0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "143496",
+      "metadata": {
+        "id": "143496",
+        "domain": "Finance",
+        "question": "The CFO’s comments during BJRI's recent earnings call were: \"looking statements contained in the company's filings with the Securities and Exchange Commission. We will start today's call with prepared remarks by Greg Levin, our chief executive officer and president; and Tom Houdek, our chief financial officer. After which we will take your questions. And with that, I will turn the call over to Greg.\nGreg?\".\nAdditionally, the historical return of BJRI two weeks prior to the earnings call was [0.007532889490641015, -0.01028031252473316, 0.025810503084957803, 0.0015341895313423226, 0.01685046713680327, 0.007532389585542809, -0.007476076862046321, -0.01807768903124496, -0.015342129415740313, 0.020878721276393675].\nYour goal is to predict whether BJRI's stock price and return will increase or decrease the day after the earnings call.",
+        "task_type": "forecasting",
+        "response": "[0.0586081221616106, 'up']"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.007532889490641015,
+              -0.01028031252473316,
+              0.025810503084957803,
+              0.0015341895313423226,
+              0.01685046713680327,
+              0.007532389585542809,
+              -0.007476076862046321,
+              -0.01807768903124496,
+              -0.015342129415740313,
+              0.020878721276393675
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.0586081221616106,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "143468",
+      "metadata": {
+        "question": "The CFO’s comments during ZI's recent earnings call were: \"quarter 2024. With me on the call today are Henry Schuck, founder, and CEO of ZoomInfo; Cameron Hyzer, our CFO; and Graham O'Brien, who will become our interim CFO. After Henry and Cameron's remarks, we will open the call to Q&A.\nDuring this call, any forward-looking statements are made pursuant to the safe harbor provisions of U.S. securities laws. Expressions of future goals, including business outlook, expectations for future financial performance, and similar items, including, without limitation, expressions using the terminology may, will, expect, anticipate, and believe, and expressions which reflect something other than historical facts are intended to identify forward-looking statements. Forward-looking statements involve a number of risks and uncertainties, including those discussed in the risk factors sections of our SEC filings.\nActual results may differ materially from any forward-looking statements. The company undertakes no obligation to revise or update any forward-looking statements in order to reflect events that may arise after this conference call, except as required by law. For more information, please refer to the forward-looking statements in the slides posted to our investor relations website at ir.zoominfo.com. All metrics on this call are non-GAAP, unless otherwise noted.\nA reconciliation can be found in the financial results press release or in the slides posted to our IR website. With that, I'll turn the call over to Henry.\".\nAdditionally, the historical return of ZI two weeks prior to the earnings call was [0.012163282959555488, -0.05236048726619624, 0.024456563287736932, 0.024756827814572224, -0.024158734191963904, 0.022988440810007615, -0.01815039271270813, -0.02992950785114923, -0.05535395508280694, -0.058597470280356445].\nYour goal is to predict whether ZI's stock price and return will increase or decrease the day after the earnings call.",
+        "id": "143468",
+        "task_type": "forecasting",
+        "response": "[-0.18265305377701246, 'down']",
+        "domain": "Finance"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.012163282959555488,
+              -0.05236048726619624,
+              0.024456563287736932,
+              0.024756827814572224,
+              -0.024158734191963904,
+              0.022988440810007615,
+              -0.01815039271270813,
+              -0.02992950785114923,
+              -0.05535395508280694,
+              -0.058597470280356445
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.18265305377701246,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "154746",
+      "metadata": {
+        "id": "154746",
+        "domain": "Web",
+        "question": "This dataset, sourced from the Kaggle web traffic forecasting competition, contains daily time series data representing the number of hits for 145,063 Wikipedia pages from July 1, 2015, to September 10, 2017. The input Time Series are [3772.0, 3849.0, 2899.0, 2892.0, 4214.0, 3634.0, 3582.0, 3580.0, 3699.0, 3529.0, 2829.0, 2990.0, 3674.0, 8312.0, 3690.0, 6298.0, 3454.0, 2588.0, 2955.0, 4366.0, 4190.0, 3873.0, 3835.0, 3285.0, 2896.0, 3360.0, 5774.0, 5307.0, 7526.0, 4170.0, 3476.0, 2599.0, 2935.0, 3342.0, 3932.0, 3706.0, 3853.0, 4087.0, 3230.0, 3301.0, 4421.0, 3983.0, 4370.0, 3912.0, 3583.0, 3383.0, 4884.0, 5181.0, 5119.0, 4173.0, 8428.0, 13485.0, 7807.0, 5944.0, 8802.0, 6254.0, 4824.0, 3928.0, 4046.0, 2784.0, 3082.0, 3943.0, 3807.0, 4272.0, 4029.0, 3349.0, 2884.0, 2987.0, 3984.0, 4765.0, 4237.0, 3995.0, 3662.0, 2845.0, 3125.0, 3748.0, 4675.0, 4282.0, 4000.0, 3639.0, 2748.0, 3246.0, 4150.0, 3999.0, 3958.0, 3832.0, 3295.0, 2391.0, 3021.0, 4184.0, 3999.0, 4091.0, 3858.0, 3452.0, 2729.0, 3706.0, 4217.0, 4427.0, 4528.0, 4401.0, 3835.0, 3696.0, 3515.0, 4439.0, 4603.0, 4296.0, 4364.0, 3958.0, 20648.0, 6370.0, 4754.0, 5363.0, 5047.0, 4736.0]. Please predict the next 32 time series point given information above.",
+        "task_type": "forecasting",
+        "response": "Based on the given information, the predictions are [4240.0, 3307.0, 3570.0, 5162.0, 5122.0, 5064.0, 4788.0, 4131.0, 2711.0, 3541.0, 5069.0, 5038.0, 5173.0, 5256.0, 4620.0, 3517.0, 4151.0, 5770.0, 6258.0, 10381.0, 7562.0, 4830.0, 3132.0, 3741.0, 5643.0, 5379.0, 4879.0, 4566.0, 4132.0, 3261.0, 3336.0, 4814.0]."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 114,
+            "serie": [
+              3772.0,
+              3849.0,
+              2899.0,
+              2892.0,
+              4214.0,
+              3634.0,
+              3582.0,
+              3580.0,
+              3699.0,
+              3529.0,
+              2829.0,
+              2990.0,
+              3674.0,
+              8312.0,
+              3690.0,
+              6298.0,
+              3454.0,
+              2588.0,
+              2955.0,
+              4366.0,
+              4190.0,
+              3873.0,
+              3835.0,
+              3285.0,
+              2896.0,
+              3360.0,
+              5774.0,
+              5307.0,
+              7526.0,
+              4170.0,
+              3476.0,
+              2599.0,
+              2935.0,
+              3342.0,
+              3932.0,
+              3706.0,
+              3853.0,
+              4087.0,
+              3230.0,
+              3301.0,
+              4421.0,
+              3983.0,
+              4370.0,
+              3912.0,
+              3583.0,
+              3383.0,
+              4884.0,
+              5181.0,
+              5119.0,
+              4173.0,
+              8428.0,
+              13485.0,
+              7807.0,
+              5944.0,
+              8802.0,
+              6254.0,
+              4824.0,
+              3928.0,
+              4046.0,
+              2784.0,
+              3082.0,
+              3943.0,
+              3807.0,
+              4272.0,
+              4029.0,
+              3349.0,
+              2884.0,
+              2987.0,
+              3984.0,
+              4765.0,
+              4237.0,
+              3995.0,
+              3662.0,
+              2845.0,
+              3125.0,
+              3748.0,
+              4675.0,
+              4282.0,
+              4000.0,
+              3639.0,
+              2748.0,
+              3246.0,
+              4150.0,
+              3999.0,
+              3958.0,
+              3832.0,
+              3295.0,
+              2391.0,
+              3021.0,
+              4184.0,
+              3999.0,
+              4091.0,
+              3858.0,
+              3452.0,
+              2729.0,
+              3706.0,
+              4217.0,
+              4427.0,
+              4528.0,
+              4401.0,
+              3835.0,
+              3696.0,
+              3515.0,
+              4439.0,
+              4603.0,
+              4296.0,
+              4364.0,
+              3958.0,
+              20648.0,
+              6370.0,
+              4754.0,
+              5363.0,
+              5047.0,
+              4736.0
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 32,
+            "serie": [
+              4240.0,
+              3307.0,
+              3570.0,
+              5162.0,
+              5122.0,
+              5064.0,
+              4788.0,
+              4131.0,
+              2711.0,
+              3541.0,
+              5069.0,
+              5038.0,
+              5173.0,
+              5256.0,
+              4620.0,
+              3517.0,
+              4151.0,
+              5770.0,
+              6258.0,
+              10381.0,
+              7562.0,
+              4830.0,
+              3132.0,
+              3741.0,
+              5643.0,
+              5379.0,
+              4879.0,
+              4566.0,
+              4132.0,
+              3261.0,
+              3336.0,
+              4814.0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "147611",
+      "metadata": {
+        "question": "The CFO’s comments during RELY's recent earnings call were: \"founder and chief executive officer of Remitly; and Hemanth Munipalli, our chief financial officer. Our results and additional management commentary are available in our earnings release, presentation slides, which can be found at ir.remitly.com.\nPlease note that this call will be simultaneously webcast on the investor relations website. Before we start, I would like to remind you that we'll be making forward-looking statements within the meaning of Federal Securities laws, including but not limited to statements regarding Remitly's future financial results and management's expectations and plans. These statements are neither promises nor guarantees and involve risks and uncertainties that may cause actual results to vary materially from those presented here. You should not place undue reliance on any forward-looking statements.\nPlease refer to our earnings release and SEC filings for more information regarding the risk factors that may affect our results. Any forward-looking statements made in this conference call, including responses to your questions, are based on current expectations as of today, and Remitly assumes no obligation to update or revise them, whether as a result of new developments or otherwise, except as required by law. The following presentation contains non-GAAP financial measures. For a reconciliation of these non-GAAP financial measures to the most directly comparable GAAP metric, please see our earnings press release, and the appendix to our earnings presentation, which are available on the IR section of our website.\nNow, I will turn the call over to Matt to begin.\".\nAdditionally, the historical return of RELY two weeks prior to the earnings call was [0.0005379359225257119, -0.004838717781831536, -0.005942766558150847, 0.023913072998898333, -0.02176219979254035, -0.0358111685558008, 0.01631958360766461, -0.00885934950960754, -0.003910597559552698, -0.016264666821065976].\nYour goal is to predict whether RELY's stock price and return will increase or decrease the day after the earnings call.",
+        "id": "147611",
+        "task_type": "forecasting",
+        "domain": "Finance",
+        "response": "[-0.12200690908189338, 'down']"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.0005379359225257119,
+              -0.004838717781831536,
+              -0.005942766558150847,
+              0.023913072998898333,
+              -0.02176219979254035,
+              -0.0358111685558008,
+              0.01631958360766461,
+              -0.00885934950960754,
+              -0.003910597559552698,
+              -0.016264666821065976
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.12200690908189338,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "147688",
+      "metadata": {
+        "id": "147688",
+        "question": "This dataset, sourced from the Kaggle web traffic forecasting competition, contains daily time series data representing the number of hits for 145,063 Wikipedia pages from July 1, 2015, to September 10, 2017. The input Time Series are [3587.0, 3793.0, 3226.0, 3330.0, 3284.0, 3626.0, 3541.0, 3892.0, 3850.0, 3321.0, 3342.0, 4316.0, 5967.0, 4620.0, 3869.0, 3597.0, 3390.0, 3254.0, 3838.0, 4464.0, 3996.0, 3658.0, 3463.0, 3355.0, 3101.0, 3180.0, 3630.0, 3380.0, 3062.0, 3263.0, 2917.0, 2891.0, 3212.0, 3096.0, 3878.0, 3537.0, 3378.0, 4285.0, 3372.0, 3349.0, 3546.0, 3615.0, 3322.0, 3968.0, 3689.0, 3178.0, 3567.0, 5483.0, 3651.0, 3562.0, 3603.0, 3562.0, 3612.0, 3882.0, 4601.0, 5644.0, 4937.0, 4444.0, 3927.0, 3552.0, 3802.0, 4766.0, 4562.0, 4151.0, 3967.0, 3476.0, 3399.0, 3334.0, 3430.0, 3473.0, 3623.0, 3854.0, 4163.0, 3851.0, 3690.0, 3982.0, 3922.0, 3830.0, 3732.0, 4048.0, 6753.0, 6711.0, 9429.0, 9927.0, 18278.0, 11145.0, 11046.0, 7267.0, 6987.0, 6662.0, 6093.0, 6981.0, 5945.0, 5162.0, 10137.0, 5443.0, 5637.0, 5468.0, 8124.0, 9319.0, 7011.0, 6166.0, 6325.0, 6490.0, 6028.0, 7224.0, 7567.0, 5899.0, 5193.0, 5780.0, 5560.0, 5528.0, 6753.0, 6569.0, 5624.0, 5054.0, 5559.0, 6291.0, 5380.0, 5671.0, 5731.0, 5011.0, 4707.0, 4885.0, 5073.0, 4523.0, 5598.0, 4951.0, 4585.0, 4571.0, 4510.0, 4743.0, 4753.0, 5450.0, 5562.0, 4392.0, 4861.0, 4741.0, 5314.0, 5521.0, 5289.0, 5232.0, 4244.0, 4421.0, 4508.0, 4399.0, 3838.0, 4767.0, 3869.0, 3498.0, 4393.0, 4194.0, 4480.0, 5025.0]. Please predict the next 31 time series point given information above.",
+        "response": "Based on the given information, the predictions are [5525.0, 4991.0, 5442.0, 3901.0, 4154.0, 4484.0, 4679.0, 7585.0, 6104.0, 4891.0, 4649.0, 4887.0, 4965.0, 4381.0, 4250.0, 4811.0, 4689.0, 3826.0, 4354.0, 4252.0, 4052.0, 4660.0, 4218.0, 2947.0, 3708.0, 4217.0, 4740.0, 4341.0, 4259.0, 3400.0, 3852.0].",
+        "task_type": "forecasting",
+        "domain": "Web"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 154,
+            "serie": [
+              3587.0,
+              3793.0,
+              3226.0,
+              3330.0,
+              3284.0,
+              3626.0,
+              3541.0,
+              3892.0,
+              3850.0,
+              3321.0,
+              3342.0,
+              4316.0,
+              5967.0,
+              4620.0,
+              3869.0,
+              3597.0,
+              3390.0,
+              3254.0,
+              3838.0,
+              4464.0,
+              3996.0,
+              3658.0,
+              3463.0,
+              3355.0,
+              3101.0,
+              3180.0,
+              3630.0,
+              3380.0,
+              3062.0,
+              3263.0,
+              2917.0,
+              2891.0,
+              3212.0,
+              3096.0,
+              3878.0,
+              3537.0,
+              3378.0,
+              4285.0,
+              3372.0,
+              3349.0,
+              3546.0,
+              3615.0,
+              3322.0,
+              3968.0,
+              3689.0,
+              3178.0,
+              3567.0,
+              5483.0,
+              3651.0,
+              3562.0,
+              3603.0,
+              3562.0,
+              3612.0,
+              3882.0,
+              4601.0,
+              5644.0,
+              4937.0,
+              4444.0,
+              3927.0,
+              3552.0,
+              3802.0,
+              4766.0,
+              4562.0,
+              4151.0,
+              3967.0,
+              3476.0,
+              3399.0,
+              3334.0,
+              3430.0,
+              3473.0,
+              3623.0,
+              3854.0,
+              4163.0,
+              3851.0,
+              3690.0,
+              3982.0,
+              3922.0,
+              3830.0,
+              3732.0,
+              4048.0,
+              6753.0,
+              6711.0,
+              9429.0,
+              9927.0,
+              18278.0,
+              11145.0,
+              11046.0,
+              7267.0,
+              6987.0,
+              6662.0,
+              6093.0,
+              6981.0,
+              5945.0,
+              5162.0,
+              10137.0,
+              5443.0,
+              5637.0,
+              5468.0,
+              8124.0,
+              9319.0,
+              7011.0,
+              6166.0,
+              6325.0,
+              6490.0,
+              6028.0,
+              7224.0,
+              7567.0,
+              5899.0,
+              5193.0,
+              5780.0,
+              5560.0,
+              5528.0,
+              6753.0,
+              6569.0,
+              5624.0,
+              5054.0,
+              5559.0,
+              6291.0,
+              5380.0,
+              5671.0,
+              5731.0,
+              5011.0,
+              4707.0,
+              4885.0,
+              5073.0,
+              4523.0,
+              5598.0,
+              4951.0,
+              4585.0,
+              4571.0,
+              4510.0,
+              4743.0,
+              4753.0,
+              5450.0,
+              5562.0,
+              4392.0,
+              4861.0,
+              4741.0,
+              5314.0,
+              5521.0,
+              5289.0,
+              5232.0,
+              4244.0,
+              4421.0,
+              4508.0,
+              4399.0,
+              3838.0,
+              4767.0,
+              3869.0,
+              3498.0,
+              4393.0,
+              4194.0,
+              4480.0,
+              5025.0
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 31,
+            "serie": [
+              5525.0,
+              4991.0,
+              5442.0,
+              3901.0,
+              4154.0,
+              4484.0,
+              4679.0,
+              7585.0,
+              6104.0,
+              4891.0,
+              4649.0,
+              4887.0,
+              4965.0,
+              4381.0,
+              4250.0,
+              4811.0,
+              4689.0,
+              3826.0,
+              4354.0,
+              4252.0,
+              4052.0,
+              4660.0,
+              4218.0,
+              2947.0,
+              3708.0,
+              4217.0,
+              4740.0,
+              4341.0,
+              4259.0,
+              3400.0,
+              3852.0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "151158",
+      "metadata": {
+        "question": "The CFO’s comments during DDD's recent earnings call were: \"quarter 2023 conference call. With me on today's call are Dr. Jeffrey Graves, president and chief executive officer; and Andrew Johnson, executive vice president and interim chief financial officer. The webcast portion of this call contains a slide presentation that we will refer to during the call.\nThose following along on the phone who wish to access the slide portion of this presentation may do so on the Investor Relations section of our website. The following discussion and responses to your questions reflect management's views as of today only and will include forward-looking statements as described on this slide. Actual results may differ materially. Additional information about factors that could potentially impact our financial results is included in this morning's press release and our recent filings with the SEC, including our most recent annual report on Form 10-K and quarterly reports on Form 10-Q.\nDuring this call, we will discuss certain non-GAAP financial measures. In our press release and slides accompanying this webcast, you will find additional disclosures regarding these non-GAAP measures, including reconciliations with comparable GAAP measures. Finally, unless otherwise stated, all comparisons in this call will be against our results for the comparable period of 2022. With that, I'll turn the call over to our CEO, Jeff Graves, for opening remarks.\".\nAdditionally, the historical return of DDD two weeks prior to the earnings call was [-0.06361323047159251, -0.0326087287502157, 0.042134858926518914, 0.005390830382983713, -0.018766738038833997, 0.11202187874747915, 0.07616705889547881, -0.0319635478686795, -0.004716976888241464, 0.026066383645343416].\nYour goal is to predict whether DDD's stock price and return will increase or decrease the day after the earnings call.",
+        "id": "151158",
+        "response": "[-0.04387992160929133, 'down']",
+        "task_type": "forecasting",
+        "domain": "Finance"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.06361323047159251,
+              -0.0326087287502157,
+              0.042134858926518914,
+              0.005390830382983713,
+              -0.018766738038833997,
+              0.11202187874747915,
+              0.07616705889547881,
+              -0.0319635478686795,
+              -0.004716976888241464,
+              0.026066383645343416
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.04387992160929133,
+              "down"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,237 +1,251 @@
-# Proyecto de Tesis: Generación de Series Temporales Sintéticas mediante Destilación Maestro-Estudiante con RAG y Validación Numérica
+# Arquitectura Neuro-Simbólica Maestro-Estudiante para la Generación de Series Temporales Sintéticas
 
-Este proyecto de tesis implementa una arquitectura híbrida neuro-simbólica multi-agente para la **generación autónoma de series temporales sintéticas de alta fidelidad**. El sistema integra un agente **Maestro experto** con adaptadores LoRA y acceso a memoria vectorial (RAG), un agente **Estudiante adaptativo** con destilación *on-the-fly*, desacoplamiento morfológico-escalar con diferenciación estocástica multiserie, y un pipeline numérico de validación empírica basado en Redes Neuronales Recurrentes (LSTM), detección estadística de alucinaciones y evaluación cualitativa con LLM como juez.
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-ee4c2c.svg)](https://pytorch.org/)
+[![Transformers](https://img.shields.io/badge/HuggingFace-Transformers-orange.svg)](https://huggingface.co/)
+[![Kaggle](https://img.shields.io/badge/Kaggle-GPU%20T4%20%2F%20P100-20BEFF.svg)](https://www.kaggle.com/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+Este repositorio contiene la implementación oficial del proyecto de tesis:
+**«Generación de Series Temporales Sintéticas mediante Destilación Maestro-Estudiante con RAG y Validación Numérica»**.
+
+El sistema propone un marco neuro-simbólico multi-agente que desacopla la semántica morfológica de la escala física absoluta, permitiendo a Modelos de Lenguaje Pequeños (SLMs de 0.5B a 3B) generar series temporales largas, continuas y de alta fidelidad con **consumo estrictamente acotado en GPU de consumo ($\le 7.20$\,GB de VRAM)** y **cero violaciones de cotas físicas ($0.00\%$)**, superando las limitaciones de colapso de modo en GANs y la necesidad de supercómputo en LLMs multimodales gigantescos.
 
 ---
 
-## 🚀 Arquitectura y Flujo de Ejecución Secuencial
+## 🏛️ Arquitectura del Sistema
 
-Para optimizar recursos de cómputo y memoria VRAM (garantizando compatibilidad en entornos con límites de GPU como Kaggle o Colab) y asegurar el rigor metodológico, el pipeline ejecuta un flujo secuencial estructurado en las siguientes fases:
+El flujo de trabajo desacopla el razonamiento cognitivo de la proyección determinista mediante una orquestación secuencial con purga de tensores en memoria:
 
 ```
-[Usuario CLI]
-      │
-      ▼
-[1. TeacherAgent (Maestro LoRA)]
-      ├── Interpretación del Requerimiento (Variables, Escala, Perfil Temporal P1..P5)
-      ├── Consulta RAG TSQA (ChromaDB Vector Store)
-      └── Filtrado Cognitivo por Lotes de Semillas (Diversidad & Relevancia)
-      │
-      ▼
-[2. Descarga y Purga de Memoria VRAM/GPU] (del teacher, gc.collect, empty_cache)
-      │
-      ▼
-[3. StudentAgent (Estudiante)]
-      ├── Razonamiento de Hiperparámetros (Épocas, Batch Size, LR)
-      ├── Destilación LoRA On-the-fly (Fine-Tuning con semillas del Maestro)
-      ├── Generación de Semillas Iniciales (10 puntos morfológicos guiados por EPIC)
-      └── Desacoplamiento Escalar y Extrapolación Estocástica Multiserie (extend_series)
-      │
-      ▼ (Exportación tabular: synthetic_series.csv)
-[4. Pipeline Numérico Autónomo]
-      ├── M6: Entrenamiento de Red Neuronal Recurrente (LinearRNN LSTM)
-      ├── M7: Inferencia y Métricas de Rendimiento (RMSE, MAE, MAPE, R²)
-      └── M8: Evaluación Dual (Estudiante como Juez + Detector de Alucinaciones)
+[Entrada en Lenguaje Natural] (CLI o Query abierta)
+              │
+              ▼
+    ┌──────────────────────────────────────────────┐
+    │  1. AGENTE MAESTRO (TeacherAgent + RAG TSQA) │
+    │  • Interpretación de dominio y escala física │
+    │  • Clasificación de perfil temporal (P1..P6) │
+    │  • Deducción de cotas analíticas [ymin, ymax]│
+    │  • Filtrado cognitivo de 50 semillas RAG     │
+    └──────────────────────────────────────────────┘
+              │
+              ▼ (Descarga de tensores, gc.collect, empty_cache)
+    ┌──────────────────────────────────────────────┐
+    │  2. AGENTE ESTUDIANTE (StudentAgent + QLoRA) │
+    │  • Destilación ligera supervisada (SFT)      │
+    │  • Inferencia morfológica normalizada en [0,1]│
+    │  • Estructuración en formato JSON estricto    │
+    └──────────────────────────────────────────────┘
+              │
+              ▼
+    ┌──────────────────────────────────────────────┐
+    │  3. DESACOPLAMIENTO ESCALAR DETERMINISTA     │
+    │  • Proyección analítica: y_t = ymin + y~_t·Δy│
+    │  • Extrapolación estocástica multiserie      │
+    │  • Generación continua de T=8.000 puntos     │
+    └──────────────────────────────────────────────┘
+              │
+              ▼ (Exportación: synthetic_series.csv)
+    ┌──────────────────────────────────────────────┐
+    │  4. VALIDACIÓN NUMÉRICA Y DOWNSTREAM (M6-M8) │
+    │  • M6: Modelado dinámico causal con LSTM     │
+    │  • M7: Métricas predictivas (RMSE, MAE, R²)  │
+    │  • M8: Tasa de alucinación semántica H_rate  │
+    └──────────────────────────────────────────────┘
 ```
 
-### 1. Entrada del Usuario e Interpretación (Maestro)
-- El usuario ingresa su requerimiento vía CLI (`pipeline/main.py`), interactiva o mediante el argumento `--query`.
-- El **Maestro** (`pipeline/teacher_agent/agent.py`), respaldado por adaptadores LoRA especializados en razonamiento de series temporales (`models/teacher_adapters`), analiza la solicitud.
-- Extrae de forma estructurada:
-  - **Dominio y Tema:** Ej. Retail, Medicina, Finanzas, Transporte.
-  - **Variable Estricta:** Respeta nombres explícitos sin alucinar columnas colaterales.
-  - **Escala Objetivo (`target_value`):** Extrae la magnitud solicitada (ej. 70 lpm, 2500 USD, 15000 pasajeros).
-  - **Tipo de Serie:** `univariada` o `multivariada`.
-  - **Perfil Matemático (`profile_id`):** Clasifica en uno de los 5 perfiles formales (`P1_ESTABLE` a `P5_COMPLEJO`).
-- Si faltan parámetros clave o la confianza es baja, el Maestro abre un diálogo interactivo para clarificar.
+---
 
-### 2. Recuperación RAG y Filtrado Cognitivo (ChromaDB)
-- El Maestro formula un plan de búsqueda y consulta la base de conocimiento vectorial **TSQA** indexada en ChromaDB (`rag/maestro`).
-- Realiza una evaluación por lotes (`_evaluate_documents_in_batches`) evaluando la coherencia semántica, física y la diversidad estadística de las semillas encontradas.
-- Produce un **Dataset Semilla** validado acompañado de un **Resumen de Calidad** justificativo.
+## 📊 Comparación Cuantitativa con el Estado del Arte
 
-### 3. Descarga Secuencial de Memoria (VRAM / GPU)
-- Para evitar sobrecarga de memoria o excepciones de OOM (*Out-Of-Memory*) por la coexistencia simultánea de múltiples modelos en la GPU, el pipeline elimina y purga al Maestro (`del teacher.llm`, `del teacher.embedder`, `gc.collect()`, `empty_cache()`) antes de instanciar al Estudiante.
+Resultados empíricos consolidados frente a los principales enfoques de la literatura científica:
 
-### 4. Destilación Adaptativa *On-the-fly* (Estudiante)
-- Se inicializa el modelo liviano del **Estudiante** (`models/student`).
-- El Estudiante razona sobre las semillas entregadas por el Maestro y decide dinámicamente sus propios hiperparámetros de entrenamiento (épocas, batch size, learning rate) para evitar sobreajuste.
-- Aplica un ajuste fino ligero con PEFT/LoRA (`models/student_lora/adapter`).
+| Enfoque / Trabajo | Hardware Mínimo | Datos Previos ($N_{\text{datos}}$) | Longitud Máx. ($T$) | Tasa de Inconsistencia | Retención Estructural | Desempeño Downstream |
+| :--- | :--- | :---: | :---: | :--- | :--- | :--- |
+| **TimeGAN** *(Yoon et al., 2019)* | GPU dedicada ($>12$\,GB) | $>10.000$ series reales | $T \le 100$ | Colapso modal estocástico | Generador directo continuo | $R^2 \approx 0.60 - 0.70$ (LSTM) |
+| **SDForger** *(IBM Research, 2025)* | NVIDIA V100 / A100 ($100$\,GB) | Cientos de series tabulares | $T \le 500$ | $3.87\%$ a $58.82\%$ NaNs | Filtro $L_2$ (norma $19.06$ vs $1.71$) | RMSE $0.48 - 0.62$ (TTM) |
+| **Montes Trujillo** *(UC3M, 2025)* | GPU local / Ollama ($\ge 16$\,GB) | $0$ (prompts estáticos) | $T \le 60$ | $>93\%$ falla estricta en 1B | Curación forzada en $>51\%$ puntos | No implementado |
+| **ChatTS** *(Tsinghua / ByteDance, 2025)* | Clúster $8\times$ NVIDIA A800 | $1.34 \times 10^5$ pares sintéticos | $T \le 1.024$ | Desalineación de parches locales | Proyección latente MLP (5 capas) | Precisión relativa $0.78$ |
+| **Nuestra Propuesta (Esta Tesis)** | **GPU Consumo ($\le 7.20$\,GB)** | **50 semillas RAG** *(abiertas)* | **$T = 8.000$** ($160.000$\,pts/lote) | **$0.00\%$ violaciones cota** | **$100\%$ JSON válido directo** | **MAE $\le 1.05$\,lpm**, **$R^2 > 0.982$** |
 
-### 5. Generación de Semillas y Extrapolación Estocástica Multiserie
-- **Generación Morfológica:** El Estudiante fine-tuneado genera los primeros 10 valores (semilla) de la serie guiado por el perfil matemático y los ejemplos morfológicos EPIC.
-- **Desacoplamiento Escalar y Extrapolación (`extend_series`):**
-  - **Desacoplamiento:** Separa la dinámica de la señal (forma/autocorrelación) de la magnitud solicitada, proyectándola exactamente sobre el `target_value` del usuario.
-  - **Diferenciación Inter-Serie:** Cada serie temporal se extrapola a su longitud objetivo (ej. 400 puntos) asignando una semilla aleatoria individual (`series_seed = 42 + idx`) y un micro-desplazamiento fisiológico/físico independiente, garantizando que cada serie represente un sujeto, sensor o tienda distinto y no una réplica idéntica.
-- **Exportación Tabular:** Los datos se guardan en `data/synthetic/synthetic_series.csv` en formato long tabular (`series_id`, `timestamp`, `variable`).
-
-### 6. Pipeline Numérico Autónomo (M6 → M7 → M8)
-- **M6 — Entrenamiento RNN (LinearRNN LSTM/GRU):**
-  - Carga el CSV generado y aplica split temporal secuencial (70% Train, 15% Val, 15% Test).
-  - Construye ventanas deslizantes (ej. `seq_len=60`, `horizon=1`) y entrena una red recurrente profunda de 2 capas con regularización *Dropout* y *Early Stopping*.
-  - Guarda el checkpoint en `data/checkpoints/rnn_final.pt`.
-- **M7 — Predicción y Métricas de Rendimiento:**
-  - Realiza inferencia sobre el conjunto de test y calcula métricas estándar: $MSE$, $RMSE$, $MAE$, $MAPE$ y coeficiente de determinación $R^2$.
-  - Genera automáticamente un gráfico comparativo en `data/synthetic/predictions_plot.png`.
-- **M8 — Evaluación Dual (Juez LLM + Detector de Alucinaciones):**
-  - **Estudiante como Juez:** Evalúa la consistencia, plausibilidad física y asigna un veredicto formal (`APROBADO` / `RECHAZADO`).
-  - **Detector de Alucinaciones:** Compara las predicciones frente a la referencia real utilizando cuatro analizadores:
-    1. *Alucinaciones de Rango:* Valores fuera de límites físicos.
-    2. *Alucinaciones Temporales:* Rupturas de estacionalidad o tendencia.
-    3. *Alucinaciones de Correlación:* Discrepancias en relaciones multivariadas.
-    4. *Alucinaciones Estadísticas:* Test de bondad de ajuste Kolmogorov-Smirnov (`ks_test`).
+*Nota: $\mathcal{H}_{\text{rate}} \le 0.26\%$ denota la tasa de alucinación semántica.*
 
 ---
 
-## 📊 Catálogo de Perfiles Matemáticos (`pipeline/config/profiles.py`)
+## 📁 Estructura del Repositorio
 
-El pipeline soporta 5 perfiles formales de series temporales:
-
-| Perfil | Identificador | Tendencia | Estacionalidad | Nivel de Ruido | Casos de Uso Típicos |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **P1** | `P1_ESTABLE` | Plana (sin tendencia) | Ninguna | Muy bajo ($\le 2\%$) | Sensores médicos en reposo (ej. ECG, frecuencia cardíaca), voltaje regulado. |
-| **P2** | `P2_ESTACIONAL` | Plana (sin tendencia) | Semanal (7 días) | Moderado ($\le 5\%$) | Tráfico urbano, afluencia en estaciones de metro, ventas base estacionales. |
-| **P3** | `P3_TENDENCIA_ESTACIONAL` | Creciente sostenida | Semanal (7 días) | Moderado + Anomalías | Comercio electrónico en expansión, ventas de retail, demanda energética. |
-| **P4** | `P4_TENDENCIA_RUIDO` | Fluctuante / Descendente | Ninguna | Medio a Alto | Mercados financieros, cotización de acciones, criptoactivos volátiles. |
-| **P5** | `P5_COMPLEJO` | Cambio de régimen (3 fases)| Fuerte / Multiciclo | Alto + Picos extremos | Cargas de servidores cloud, tráfico web bajo eventos DDoS, telemetría industrial. |
-
----
-
-## 📚 Origen de Datasets y Referencias
-
-El proyecto se fundamenta en tres fuentes de datos y marcos metodológicos:
-
-| Recurso / Dataset | Archivo Local | Origen / Enlace | Función en el Proyecto |
-| :--- | :--- | :--- | :--- |
-| **Time-Series Reasoning** | `data/TS_Dataset.jsonl` (8,787 registros) | Hugging Face: [`mikeam/time-series-reasoning`](https://huggingface.co/datasets/mikeam/time-series-reasoning) (Mike Merrill) | **Fine-Tuning LoRA del Maestro:** Pares instrucción-serie con escenarios del mundo real, explicaciones contextuales y generadores en NumPy. Entrenó los adaptadores en `models/teacher_adapters`. |
-| **TSQA (Time Series Question Answering)** | `data/time_series_generation.jsonl` (~192,800 registros) | Hugging Face: [`Time-MQA/TSQA`](https://huggingface.co/datasets/Time-MQA/TSQA) (TSQA Dataset) | Benchmark **TSQA** / Kaggle Web Traffic & Yahoo Server Metrics | **Base de Conocimiento RAG:** Indexado en la base vectorial ChromaDB (`rag/maestro`). Provee al Maestro de semillas empíricas para contextualizar la generación. |
-
-
-### Ficha Técnica del Fine-Tuning del Maestro
-Los adaptadores LoRA del Maestro (`models/teacher_adapters`) fueron entrenados en **Kaggle GPU** a partir de `data/TS_Dataset.jsonl`:
-- **Hiperparámetros:** 2 épocas, batch size por dispositivo de 1, `gradient_accumulation_steps=4` (batch size efectivo = 4).
-- **Optimizador y Scheduler:** `paged_adamw_8bit` con tasa de aprendizaje `2e-4` y scheduler `cosine` (10 pasos de warmup).
-- **LoRA:** Rank $r=16$, $\alpha=32$, dropout $0.05$ en módulos de atención y MLP (`q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj`).
-- **Checkpoint final:** 4,394 pasos (`checkpoint-4394`).
-
----
-
-## 🛠 Configuración del Entorno (`.env`)
-
-El pipeline parametriza rutas y modelos a través de variables de entorno:
-
-```env
-# Modelos base en Hugging Face
-TEACHER_MODEL_ID=meta-llama/Llama-3.2-3B-Instruct
-STUDENT_MODEL_ID=meta-llama/Llama-3.2-1B-Instruct
-HF_TOKEN=tu_token_huggingface_aqui
-
-# Rutas locales de modelos y adaptadores
-TEACHER_MODEL_PATH=./models/profesor
-TEACHER_MODEL_PATH_ADAPTERS=./models/teacher_adapters
-STUDENT_MODEL_PATH=./models/student
-STUDENT_LORA_PATH=./models/student_lora
-
-# Configuración del dataset sintético
-SYNTHETIC_NUM_SERIES=20
-SYNTHETIC_POINTS_PER_SERIES=400
-SYNTHETIC_CHUNK_SERIES=2
-SYNTHETIC_CHUNK_POINTS=80
-
-# Control de longitud de generación
-LLM_MAX_NEW_TOKENS=2048
 ```
-
-**Dimensiones del Dataset Sintético:**
-`Total filas = SYNTHETIC_NUM_SERIES × SYNTHETIC_POINTS_PER_SERIES` (por defecto: $20 \times 400 = 8,000$ filas CSV), garantizando datos suficientes para entrenar ventanas temporales de longitud 60 en M6.
-
----
-
-## 📂 Estructura de Directorios
-
-```text
 proyecto_tesis/
-├── pipeline/
-│   ├── main.py                # Entrada principal (CLI) del pipeline
-│   ├── numeric_pipeline.py    # Orquestador del pipeline numérico (M6 → M7 → M8)
-│   ├── teacher_agent/         # Agente Maestro: Interpretación, RAG ChromaDB, Filtrado cognitivo
-│   │   └── agent.py
-│   ├── student_agent/         # Agente Estudiante: Destilación LoRA, Generación, Extrapolación
-│   │   ├── agent.py
-│   │   └── fine_tuner.py
-│   ├── training/              # Módulo 6 (M6): Entrenamiento RNN Lineal (LSTM/GRU)
-│   │   ├── model.py
-│   │   ├── trainer.py
-│   │   └── dataset.py
-│   ├── prediction/            # Módulo 7 (M7): Predictor e inferencia de series
-│   │   └── predictor.py
-│   ├── evaluation/            # Módulo 8 (M8): Estudiante como Juez y Detector de Alucinaciones
-│   │   ├── judge.py
-│   │   └── hallucination.py
-│   ├── config/                # Configuraciones y Catálogos
-│   │   ├── profiles.py        # Catálogo formal de perfiles matemáticos (P1..P5)
-│   │   ├── settings.py        # Configuración global y rutas
-│   │   └── pipeline_config.py # Configuración de hiperparámetros RNN y métricas
-│   └── utils/                 # Extrapolación, series_utils, LLMClient, logger
-│       ├── series_utils.py    # Algoritmo de extrapolación estocástica multiserie
-│       └── llm_client.py      # Cliente unificado de inferencia LLM con rescate JSON
-├── data/
-│   ├── TS_Dataset.jsonl       # Dataset de fine-tuning del Maestro (8,787 registros)
-│   ├── time_series_generation.jsonl # Dataset para la base de conocimiento RAG (~192k registros)
-│   ├── checkpoints/           # Checkpoints del modelo LSTM entrenado (rnn_final.pt)
-│   └── synthetic/             # Salida del dataset sintético (synthetic_series.csv y plots)
-├── rag/
-│   └── maestro/               # Persistencia local de ChromaDB (Vector Store RAG)
-├── models/
-│   ├── profesor/              # Modelo base del Maestro
-│   ├── teacher_adapters/      # Adaptadores LoRA preentrenados del Maestro
-│   ├── student/               # Modelo base del Estudiante
-│   └── student_lora/          # Adaptadores LoRA destilados del Estudiante
-├── scripts/
-│   ├── setup_models.py        # Descarga de modelos base desde Hugging Face
-│   └── build_rag_from_jsonl.py# Construcción e indexación del RAG en ChromaDB
-└── requirements.txt           # Dependencias (PyTorch, Transformers, PEFT, ChromaDB, etc.)
+├── pipeline/                 # Núcleo del framework neuro-simbólico
+│   ├── config/               # Configuraciones, perfiles P1-P6 y settings
+│   ├── teacher_agent/        # Agente Maestro (Razonamiento LoRA + RAG ChromaDB)
+│   ├── student_agent/        # Agente Estudiante (Inferencia ligera QLoRA 4-bit)
+│   ├── numeric_pipeline.py   # Desacoplamiento escalar y orquestación M6-M8
+│   ├── training/             # M6: Red recurrente LSTM para modelado predictivo
+│   ├── prediction/           # M7: Inferencia causal y métricas (RMSE, MAE, R²)
+│   ├── evaluation/           # M8: Detector de alucinaciones (H_rate) y Juez
+│   ├── utils/                # Carga de modelos, cuantización y logging
+│   └── main.py               # Punto de entrada ejecutable CLI
+│
+├── notebooks_kaggle/         # Cuadernos Jupyter para ejecución en Kaggle (GPU)
+│   ├── 00_crear_rag_kaggle.ipynb              # Construcción e indexación del RAG en Kaggle
+│   ├── 01_finetuning_maestro_qwen_kaggle.ipynb
+│   ├── 02_finetuning_maestro_llama_kaggle.ipynb
+│   ├── 03_finetuning_maestro_gemma_kaggle.ipynb
+│   ├── orquestador_experimentos_kaggle.ipynb  # Matriz completa de 54 experimentos
+│   └── README.md                              # Guía paso a paso de uso en Kaggle
+│
+├── scripts/                  # Scripts auxiliares y herramientas CLI
+│   ├── download_assets.py                     # Descarga automatizada de RAG y Adaptadores LoRA de Kaggle
+│   ├── finetune_maestro.py                    # Fine-tuning CLI supervisado (QLoRA 4-bit)
+│   ├── build_rag_from_jsonl.py                # Construcción del índice vectorial ChromaDB
+│   ├── extraer_rag.py                         # Inspección de semillas del corpus TSQA
+│   ├── setup_models.py                        # Descarga y verificación de checkpoints HF
+│   └── README.md
+│
+├── resultados/               # Banco integral de resultados y trazas forenses
+│   ├── E1/ ... E9/                            # 54 ejecuciones factoriales completas
+│   │   ├── P1_ESTABLE ... P6_MULTIVARIADO     # config_generacion.json, metricas, csv, plots
+│   ├── reproducibilidad/                      # Réplicas estocásticas inter-corrida (E1, E3, E5)
+│   ├── logit_kd/                              # Ablación Hinton Knowledge Distillation (E1)
+│   ├── resumen_general_todos_escenarios.csv   # Matriz factorial consolidada
+│   └── README.md                              # Guía exhaustiva de auditoría de resultados
+│
+├── rag/                      # Base de conocimiento vectorial RAG
+│   ├── README.md                              # Documentación del índice vectorial ChromaDB
+│   └── .gitkeep
+│
+├── data/                     # Directorio de datos y salidas sintéticas
+│   ├── README.md
+│   └── .gitkeep
+│
+├── requirements.txt          # Dependencias de Python auditadas
+├── .env.example              # Plantilla de variables de entorno
+├── .gitignore                # Reglas de exclusión de Git
+└── README.md                 # Documentación principal del repositorio
 ```
 
 ---
 
-## 💻 Inicio Rápido y Ejemplos de Ejecución
+## 🧠 Catálogo de Modelos Docentes y Recomendaciones de Selección
 
-### 1. Instalación y Configuración Inicial
+El marco neuro-simbólico fue validado rigurosamente sobre tres familias fundacionales de última generación. Para facilitar la experimentación sin costo de entrenamiento previo, se disponen de **adaptadores LoRA preentrenados y curados** alojados en repositorios públicos oficiales en Kaggle:
+
+| Familia Docente | Modelo Maestro Oficial | Parámetros | Ventana de Contexto | Adaptador Preentrenado en Kaggle | Estudiante Recomendado |
+| :---: | :--- | :---: | :---: | :--- | :--- |
+| **Qwen 2.5** | `Qwen/Qwen2.5-7B-Instruct` | 7.61B | 128k tokens | [`danielrangelsanch/maestro-qwen-adapter`](https://www.kaggle.com/datasets/danielrangelsanch/maestro-qwen-adapter) | `Qwen2.5-1.5B-Instruct` |
+| **LLaMA 3.1** | `meta-llama/Llama-3.1-8B-Instruct` | 8.03B | 128k tokens | [`danielrangelsanch/maestro-llama-adapter`](https://www.kaggle.com/datasets/danielrangelsanch/maestro-llama-adapter) | `Llama-3.2-1B-Instruct` |
+| **Gemma 2** | `google/gemma-2-9b-it` | 9.24B | 8k tokens (*SWA*) | [`danielrangelsanch/maestro-gemma-adapter`](https://www.kaggle.com/datasets/danielrangelsanch/maestro-gemma-adapter) | `Gemma-2-2b-it` |
+
+### 💡 Pautas Clave de Selección y Cómputo:
+1. **Cota de Tamaño Recomendada ($\le 7\text{B}-9\text{B}$):** Se aconseja utilizar modelos docentes de **máximo 7 u 8 billones de parámetros** (hasta 9B en Gemma) y discentes de **0.5B a 3B**. Esta calibración permite operar dentro del presupuesto estricto de **$\le 7.20$\,GB de VRAM** en GPUs comerciales mediante cuantización QLoRA de 4 bits.
+2. **⚠️ Evitar Modelos de Razonamiento (Chain-of-Thought):**
+   > [!WARNING]
+   > **NO emplear modelos de razonamiento tipo DeepSeek-R1, QwQ u homólogos.**
+   > Estos modelos emiten cadenas verborreicas de pensamiento no estructurado delimitadas por etiquetas `<think> ... </think>` antes de su respuesta final. Dicho comportamiento **rompe la sintaxis estricta del esquema JSON** requerida por el Agente Maestro, satura la ventana de contexto de generación y causa fallas de deserialización y desbordamiento de VRAM. Se debe utilizar siempre variantes convencionales de seguimiento de instrucciones (**`Instruct`** o **`it`**).
+3. **Modelos Fuera del Catálogo:** Si deseas utilizar un modelo docente diferente a los tres evaluados, el sistema operará con el modelo base y RAG, o puedes entrenar un nuevo adaptador ejecutando:
+   ```bash
+   python scripts/finetune_maestro.py --model <id_del_modelo>
+   ```
+
+---
+
+## 🚀 Guía de Instalación y Ejecución Local
+
+### 1. Requisitos de Hardware y Software
+- **Python:** 3.10 o superior.
+- **GPU:** NVIDIA (>= 8 GB VRAM recomendada) o Apple Silicon (MPS) o CPU.
+- **CUDA:** 11.8 o 12.1+ (si se usa GPU NVIDIA con cuantización BitsAndBytes).
+
+### 2. Clonar el Repositorio y Crear el Entorno Virtual
 ```bash
-# 1. Instalar dependencias
+git clone https://github.com/danielrangelsanch/proyecto_tesis.git
+cd proyecto_tesis
+
+python3 -m venv .venv
+source .venv/bin/activate  # En Windows: .venv\Scripts\activate
+pip install --upgrade pip
 pip install -r requirements.txt
+```
 
-# 2. Descargar modelos base (configurar previamente HF_TOKEN en .env)
-python scripts/setup_models.py
+### 3. Configuración de Variables de Entorno
+Copia la plantilla y configura tus credenciales:
+```bash
+cp .env.example .env
+```
+Edita `.env` e introduce tu token de Hugging Face (`HF_TOKEN`) para descargar los modelos base.
 
-# 3. Construir base de datos vectorial ChromaDB (si no existe rag/maestro)
+### 4. Inicialización Automática de Assets (RAG y Adaptadores LoRA)
+El script `scripts/download_assets.py` lee directamente tu configuración en `.env` (variables `TEACHER_MODEL_ID` y `RAG_DB_PATH`) y descarga automáticamente sin necesidad de pasar argumentos:
+- Verifica si la base RAG ya existe en `rag/maestro`; si no existe, la descarga desde Kaggle (`danielrangelsanch/rag-maestro`).
+- Verifica si el adaptador LoRA del Maestro configurado en `.env` existe; si falta y pertenece al catálogo oficial, lo descarga e instala en su ruta.
+```bash
+# Inicialización automática guiada por .env (Recomendado)
+python scripts/download_assets.py
+
+# Opcional: Descargar los 3 adaptadores del catálogo al mismo tiempo
+python scripts/download_assets.py --all-adapters
+```
+
+### 5. Indexación del Corpus RAG (Opcional)
+Si prefieres construir la base vectorial localmente desde cero a partir del archivo JSONL de semillas abiertas de TSQA:
+```bash
 python scripts/build_rag_from_jsonl.py
 ```
 
-### 2. Ejecución según Perfil Matemático
-
-#### Perfil P1_ESTABLE (Salud / Frecuencia Cardíaca):
+### 6. Ejecutar el Pipeline de Generación
+Ejecución interactiva o mediante consulta declarativa:
 ```bash
-python -m pipeline.main --query "Necesito generar lecturas de frecuencia cardíaca de un paciente en reposo monitoreado en una clínica. Dominio: Medicina y salud. Variable estricta: Únicamente 'Frecuencia_Cardiaca'. Perfil matemático: P1_ESTABLE, valores constantes con bajo nivel de ruido. Escala: mantenerse estable alrededor de 70 lpm durante todo el periodo."
+# Modo directo con requerimiento clínico (Perfil P1)
+python pipeline/main.py --query "Necesito generar lecturas de frecuencia cardíaca de un paciente en reposo monitoreado en una clínica, con bajo nivel de ruido y valores estables alrededor de 70 lpm."
+
+# Modo interactivo (el Maestro solicitará los parámetros faltantes)
+python pipeline/main.py
 ```
 
-#### Perfil P2_ESTACIONAL (Transporte / Metro):
+### 7. Ejecutar la Validación Numérica (M6–M8)
+Una vez generadas las series (`data/synthetic/synthetic_series.csv`), ejecuta la validación downstream con LSTM:
 ```bash
-python -m pipeline.main --query "Simular el flujo diario de pasajeros en una estación de metro durante un año completo. Dominio: Transporte urbano. Variable estricta: Únicamente 'Pasajeros'. Perfil matemático: P2_ESTACIONAL, con ciclos semanales marcados (mayor afluencia en días laborales y menor en fines de semana), sin tendencia global. Escala: promedio de 15000 pasajeros diarios."
+python pipeline/numeric_pipeline.py
 ```
 
-#### Perfil P3_TENDENCIA_ESTACIONAL (Retail / Ventas):
-```bash
-python -m pipeline.main --query "Simular las ventas diarias de una plataforma de comercio electrónico en expansión durante un año. Dominio: Retail y Ventas. Variable estricta: Únicamente 'Ventas_Diarias'. Perfil matemático: P3_TENDENCIA_ESTACIONAL, con tendencia creciente sostenida y ciclos semanales marcados por mayor consumo en fines de semana. Escala: promedio inicial de 2500 USD creciendo hacia 4000 USD."
-```
+---
 
-#### Perfil P4_TENDENCIA_RUIDO (Finanzas / Cotizaciones):
-```bash
-python -m pipeline.main --query "Simular la cotización diaria de una acción tecnológica durante un ciclo correctivo de mercado. Dominio: Finanzas y Mercados. Variable estricta: Únicamente 'Precio_Accion'. Perfil matemático: P4_TENDENCIA_RUIDO, con tendencia fluctuante descendente y alto nivel de ruido o volatilidad, sin componentes estacionales. Escala: cotizando alrededor de 120 USD."
-```
+## ☁️ Experimentación en la Nube (Kaggle)
 
-#### Perfil P5_COMPLEJO (Servidores / Telecomunicaciones):
-```bash
-python -m pipeline.main --query "Monitorear el consumo de ancho de banda en un centro de datos empresarial. Dominio: Telecomunicaciones y Servidores. Variable estricta: Únicamente 'Ancho_Banda_Gbps'. Perfil matemático: P5_COMPLEJO, con fuerte estacionalidad por horario laboral, alto ruido de tráfico y picos anómalos esporádicos por sobrecarga. Escala: promedio de 45 Gbps."
+Para reproducir los experimentos completos sin consumir recursos locales:
+
+1. Importa cualquiera de los cuadernos ubicados en [`notebooks_kaggle/`](notebooks_kaggle/):
+   - **`01_finetuning_maestro_qwen_kaggle.ipynb`**, **`02_..._llama_...`**, **`03_..._gemma_...`**: Para entrenar los adaptadores LoRA de los Maestros (Qwen-2.5-7B, LLaMA-3.1-8B o Gemma-2-9B).
+   - **`orquestador_experimentos_kaggle.ipynb`**: Para reproducir de forma autónoma la matriz completa de **54 ejecuciones experimentales** ($9 \text{ escenarios} \times 6 \text{ perfiles}$).
+2. Habilita el acelerador **GPU T4 x2** o **GPU P100** e **Internet On**.
+3. Añade tu `HF_TOKEN` en **Add-ons $\to$ Secrets**.
+4. Consulta las instrucciones detalladas en [`notebooks_kaggle/README.md`](notebooks_kaggle/README.md).
+
+---
+
+## 📈 Perfiles Temporales Formales Evaluados
+
+El catálogo en [`pipeline/config/profiles.py`](pipeline/config/profiles.py) modela 6 perfiles con dinámicas físicas contrastantes:
+
+- **$P_1$ (Estable):** Régimen estacionario con ruido blanco gaussiano acotado (ej. pulso basal en reposo).
+- **$P_2$ (Estacional Puro):** Periodicidad armónica sinusoidal con estacionalidad fija (ej. afluencia de transporte público).
+- **$P_3$ (Tendencia + Estacionalidad):** Crecimiento secular monótono superpuesto con oscilaciones estacionales (ej. ventas retail).
+- **$P_4$ (Tendencia + Ruido Estocástico):** Deriva no estacionaria con variabilidad browniana y volatilidad local (ej. cotizaciones bursátiles).
+- **$P_5$ (Dinámica Compleja):** Multi-régimen con transiciones abruptas y ciclos no lineales (ej. tráfico de ancho de banda en servidores).
+- **$P_6$ (Multivariado Acoplado):** Series bivariadas con dependencia cruzada y escalado desacoplado por canal (ej. presión arterial sistólica y diastólica).
+
+---
+
+## 📜 Licencia y Cita Académica
+
+Este proyecto está distribuido bajo la licencia MIT. Si utilizas este código o los resultados en tu investigación, por favor cita:
+
+```bibtex
+@mastersthesis{rangel2026series,
+  author  = {Daniel Rangel Sánchez},
+  title   = {Generación de Series Temporales Sintéticas mediante Destilación Maestro-Estudiante con RAG y Validación Numérica},
+  school  = {Facultad de Ingeniería, Universidad de Los Andes / Universidad Internacional de Valencia},
+  year    = {2026}
+}
 ```

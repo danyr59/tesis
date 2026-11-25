@@ -7,10 +7,10 @@ def setup_models():
     load_dotenv()
     
     token = os.getenv("HF_TOKEN")
-    teacher_id = os.getenv("TEACHER_MODEL_ID")
-    student_id = os.getenv("STUDENT_MODEL_ID")
-    teacher_path = os.getenv("TEACHER_MODEL_PATH")
-    student_path = os.getenv("STUDENT_MODEL_PATH")
+    teacher_id = os.getenv("TEACHER_MODEL_ID", "Qwen/Qwen2.5-7B-Instruct")
+    student_id = os.getenv("STUDENT_MODEL_ID", "Qwen/Qwen2.5-1.5B-Instruct")
+    teacher_path = os.getenv("TEACHER_MODEL_PATH", "./models/profesor")
+    student_path = os.getenv("STUDENT_MODEL_PATH", "./models/student")
 
     if not token :
         print("ERROR: Por favor, configura tu HF_TOKEN en el archivo .env")

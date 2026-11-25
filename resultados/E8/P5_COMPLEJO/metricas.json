@@ -1,0 +1,32 @@
+{
+  "escenario": "E8_gemma_qwen",
+  "tipo_escenario": "Cross-Family",
+  "perfil": "P5_COMPLEJO",
+  "teacher": "google/gemma-2-9b-it",
+  "student": "Qwen/Qwen2.5-1.5B-Instruct",
+  "downstream": {
+    "r2": 0.9831925861503724,
+    "mape": 15790905.111312587,
+    "rmse": 25.765905039428763,
+    "mae": 9.77190850085832
+  },
+  "juez": {
+    "aprobado": true,
+    "confianza": 0.925,
+    "score_alucinacion": 0.07499999999999996
+  },
+  "alucinaciones": {
+    "tasa_alucinacion": 0.002631578947368421,
+    "total_predictions": 1140,
+    "total_hallucinations": 3,
+    "range_violations": 0,
+    "temporal_violations": 2,
+    "correlation_violations": 0,
+    "statistical_violations": 1,
+    "is_clean": false
+  },
+  "eficiencia": {
+    "tiempo_segundos": 981.69,
+    "vram_pico_gb": 7.17
+  }
+}

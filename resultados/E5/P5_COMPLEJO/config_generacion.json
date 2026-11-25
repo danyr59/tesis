@@ -1,0 +1,1760 @@
+{
+  "escenario": "E5_llama_qwen",
+  "perfil": "P5_COMPLEJO",
+  "query": "Monitorear el consumo de ancho de banda en un centro de datos empresarial. Dominio: Telecomunicaciones y Servidores. Variable estricta: Únicamente 'Ancho_Banda_Gbps'. Perfil matemático: P5_COMPLEJO, con fuerte estacionalidad por horario laboral, alto ruido de tráfico y picos anómalos esporádicos por sobrecarga. Escala: promedio de 45 Gbps.",
+  "dominio": "servidores",
+  "structured_prompt": {
+    "values": {
+      "tema": "Ancho de Banda",
+      "dominio": "Telecomunicaciones y Servidores",
+      "localizacion": "Centro de Datos Empresarial",
+      "frecuencia": "Minuto",
+      "start_date": "2024-01-01",
+      "variables": [
+        "Ancho_Banda_Gbps"
+      ],
+      "target_value": 45.0,
+      "tipo_serie": "univariada",
+      "profile_id": "P5_COMPLEJO",
+      "num_series_configurados": 20,
+      "puntos_por_serie_configurados": 400
+    },
+    "missing_parameters": [],
+    "pending_questions": [],
+    "justification": "El centro de datos empresarial puede experimentar picos de ancho de banda durante el horario laboral debido a la actividad de los empleados. Además, la empresa puede realizar actualizaciones de software o realizar tareas de mantenimiento que pueden afectar el ancho de banda.",
+    "suggested_search": "Ancho de Banda en un centro de datos durante el horario laboral",
+    "search_strategy": "Análisis de la serie temporal para identificar patrones y picos durante el horario laboral y la influencia de eventos externos como actualizaciones de software o mantenimiento.",
+    "confidence": 0.9
+  },
+  "metadata_summary": {
+    "count": 41,
+    "refinements_applied": [
+      ""
+    ],
+    "domain": "Telecomunicaciones y Servidores",
+    "rag_dataset": "TSQA",
+    "diversity_score": 0.36991869918699183
+  },
+  "seed_dataset": [
+    {
+      "id": "177121",
+      "metadata": {
+        "domain": "Healthcare",
+        "task_type": "summary_statistical_property",
+        "id": "177121",
+        "question": "Analyze the statistical properties of the data points [266.13, 274.22, 278.5, 276.73, 274.47, 276.33, 284.01, 283.1, 275.91, 276.43, 276.99, 278.36, 279.79, 283.11, 286.82, 291.7, 293.77, 290.42, 286.17, 281.7, 287.16, 282.47, 278.25, 284.96].",
+        "response": "The data shows a mean of around 281, suggesting that the points are centered about this value over the period surveyed. The standard deviation suggests moderate variability around the mean, given the periodic fluctuations observed throughout the series."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              266.13,
+              274.22,
+              278.5,
+              276.73,
+              274.47,
+              276.33,
+              284.01,
+              283.1,
+              275.91,
+              276.43,
+              276.99,
+              278.36,
+              279.79,
+              283.11,
+              286.82,
+              291.7,
+              293.77,
+              290.42,
+              286.17,
+              281.7,
+              287.16,
+              282.47,
+              278.25,
+              284.96
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "177223",
+      "metadata": {
+        "response": "The mean is approximately 345.3, indicating the central tendency of the data. The standard deviation of 63.4 reflects the spread of data points around the mean. Maximum at 411.0 and minimum at 193.5 provide a measure of the range that shows the data's dispersion.",
+        "domain": "Healthcare",
+        "question": "Provide summary statistics of the time series for the points: [292.0, 324.5, 353.5, 376.5, 393.0, 404.0, 410.5, 411.0, 408.5, 401.0, 389.0, 376.5, 362.5, 345.5, 329.5, 313.0, 297.5, 282.0, 266.5, 251.5, 236.5, 222.5, 210.0, 193.5].",
+        "id": "177223",
+        "task_type": "summary statistics"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              292.0,
+              324.5,
+              353.5,
+              376.5,
+              393.0,
+              404.0,
+              410.5,
+              411.0,
+              408.5,
+              401.0,
+              389.0,
+              376.5,
+              362.5,
+              345.5,
+              329.5,
+              313.0,
+              297.5,
+              282.0,
+              266.5,
+              251.5,
+              236.5,
+              222.5,
+              210.0,
+              193.5
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "191237",
+      "metadata": {
+        "domain": "Healthcare",
+        "task_type": "statistical summary",
+        "question": "Provide a statistical summary (mean, median) of the selected data [31.62, 30.25, 32.5, 33.53, 32.62, 33.53, 33.09, 31.91, 31.0, 31.25, 30.44, 30.62].",
+        "id": "191237",
+        "response": "Mean = 31.94, Median = 31.97. These statistics suggest the data is closely distributed around the central tendency of approximately 32, with small deviations."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 12,
+            "serie": [
+              31.62,
+              30.25,
+              32.5,
+              33.53,
+              32.62,
+              33.53,
+              33.09,
+              31.91,
+              31.0,
+              31.25,
+              30.44,
+              30.62
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "188456",
+      "metadata": {
+        "task_type": "statistical property analysis",
+        "id": "188456",
+        "domain": "Healthcare",
+        "response": "Calculate mean: Sum (18 values)/24, resulting in around -35. The median is the middle value between -22.5 and 19.5, which is -1.5. These show central tendency amid negative values and growth.",
+        "question": "Determine the mean and median of the data points [86.5, 81.0, 76.0, 69.0, 59.5, 47.5, 33.0, 19.5, 3.5, -15.5, -35.0, -56.5, -74.0, -92.5, -108.5, -121.5, -131.0, -134.0, -131.5, -120.5, -104.0, -81.5, -54.5, -22.5]."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              86.5,
+              81.0,
+              76.0,
+              69.0,
+              59.5,
+              47.5,
+              33.0,
+              19.5,
+              3.5,
+              -15.5,
+              -35.0,
+              -56.5,
+              -74.0,
+              -92.5,
+              -108.5,
+              -121.5,
+              -131.0,
+              -134.0,
+              -131.5,
+              -120.5,
+              -104.0,
+              -81.5,
+              -54.5,
+              -22.5
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "172447",
+      "metadata": {
+        "question": "Assess the mean of the data points [14.78, 16.5, 17.28, 18.56, 19.84, 19.25, 16.75, 14.75].",
+        "response": "Mean = (14.78 + 16.5 + 17.28 + 18.56 + 19.84 + 19.25 + 16.75 + 14.75) / 8 = 17.84. The mean is calculated by summing all the observations and dividing by the number of observations.",
+        "task_type": "statistical_property_assessment",
+        "id": "172447",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 8,
+            "serie": [
+              14.78,
+              16.5,
+              17.28,
+              18.56,
+              19.84,
+              19.25,
+              16.75,
+              14.75
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "170731",
+      "metadata": {
+        "domain": "Healthcare",
+        "task_type": "summary_statistics",
+        "response": "Summary Statistics: Mean = 4.53, Median = 5.03, Minimum = 2.88, Maximum = 5.94. These statistics are calculated using standard formulas: Mean is the sum of observations divided by count; Median is the middle value in the ordered list; Min and Max are the smallest and largest values, respectively.",
+        "question": "Provide summary statistics for data points [5.31, 5.94, 5.5, 5.25, 5.69, 5.84, 4.91, 3.91, 3.91, 4.28, 4.16, 3.72, 4.31, 5.06, 5.84, 5.5, 5.12, 5.22, 4.88, 3.47, 2.88, 3.12, 4.06, 4.5].",
+        "id": "170731"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              5.31,
+              5.94,
+              5.5,
+              5.25,
+              5.69,
+              5.84,
+              4.91,
+              3.91,
+              3.91,
+              4.28,
+              4.16,
+              3.72,
+              4.31,
+              5.06,
+              5.84,
+              5.5,
+              5.12,
+              5.22,
+              4.88,
+              3.47,
+              2.88,
+              3.12,
+              4.06,
+              4.5
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "176658",
+      "metadata": {
+        "domain": "Healthcare",
+        "response": "The mean for this data set would be somewhere between the lower and upper threshold of the data points, around 17-20. The variance appears to be moderate to high, given the differences in values and the consistent pattern of movement.",
+        "question": "Using the data [12.59, 14.44, 13.56, 12.28, 12.94, 14.31, 14.53, 14.28, 16.53, 20.22, 21.97, 21.31, 21.03, 21.62, 21.28, 18.94, 17.38, 18.38, 19.88, 19.0, 17.59, 18.0, 19.78, 19.91], what can be inferred about the mean and variance for this segment?",
+        "id": "176658",
+        "task_type": "statistical property"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              12.59,
+              14.44,
+              13.56,
+              12.28,
+              12.94,
+              14.31,
+              14.53,
+              14.28,
+              16.53,
+              20.22,
+              21.97,
+              21.31,
+              21.03,
+              21.62,
+              21.28,
+              18.94,
+              17.38,
+              18.38,
+              19.88,
+              19.0,
+              17.59,
+              18.0,
+              19.78,
+              19.91
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "184138",
+      "metadata": {
+        "domain": "Healthcare",
+        "question": "Calculate and interpret the mean of the data points [-2893.78, -2897.69, -2895.36, -2890.19, -2889.77, -2898.53, -2905.8, -2902.7, -2889.96, -2883.31, -2891.36, -2896.85, -2899.59, -2890.97, -2886.65, -2889.19, -2890.4, -2897.38, -2889.05, -2886.35, -2888.45, -2890.68, -2898.07, -2889.09].",
+        "response": "The mean of the data is approximately -2892.85. This is calculated by summing all the values (-2893.78 + -2897.69 + ... + -2889.09) and dividing by the number of data points (24). The mean provides a measure of central tendency, indicating that these values generally cluster around this central point in the dataset.",
+        "id": "184138",
+        "task_type": "central_tendency"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -2893.78,
+              -2897.69,
+              -2895.36,
+              -2890.19,
+              -2889.77,
+              -2898.53,
+              -2905.8,
+              -2902.7,
+              -2889.96,
+              -2883.31,
+              -2891.36,
+              -2896.85,
+              -2899.59,
+              -2890.97,
+              -2886.65,
+              -2889.19,
+              -2890.4,
+              -2897.38,
+              -2889.05,
+              -2886.35,
+              -2888.45,
+              -2890.68,
+              -2898.07,
+              -2889.09
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "165183",
+      "metadata": {
+        "response": "The mean of these data points is approximately 658.60. To calculate this, sum all the data points, which results in 15806.25, and divide by the total number of points, 24. This average indicates a central value around which most data points cluster, providing a summary measure of the data set.",
+        "question": "Calculate and interpret the mean of these data points: [666.06, 671.87, 669.87, 671.47, 666.55, 661.45, 662.67, 659.89, 659.24, 660.85, 658.75, 657.75, 657.34, 655.07, 656.93, 657.57, 655.38, 651.92, 645.92, 640.63, 639.42, 645.26, 652.24, 654.71].",
+        "id": "165183",
+        "domain": "Healthcare",
+        "task_type": "statistical_properties"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              666.06,
+              671.87,
+              669.87,
+              671.47,
+              666.55,
+              661.45,
+              662.67,
+              659.89,
+              659.24,
+              660.85,
+              658.75,
+              657.75,
+              657.34,
+              655.07,
+              656.93,
+              657.57,
+              655.38,
+              651.92,
+              645.92,
+              640.63,
+              639.42,
+              645.26,
+              652.24,
+              654.71
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "165287",
+      "metadata": {
+        "response": "The mean of the dataset is -20830.8. The mean provides a measure of central tendency, indicating that the average value of this dataset hovers around -20830.8, suggesting central concentration amidst fluctuations.",
+        "id": "165287",
+        "question": "Calculate the mean of the data points [-20824.44, -20829.09, -20838.09, -20841.17, -20838.61, -20834.23, -20833.92, -20831.2, -20821.95, -20822.28, -20827.76, -20825.04] and explain its significance.",
+        "task_type": "statistical property investigation",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 12,
+            "serie": [
+              -20824.44,
+              -20829.09,
+              -20838.09,
+              -20841.17,
+              -20838.61,
+              -20834.23,
+              -20833.92,
+              -20831.2,
+              -20821.95,
+              -20822.28,
+              -20827.76,
+              -20825.04
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "168793",
+      "metadata": {
+        "question": "Calculate the mean of the data points [0.46, 0.45, 0.49, 0.55, 0.62, 0.69, 0.76, 0.82, 0.85, 0.91, 1.04, 1.2, 1.35, 1.5, 1.57, 1.63, 1.72, 1.73, 1.65, 1.54, 1.42, 1.32, 1.2, 1.1] and discuss its significance.",
+        "task_type": "summary_statistic",
+        "domain": "Healthcare",
+        "response": "The mean is calculated by summing the numbers and dividing by the number of data points: (0.46 + 0.45 + ... + 1.1)/24 = approximately 1.053. This average value represents the central tendency of the dataset, indicating where most values cluster in this segment of time series indicating upward growth.",
+        "id": "168793"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.46,
+              0.45,
+              0.49,
+              0.55,
+              0.62,
+              0.69,
+              0.76,
+              0.82,
+              0.85,
+              0.91,
+              1.04,
+              1.2,
+              1.35,
+              1.5,
+              1.57,
+              1.63,
+              1.72,
+              1.73,
+              1.65,
+              1.54,
+              1.42,
+              1.32,
+              1.2,
+              1.1
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "183959",
+      "metadata": {
+        "task_type": "statistical_summary",
+        "question": "Provide a statistical summary including mean, median, and standard deviation for the data points [2802.65, 2807.24, 2809.72, 2814.63, 2810.87, 2810.65, 2814.33, 2812.65, 2812.18, 2812.69, 2810.9, 2811.5, 2809.7, 2809.61, 2811.4, 2809.57, 2805.04, 2807.52, 2811.27, 2808.45, 2807.36, 2807.57, 2807.91, 2808.3].",
+        "id": "183959",
+        "domain": "Healthcare",
+        "response": "To summarize, the mean is approximately 2809.73, calculated as a sum of all data points divided by 24. The median is 2809.86, found by arranging the data in order and finding the middle value. The standard deviation is approximately 2.89, calculated using the formula for standard deviation, which measures the data's dispersion around the mean."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              2802.65,
+              2807.24,
+              2809.72,
+              2814.63,
+              2810.87,
+              2810.65,
+              2814.33,
+              2812.65,
+              2812.18,
+              2812.69,
+              2810.9,
+              2811.5,
+              2809.7,
+              2809.61,
+              2811.4,
+              2809.57,
+              2805.04,
+              2807.52,
+              2811.27,
+              2808.45,
+              2807.36,
+              2807.57,
+              2807.91,
+              2808.3
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "185639",
+      "metadata": {
+        "question": "Analyze the dataset [1640.8, 1655.82, 1658.99, 1655.49, 1663.44, 1663.17, 1651.77, 1647.11, 1651.89, 1653.11, 1652.92, 1644.93, 1638.56, 1640.35, 1642.6, 1646.88, 1655.25, 1669.12, 1681.82, 1689.56, 1692.08, 1698.9, 1696.73, 1694.66] and provide a statistical summary including mean, median, and range.",
+        "task_type": "statistical summary",
+        "response": "Mean: Approximately 1662.66; Median: 1656.92; Range: 60.54 (1698.9 - 1638.36). The mean and median provide measures of central tendency, while the range indicates the spread of data.",
+        "id": "185639",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              1640.8,
+              1655.82,
+              1658.99,
+              1655.49,
+              1663.44,
+              1663.17,
+              1651.77,
+              1647.11,
+              1651.89,
+              1653.11,
+              1652.92,
+              1644.93,
+              1638.56,
+              1640.35,
+              1642.6,
+              1646.88,
+              1655.25,
+              1669.12,
+              1681.82,
+              1689.56,
+              1692.08,
+              1698.9,
+              1696.73,
+              1694.66
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "172020",
+      "metadata": {
+        "id": "172020",
+        "response": "Mean: -2731.09. Median: -2732.15. To calculate the mean, add up all the data points and divide by the number of points (24). The median is the middle value: After sorting, consider the 12th and 13th values, -2732.74 and -2731.57, then average them.",
+        "domain": "Healthcare",
+        "task_type": "summary statistics",
+        "question": "Calculate and explain the mean and median of the data points: [-2749.49, -2732.49, -2721.13, -2724.87, -2736.82, -2738.25, -2733.0, -2718.51, -2711.92, -2714.77, -2725.13, -2728.59, -2726.95, -2739.87, -2742.74, -2739.33, -2726.76, -2730.96, -2735.09, -2739.87, -2745.99, -2726.57, -2725.45, -2721.66]"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -2749.49,
+              -2732.49,
+              -2721.13,
+              -2724.87,
+              -2736.82,
+              -2738.25,
+              -2733.0,
+              -2718.51,
+              -2711.92,
+              -2714.77,
+              -2725.13,
+              -2728.59,
+              -2726.95,
+              -2739.87,
+              -2742.74,
+              -2739.33,
+              -2726.76,
+              -2730.96,
+              -2735.09,
+              -2739.87,
+              -2745.99,
+              -2726.57,
+              -2725.45,
+              -2721.66
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "162973",
+      "metadata": {
+        "response": "The data has a mean around -1960, with notable points clustering below this value and a median close to it, suggesting a slightly negative skew. An observed range spans from approximately -1950.05 to -1976.83. The series exhibits moderate variance, with standard deviations manifesting normal distribution deviation.",
+        "task_type": "statistical_summary",
+        "question": "Provide a brief statistical summary for the data points [-1959.81, -1955.29, -1955.04, -1958.62, -1956.43, -1952.09, -1950.05, -1953.75, -1961.49, -1967.21, -1967.44, -1960.3, -1962.87, -1973.54, -1976.83, -1972.24, -1970.52, -1973.69, -1974.87, -1972.44, -1965.45, -1958.82, -1955.09, -1950.32].",
+        "domain": "Healthcare",
+        "id": "162973"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -1959.81,
+              -1955.29,
+              -1955.04,
+              -1958.62,
+              -1956.43,
+              -1952.09,
+              -1950.05,
+              -1953.75,
+              -1961.49,
+              -1967.21,
+              -1967.44,
+              -1960.3,
+              -1962.87,
+              -1973.54,
+              -1976.83,
+              -1972.24,
+              -1970.52,
+              -1973.69,
+              -1974.87,
+              -1972.44,
+              -1965.45,
+              -1958.82,
+              -1955.09,
+              -1950.32
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "183726",
+      "metadata": {
+        "task_type": "statistical_description",
+        "question": "Provide a statistical description of these points: [-2939.52, -2933.6, -2931.33, -2939.92, -2940.71, -2943.05, -2935.97, -2939.19, -2930.3, -2914.08, -2918.85, -2925.32, -2911.43, -2918.58, -2915.86, -2914.34, -2912.88, -2912.57, -2911.57, -2911.0, -2909.8, -2912.81, -2916.13, -2920.63].",
+        "response": "The mean of the data seems to hover around -2925. The data has a moderate spread, indicating medium variance. Standard deviation can be calculated to quantify this.",
+        "domain": "Healthcare",
+        "id": "183726"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -2939.52,
+              -2933.6,
+              -2931.33,
+              -2939.92,
+              -2940.71,
+              -2943.05,
+              -2935.97,
+              -2939.19,
+              -2930.3,
+              -2914.08,
+              -2918.85,
+              -2925.32,
+              -2911.43,
+              -2918.58,
+              -2915.86,
+              -2914.34,
+              -2912.88,
+              -2912.57,
+              -2911.57,
+              -2911.0,
+              -2909.8,
+              -2912.81,
+              -2916.13,
+              -2920.63
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "182521",
+      "metadata": {
+        "response": "Mean = 10.27, Median = 9.85, Variance = 6.38, Minimum = 5.81, Maximum = 13.94. The data is slightly right-skewed, with a mean higher than the median.",
+        "question": "Provide a statistical summary of these points: [9.5, 9.0, 8.5, 8.31, 9.69, 11.34, 12.84, 13.94, 13.44, 11.28, 8.97, 5.81].",
+        "id": "182521",
+        "domain": "Healthcare",
+        "task_type": "descriptive_statistics"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 12,
+            "serie": [
+              9.5,
+              9.0,
+              8.5,
+              8.31,
+              9.69,
+              11.34,
+              12.84,
+              13.94,
+              13.44,
+              11.28,
+              8.97,
+              5.81
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "192672",
+      "metadata": {
+        "response": "The mean is approximately -4.72. This is calculated by summing up all the values: -109.41, and dividing by the number of points: 24. This provides insight into the central tendency of the data.",
+        "id": "192672",
+        "question": "Calculate and discuss the mean of the time series data [-1.41, -3.81, -4.91, -7.16, -7.91, -8.0, -7.78, -7.16, -5.44, -3.47, -2.97, -2.53, -2.06, -2.53, -3.28, -3.84, -3.72, -4.34, -3.94, -3.88, -3.75, -3.53, -3.16, -2.84].",
+        "domain": "Healthcare",
+        "task_type": "statistical property"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -1.41,
+              -3.81,
+              -4.91,
+              -7.16,
+              -7.91,
+              -8.0,
+              -7.78,
+              -7.16,
+              -5.44,
+              -3.47,
+              -2.97,
+              -2.53,
+              -2.06,
+              -2.53,
+              -3.28,
+              -3.84,
+              -3.72,
+              -4.34,
+              -3.94,
+              -3.88,
+              -3.75,
+              -3.53,
+              -3.16,
+              -2.84
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "192030",
+      "metadata": {
+        "task_type": "summary statistics",
+        "id": "192030",
+        "domain": "Healthcare",
+        "response": "Mean is approximately 151.9 and Median is 152.855. Calculating the mean involves summing all numbers and dividing by 24, and the median is the middle value of the ordered data.",
+        "question": "Compute the mean and median of the data points [155.3, 160.02, 160.04, 158.08, 157.4, 155.95, 157.26, 154.72, 147.76, 146.77, 142.31, 141.15, 144.17, 144.01, 142.72, 142.88, 151.48, 150.26, 143.42, 148.94, 153.45, 157.39, 162.13, 156.4]."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              155.3,
+              160.02,
+              160.04,
+              158.08,
+              157.4,
+              155.95,
+              157.26,
+              154.72,
+              147.76,
+              146.77,
+              142.31,
+              141.15,
+              144.17,
+              144.01,
+              142.72,
+              142.88,
+              151.48,
+              150.26,
+              143.42,
+              148.94,
+              153.45,
+              157.39,
+              162.13,
+              156.4
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "181975",
+      "metadata": {
+        "id": "181975",
+        "task_type": "descriptive_statistics",
+        "response": "The mean of the data is approximately -989.28. This average value represents the general level around which the data points are clustered. Given the downward trend over the series, this mean suggests a tendency towards increasingly negative values.",
+        "question": "Based on the data series [-958.29, -961.86, -959.31, -958.54, -964.13, -969.51, -973.13, -975.24, -980.44, -986.5, -990.92, -992.58, -990.29, -994.6, -1000.02, -1005.38, -1012.76, -1017.26, -1019.84, -1021.04, -1018.5, -1015.43, -1008.16, -1003.08], compute the mean and provide an interpretation in the context of this data.",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -958.29,
+              -961.86,
+              -959.31,
+              -958.54,
+              -964.13,
+              -969.51,
+              -973.13,
+              -975.24,
+              -980.44,
+              -986.5,
+              -990.92,
+              -992.58,
+              -990.29,
+              -994.6,
+              -1000.02,
+              -1005.38,
+              -1012.76,
+              -1017.26,
+              -1019.84,
+              -1021.04,
+              -1018.5,
+              -1015.43,
+              -1008.16,
+              -1003.08
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "170689",
+      "metadata": {
+        "id": "170689",
+        "question": "Calculate the mean of the data points [0.29, 0.29, 0.29, 0.29, 0.28, 0.28, 0.28, 0.28, 0.27, 0.27, 0.27, 0.27, 0.26, 0.26, 0.26, 0.26, 0.26, 0.26, 0.26, 0.25, 0.25, 0.25, 0.25, 0.25].",
+        "task_type": "statistical property",
+        "domain": "Healthcare",
+        "response": "The mean of the data points is calculated by summing all the points and dividing by their count: (0.29*4 + 0.28*4 + 0.27*4 + 0.26*6 + 0.25*5)/24 = 6.43/24 ≈ 0.2679. The mean value provides an average that represents the central tendency of this dataset."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.29,
+              0.29,
+              0.29,
+              0.29,
+              0.28,
+              0.28,
+              0.28,
+              0.28,
+              0.27,
+              0.27,
+              0.27,
+              0.27,
+              0.26,
+              0.26,
+              0.26,
+              0.26,
+              0.26,
+              0.26,
+              0.26,
+              0.25,
+              0.25,
+              0.25,
+              0.25,
+              0.25
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "179212",
+      "metadata": {
+        "response": "The mean of this dataset is approximately -37713.8. This value represents the central tendency around which other data points are averaged, providing insight into the overall level or average condition of the series.",
+        "task_type": "descriptive statistics",
+        "id": "179212",
+        "domain": "Healthcare",
+        "question": "Given the dataset segment [-37816.85, -37569.72, -37520.37, -37724.42, -37945.4, -37850.31, -37605.63, -37524.74, -37694.4, -37940.48, -37887.61, -37615.5, -37495.44, -37658.26, -37917.11, -37899.15, -37662.48, -37518.6, -37615.62, -37874.31, -37910.81, -37672.58, -37500.81, -37574.99], calculate and describe the mean value and its significance in understanding this data's central tendency."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -37816.85,
+              -37569.72,
+              -37520.37,
+              -37724.42,
+              -37945.4,
+              -37850.31,
+              -37605.63,
+              -37524.74,
+              -37694.4,
+              -37940.48,
+              -37887.61,
+              -37615.5,
+              -37495.44,
+              -37658.26,
+              -37917.11,
+              -37899.15,
+              -37662.48,
+              -37518.6,
+              -37615.62,
+              -37874.31,
+              -37910.81,
+              -37672.58,
+              -37500.81,
+              -37574.99
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "191944",
+      "metadata": {
+        "id": "191944",
+        "task_type": "mean calculation",
+        "question": "Calculate the mean of the data points [393.0, 295.0, 173.0, 123.0, 73.0, 126.0, 50.0, 23.0, 9.0, 11.0, 7.0, 11.0, 43.0, 100.0, 241.0, 502.0, 540.0, 362.0, 246.0, 876.0, 766.0, 341.0, 253.0, 280.0].",
+        "response": "The mean is 276.5. This is calculated by summing the data (6637.0) and dividing by the number of data points (24).",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              393.0,
+              295.0,
+              173.0,
+              123.0,
+              73.0,
+              126.0,
+              50.0,
+              23.0,
+              9.0,
+              11.0,
+              7.0,
+              11.0,
+              43.0,
+              100.0,
+              241.0,
+              502.0,
+              540.0,
+              362.0,
+              246.0,
+              876.0,
+              766.0,
+              341.0,
+              253.0,
+              280.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "181099",
+      "metadata": {
+        "id": "181099",
+        "task_type": "descriptive_statistics",
+        "domain": "Healthcare",
+        "question": "Calculate the mean of the data points: [-7143.95, -7142.9, -7141.44, -7140.72, -7139.82, -7139.1, -7138.88, -7139.34, -7135.76, -7130.12, -7129.16, -7129.15, -7129.58, -7123.7, -7111.57, -7112.02, -7121.54, -7132.7, -7143.04, -7148.88, -7150.74, -7154.8, -7160.56, -7164.4].",
+        "response": "The mean is approximately -7136.74. This is calculated by summing the values and dividing by the number of observations: Sum = -171280.9, Observations = 24, Mean = -171280.9/24 = -7136.74."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -7143.95,
+              -7142.9,
+              -7141.44,
+              -7140.72,
+              -7139.82,
+              -7139.1,
+              -7138.88,
+              -7139.34,
+              -7135.76,
+              -7130.12,
+              -7129.16,
+              -7129.15,
+              -7129.58,
+              -7123.7,
+              -7111.57,
+              -7112.02,
+              -7121.54,
+              -7132.7,
+              -7143.04,
+              -7148.88,
+              -7150.74,
+              -7154.8,
+              -7160.56,
+              -7164.4
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "185425",
+      "metadata": {
+        "id": "185425",
+        "response": "The mean is calculated by summing all the values and dividing by the number of points. Mean = (6.83) / 24 ≈ 0.2845. The mean provides a measure of the central tendency of the data.",
+        "question": "Calculate the mean of the time series data [0.26, 0.26, 0.25, 0.24, 0.24, 0.23, 0.23, 0.22, 0.22, 0.22, 0.22, 0.23, 0.23, 0.25, 0.26, 0.29, 0.31, 0.34, 0.37, 0.41, 0.44, 0.47, 0.5, 0.52].",
+        "domain": "Healthcare",
+        "task_type": "statistical_summary"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.26,
+              0.26,
+              0.25,
+              0.24,
+              0.24,
+              0.23,
+              0.23,
+              0.22,
+              0.22,
+              0.22,
+              0.22,
+              0.23,
+              0.23,
+              0.25,
+              0.26,
+              0.29,
+              0.31,
+              0.34,
+              0.37,
+              0.41,
+              0.44,
+              0.47,
+              0.5,
+              0.52
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "186997",
+      "metadata": {
+        "question": "Analyze the data: [-0.64, -0.48, -0.4, -0.38, -0.37, -0.34, -0.31, -0.27, -0.24, -0.22, -0.18, -0.14]. Calculate and explain the significance of the mean and variance of these points.",
+        "task_type": "summary statistics",
+        "domain": "Healthcare",
+        "id": "186997",
+        "response": "The mean is approximately -0.31, showing that the average of the series lies close to this value. The variance measures how dispersed the points are around the mean. Given the steadily rising nature of the data, the variance is expected to be low, indicating stability and lack of volatility."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 12,
+            "serie": [
+              -0.64,
+              -0.48,
+              -0.4,
+              -0.38,
+              -0.37,
+              -0.34,
+              -0.31,
+              -0.27,
+              -0.24,
+              -0.22,
+              -0.18,
+              -0.14
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "175944",
+      "metadata": {
+        "domain": "Healthcare",
+        "task_type": "statistical_property_analysis",
+        "response": "The central tendency of the data points centers around 0.32. This is indicated by the frequent repetition and clustering of values close to 0.32, suggesting that it may be around the mean or median of this data set.",
+        "id": "175944",
+        "question": "What can be inferred about the central tendency of the data points [0.37, 0.37, 0.36, 0.36, 0.35, 0.35, 0.34, 0.34, 0.33, 0.33, 0.32, 0.32, 0.32, 0.32, 0.32, 0.31, 0.31, 0.31, 0.3, 0.3, 0.3, 0.3, 0.3, 0.29]?"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.37,
+              0.37,
+              0.36,
+              0.36,
+              0.35,
+              0.35,
+              0.34,
+              0.34,
+              0.33,
+              0.33,
+              0.32,
+              0.32,
+              0.32,
+              0.32,
+              0.32,
+              0.31,
+              0.31,
+              0.31,
+              0.3,
+              0.3,
+              0.3,
+              0.3,
+              0.3,
+              0.29
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "187841",
+      "metadata": {
+        "question": "Produce a statistical summary of the following data points: [35.44, 34.97, 34.72, 33.88, 33.06, 34.06, 35.12, 34.59, 32.75, 36.94, 39.78, 40.91, 41.31, 42.16, 42.75, 42.03, 40.75, 40.16, 40.31, 39.22, 36.94, 35.44, 34.97, 34.72].",
+        "response": "The statistical summary includes: Mean ≈ 37.86, Median = 36.94, Minimum = 32.75, Maximum = 42.75. The data shows a slight deviation from symmetry (skewed towards lower values) and reflects the concentration around the mean.",
+        "task_type": "statistical_summary",
+        "id": "187841",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              35.44,
+              34.97,
+              34.72,
+              33.88,
+              33.06,
+              34.06,
+              35.12,
+              34.59,
+              32.75,
+              36.94,
+              39.78,
+              40.91,
+              41.31,
+              42.16,
+              42.75,
+              42.03,
+              40.75,
+              40.16,
+              40.31,
+              39.22,
+              36.94,
+              35.44,
+              34.97,
+              34.72
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "174228",
+      "metadata": {
+        "id": "174228",
+        "question": "Provide a statistical summary including mean, median, and standard deviation for the data points [6035.33, 6021.69, 6016.33, 6023.24, 6023.42, 6023.37, 5998.84, 6005.1, 6011.05, 6009.5, 6010.46, 6012.04, 6018.12, 6022.86, 6028.2, 6026.43, 6035.26, 6048.3, 6054.88, 6056.59, 6047.63, 6043.37, 6048.06, 6049.99].",
+        "task_type": "statistical_summary",
+        "domain": "Healthcare",
+        "response": "Mean: 6028.52, Median: 6026.5, Standard Deviation: 17.08. The mean value is calculated by summing all data points and dividing by the total number (6028.52 = 144684.48/24). The median is the middle value of the ordered data set, and the standard deviation is calculated to assess the variability or dispersion of the dataset using the formula for standard deviation."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              6035.33,
+              6021.69,
+              6016.33,
+              6023.24,
+              6023.42,
+              6023.37,
+              5998.84,
+              6005.1,
+              6011.05,
+              6009.5,
+              6010.46,
+              6012.04,
+              6018.12,
+              6022.86,
+              6028.2,
+              6026.43,
+              6035.26,
+              6048.3,
+              6054.88,
+              6056.59,
+              6047.63,
+              6043.37,
+              6048.06,
+              6049.99
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "176013",
+      "metadata": {
+        "task_type": "summary statistics",
+        "question": "Calculate and interpret the mean of the given data points [0.4, 0.44, 0.48, 0.53, 0.57, 0.61, 0.65, 0.68, 0.7, 0.72, 0.73, 0.73, 0.73, 0.73, 0.72, 0.71, 0.7, 0.69, 0.68, 0.66, 0.65, 0.63, 0.62, 0.6].",
+        "response": "The mean of these data points is approximately 0.652. This is calculated by summing up all the values and dividing by the number of observations (24). This average reflects an overall higher inclination as the values peak in the mid of the series before slightly dropping towards the end.",
+        "id": "176013",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.4,
+              0.44,
+              0.48,
+              0.53,
+              0.57,
+              0.61,
+              0.65,
+              0.68,
+              0.7,
+              0.72,
+              0.73,
+              0.73,
+              0.73,
+              0.73,
+              0.72,
+              0.71,
+              0.7,
+              0.69,
+              0.68,
+              0.66,
+              0.65,
+              0.63,
+              0.62,
+              0.6
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "176106",
+      "metadata": {
+        "question": "Calculate and describe the statistical mean of the data points [10.0, 60.0, 107.0, 148.0, 190.0, 223.0, 250.5, 272.5, 286.0, 298.0, 299.5].",
+        "response": "Mean = (10.0 + 60.0 + 107.0 + 148.0 + 190.0 + 223.0 + 250.5 + 272.5 + 286.0 + 298.0 + 299.5) / 11 = 204.5. The data points average out to 204.5, providing a central measure of the overall data.",
+        "id": "176106",
+        "task_type": "statistical properties",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 11,
+            "serie": [
+              10.0,
+              60.0,
+              107.0,
+              148.0,
+              190.0,
+              223.0,
+              250.5,
+              272.5,
+              286.0,
+              298.0,
+              299.5
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "169068",
+      "metadata": {
+        "response": "Mean: 13.17, Median: 11.5, Range: 24.0 - 6.0 = 18.0. To calculate the mean, sum all values and divide by 24. The median is the middle value in the ordered data set. The range is calculated by subtracting the minimum value from the maximum value.",
+        "id": "169068",
+        "domain": "Web",
+        "question": "Provide a statistical summary (mean, median, range) of the data points [24.0, 14.0, 17.0, 11.0, 17.0, 7.0, 8.0, 17.0, 10.0, 13.0, 9.0, 9.0, 12.0, 7.0, 20.0, 12.0, 10.0, 6.0, 24.0, 8.0, 11.0, 13.0, 16.0, 11.0].",
+        "task_type": "statistical summary"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              24.0,
+              14.0,
+              17.0,
+              11.0,
+              17.0,
+              7.0,
+              8.0,
+              17.0,
+              10.0,
+              13.0,
+              9.0,
+              9.0,
+              12.0,
+              7.0,
+              20.0,
+              12.0,
+              10.0,
+              6.0,
+              24.0,
+              8.0,
+              11.0,
+              13.0,
+              16.0,
+              11.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "167931",
+      "metadata": {
+        "question": "Calculate the mean of these data points: [-0.16, -0.16, -0.17, -0.16, -0.16, -0.16, -0.15, -0.16, -0.16, -0.17, -0.16, -0.18, -0.17, -0.16, -0.19, -0.18, -0.17, -0.18, -0.18, -0.16, -0.16, -0.17, -0.16, -0.16].",
+        "response": "Mean = sum of all data points / number of data points = (-4.07) / 24 = -0.1695. Therefore, the mean of the data points is approximately -0.1695.",
+        "id": "167931",
+        "task_type": "statistical property analysis",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -0.16,
+              -0.16,
+              -0.17,
+              -0.16,
+              -0.16,
+              -0.16,
+              -0.15,
+              -0.16,
+              -0.16,
+              -0.17,
+              -0.16,
+              -0.18,
+              -0.17,
+              -0.16,
+              -0.19,
+              -0.18,
+              -0.17,
+              -0.18,
+              -0.18,
+              -0.16,
+              -0.16,
+              -0.17,
+              -0.16,
+              -0.16
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "192171",
+      "metadata": {
+        "id": "192171",
+        "task_type": "statistics",
+        "question": "Calculate the mean and explain its significance for this period [-4191.83, -4193.95, -4197.52, -4191.97, -4194.47, -4196.05, -4191.59, -4188.59, -4185.21, -4183.28, -4179.07, -4185.32, -4184.66, -4181.28, -4181.89, -4184.42, -4189.11].",
+        "response": "The mean is approximately -4190.30. It summarizes the central tendency, providing an average level explanation amongst the values, representing possible expected center of the time series during that period, helpful for generating insights into overall historical series behavior.",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 17,
+            "serie": [
+              -4191.83,
+              -4193.95,
+              -4197.52,
+              -4191.97,
+              -4194.47,
+              -4196.05,
+              -4191.59,
+              -4188.59,
+              -4185.21,
+              -4183.28,
+              -4179.07,
+              -4185.32,
+              -4184.66,
+              -4181.28,
+              -4181.89,
+              -4184.42,
+              -4189.11
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "178538",
+      "metadata": {
+        "response": "The mean of these data points is approximately 682.17. This is calculated by summing all numbers (16412.18) and then dividing by the number of data points (24). The mean value indicates that most of the data points are around 682, suggesting a central tendency towards this value.",
+        "id": "178538",
+        "question": "Calculate and comment on the mean of the data points [700.98, 704.13, 703.61, 703.03, 707.11, 707.41, 704.87, 703.36, 699.09, 694.19, 689.55, 685.41, 681.92, 675.59, 670.37, 668.03, 669.07, 667.71, 665.06, 661.15, 654.72, 655.06, 656.12, 651.2].",
+        "task_type": "statistical properties",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              700.98,
+              704.13,
+              703.61,
+              703.03,
+              707.11,
+              707.41,
+              704.87,
+              703.36,
+              699.09,
+              694.19,
+              689.55,
+              685.41,
+              681.92,
+              675.59,
+              670.37,
+              668.03,
+              669.07,
+              667.71,
+              665.06,
+              661.15,
+              654.72,
+              655.06,
+              656.12,
+              651.2
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "186214",
+      "metadata": {
+        "domain": "Healthcare",
+        "response": "Mean: 4.97, Median: 5.04. The mean is calculated by summing the values and dividing by the number of values. The sum is 119.25 and divided by 24 gives about 4.97. The median is the middle value when the data is ordered, here it is between 5.03 and 5.12, and thus approximately 5.04.",
+        "id": "186214",
+        "task_type": "statistical property",
+        "question": "Calculate the mean and median of the time series data points [3.5, 3.31, 3.34, 2.0, 3.84, 4.62, 5.03, 6.81, 7.34, 6.66, 7.16, 6.44, 6.06, 5.31, 5.12, 3.34, 3.0, 2.59, 3.19, 4.16, 5.38, 6.53, 6.88, 5.78]"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              3.5,
+              3.31,
+              3.34,
+              2.0,
+              3.84,
+              4.62,
+              5.03,
+              6.81,
+              7.34,
+              6.66,
+              7.16,
+              6.44,
+              6.06,
+              5.31,
+              5.12,
+              3.34,
+              3.0,
+              2.59,
+              3.19,
+              4.16,
+              5.38,
+              6.53,
+              6.88,
+              5.78
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "163872",
+      "metadata": {
+        "domain": "Healthcare",
+        "question": "Based on the time series points [6.22, 7.38, 9.75, 11.16, 10.09, 9.59, 11.03, 11.94, 10.5, 9.38, 10.78, 13.03, 12.94, 12.06, 13.06, 14.91, 14.94, 13.41, 12.69, 12.81, 11.59, 7.19, 3.41, 1.88], which statistical measure would best describe the data? \nA) Mean \nB) Median \nC) Mode",
+        "id": "163872",
+        "task_type": "statistical_property_analysis",
+        "response": "A) Mean. Due to the numerical nature and range of the data points, the mean is more representative for the central tendency, correcting for any typical high/low distribution."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              6.22,
+              7.38,
+              9.75,
+              11.16,
+              10.09,
+              9.59,
+              11.03,
+              11.94,
+              10.5,
+              9.38,
+              10.78,
+              13.03,
+              12.94,
+              12.06,
+              13.06,
+              14.91,
+              14.94,
+              13.41,
+              12.69,
+              12.81,
+              11.59,
+              7.19,
+              3.41,
+              1.88
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "164851",
+      "metadata": {
+        "id": "164851",
+        "response": "The mean is 0.29. This average indicates the central tendency of the data, which stays consistently low, exhibiting stability with a slight upward movement towards the higher values at the end.",
+        "domain": "Healthcare",
+        "task_type": "statistical_properties",
+        "question": "Calculate the mean of the data points [0.34, 0.34, 0.33, 0.33, 0.32, 0.32, 0.31, 0.31, 0.3, 0.3, 0.29, 0.29, 0.28, 0.28, 0.27, 0.27, 0.26, 0.26, 0.26, 0.26, 0.26, 0.27, 0.29, 0.33] and discuss its significance."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.34,
+              0.34,
+              0.33,
+              0.33,
+              0.32,
+              0.32,
+              0.31,
+              0.31,
+              0.3,
+              0.3,
+              0.29,
+              0.29,
+              0.28,
+              0.28,
+              0.27,
+              0.27,
+              0.26,
+              0.26,
+              0.26,
+              0.26,
+              0.26,
+              0.27,
+              0.29,
+              0.33
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "184824",
+      "metadata": {
+        "question": "Describe the distribution of data within these points: [-5.97, -3.84, -1.72, 1.12, 2.25, 5.66, 7.53, 7.78, 6.31, 5.41, 3.88, 1.97, 30.69, 30.25, 26.34, 28.56, 26.53, 28.44, 31.44, 33.34, 35.91, 37.78, 39.56, 39.69].",
+        "task_type": "data distribution",
+        "response": "The distribution appears bimodal. Initial negative to low positive numbers suggest one group; then, a jump to 26-39 characterizes the second one. The primary segment causes a wider range suggesting two distinct main clusters.",
+        "id": "184824",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -5.97,
+              -3.84,
+              -1.72,
+              1.12,
+              2.25,
+              5.66,
+              7.53,
+              7.78,
+              6.31,
+              5.41,
+              3.88,
+              1.97,
+              30.69,
+              30.25,
+              26.34,
+              28.56,
+              26.53,
+              28.44,
+              31.44,
+              33.34,
+              35.91,
+              37.78,
+              39.56,
+              39.69
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "189259",
+      "metadata": {
+        "task_type": "statistical analysis",
+        "domain": "Healthcare",
+        "question": "Calculate the mean of the data points [21.16, 20.66, 21.47, 23.53, 23.59, 21.84, 21.0, 22.22, 22.84, 21.56, 20.38, 21.69, 23.12, 21.72, 18.97, 18.41, 18.69, 17.81, 16.38, 17.81, 21.66, 24.91, 25.81, 27.25] and interpret the result.",
+        "id": "189259",
+        "response": "The mean is 21.67. By calculating (sum of the values = 520 / number of points = 24), we get an average of about 21.67. This indicates a central tendency slightly above 21, suggesting that despite the fluctuations, the series centers around this value."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              21.16,
+              20.66,
+              21.47,
+              23.53,
+              23.59,
+              21.84,
+              21.0,
+              22.22,
+              22.84,
+              21.56,
+              20.38,
+              21.69,
+              23.12,
+              21.72,
+              18.97,
+              18.41,
+              18.69,
+              17.81,
+              16.38,
+              17.81,
+              21.66,
+              24.91,
+              25.81,
+              27.25
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "172738",
+      "metadata": {
+        "id": "172738",
+        "response": "To analyze mean, add all values and divide by 24. For variance, find mean, subtract it from each point, square result, find average of those squares. This will indicate central tendency (mean) and spread (variance) of data.",
+        "question": "Discuss the statistical properties such as mean and variance of the data points [-2395.82, -2390.87, -2389.37, -2389.97, -2390.24, -2390.49, -2387.44, -2388.1, -2389.74, -2389.83, -2391.25, -2393.44, -2392.24, -2390.62, -2390.83, -2392.52, -2392.8, -2394.46, -2397.3, -2394.54, -2388.88, -2388.16, -2392.69, -2392.44].",
+        "domain": "Healthcare",
+        "task_type": "statistical properties"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -2395.82,
+              -2390.87,
+              -2389.37,
+              -2389.97,
+              -2390.24,
+              -2390.49,
+              -2387.44,
+              -2388.1,
+              -2389.74,
+              -2389.83,
+              -2391.25,
+              -2393.44,
+              -2392.24,
+              -2390.62,
+              -2390.83,
+              -2392.52,
+              -2392.8,
+              -2394.46,
+              -2397.3,
+              -2394.54,
+              -2388.88,
+              -2388.16,
+              -2392.69,
+              -2392.44
+            ]
+          }
+        ],
+        "output": []
+      }
+    }
+  ]
+}

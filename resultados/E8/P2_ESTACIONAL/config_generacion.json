@@ -1,0 +1,2201 @@
+{
+  "escenario": "E8_gemma_qwen",
+  "perfil": "P2_ESTACIONAL",
+  "query": "Simular el flujo diario de pasajeros en una estación de metro durante un año completo. Dominio: Transporte urbano. Variable estricta: Únicamente 'Pasajeros'. Perfil matemático: P2_ESTACIONAL, con ciclos semanales marcados (mayor afluencia en días laborales y menor en fines de semana), sin tendencia global. Escala: promedio de 15000 pasajeros diarios.",
+  "dominio": "transporte",
+  "structured_prompt": {
+    "values": {
+      "tema": "Daily passenger count at a metro station",
+      "dominio": "Transportation",
+      "localizacion": "New York City",
+      "frecuencia": "Daily",
+      "start_date": "2023-01-01",
+      "variables": [
+        "Pasajeros"
+      ],
+      "target_value": 15000.0,
+      "tipo_serie": "univariada",
+      "profile_id": "P2_ESTACIONAL",
+      "num_series_configuradas": 365,
+      "puntos_por_serie_configurados": 1
+    },
+    "missing_parameters": [],
+    "pending_questions": [],
+    "justification": "The time series represents the daily passenger count at a metro station in New York City. The sample rate is daily, and the duration is one year. The time series is expected to show a weekly pattern with higher passenger count on weekdays and lower on weekends. There is no global trend.",
+    "suggested_search": "Time series analysis of metro passenger count in New York City",
+    "search_strategy": "Search for time series data on metro passenger count in New York City. The data should be sampled daily for a year. The time series should show a weekly pattern with higher passenger count on weekdays and lower on weekends.",
+    "confidence": 0.9
+  },
+  "metadata_summary": {
+    "count": 50,
+    "refinements_applied": [
+      "broaden_domain"
+    ],
+    "domain": "Transportation",
+    "rag_dataset": "TSQA",
+    "diversity_score": 0.3116666666666667
+  },
+  "seed_dataset": [
+    {
+      "id": "189397",
+      "metadata": {
+        "id": "189397",
+        "response": "Correct answer: D) 345.2. To compute the mean, sum up all data points (8307.0) and divide by the number of data points (24): Mean = 8307.0 / 24 = 345.2.",
+        "task_type": "central_tendency",
+        "domain": "Traffic",
+        "question": "What is the mean value of the time series data [422.0, 520.0, 609.0, 656.0, 643.0, 666.0, 367.0, 61.0, 72.0, 77.0, 7.0, 12.0, 4.0, 10.0, 55.0, 91.0, 158.0, 201.0, 273.0, 453.0, 478.0, 542.0, 578.0, 285.0]? Options: A) 309.8 B) 400.5 C) 324.7 D) 345.2"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              422.0,
+              520.0,
+              609.0,
+              656.0,
+              643.0,
+              666.0,
+              367.0,
+              61.0,
+              72.0,
+              77.0,
+              7.0,
+              12.0,
+              4.0,
+              10.0,
+              55.0,
+              91.0,
+              158.0,
+              201.0,
+              273.0,
+              453.0,
+              478.0,
+              542.0,
+              578.0,
+              285.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "169566",
+      "metadata": {
+        "question": "Calculate the mean of the following data set: [782.0, 853.0, 493.0, 423.0, 243.0, 353.0, 538.0, 294.0, 114.0, 273.0, 493.0, 92.0, 213.0, 311.0, 458.0, 874.0, 574.0, 323.0, 214.0, 112.0, 381.0, 582.0, 843.0, 123.0].",
+        "response": "The mean is calculated by summing all values and dividing by the count. (782+853+493+423+243+353+538+294+114+273+493+92+213+311+458+874+574+323+214+112+381+582+843+123)/24 = 397.5.",
+        "domain": "Traffic",
+        "task_type": "statistical_properties",
+        "id": "169566"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              782.0,
+              853.0,
+              493.0,
+              423.0,
+              243.0,
+              353.0,
+              538.0,
+              294.0,
+              114.0,
+              273.0,
+              493.0,
+              92.0,
+              213.0,
+              311.0,
+              458.0,
+              874.0,
+              574.0,
+              323.0,
+              214.0,
+              112.0,
+              381.0,
+              582.0,
+              843.0,
+              123.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "188919",
+      "metadata": {
+        "id": "188919",
+        "question": "Calculate and interpret the mean of this data set segment: [731.0, 632.0, 670.0, 537.0, 1008.0, 992.0, 581.0, 583.0, 465.0, 591.0, 379.0, 294.0, 243.0, 144.0, 146.0, 64.0, 62.0, 15.0, 7.0, 7.0, 4.0, 18.0, 61.0, 214.0].",
+        "response": "The mean is calculated by summing all values and dividing by the number of values: (731.0 + 632.0 + 670.0 + 537.0 + 1008.0 + 992.0 + 581.0 + 583.0 + 465.0 + 591.0 + 379.0 + 294.0 + 243.0 + 144.0 + 146.0 + 64.0 + 62.0 + 15.0 + 7.0 + 7.0 + 4.0 + 18.0 + 61.0 + 214.0) / 24 = 388.83 approximately. This indicates moderate central tendency given the high peaks and low troughs.",
+        "domain": "Traffic",
+        "task_type": "statistical property"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              731.0,
+              632.0,
+              670.0,
+              537.0,
+              1008.0,
+              992.0,
+              581.0,
+              583.0,
+              465.0,
+              591.0,
+              379.0,
+              294.0,
+              243.0,
+              144.0,
+              146.0,
+              64.0,
+              62.0,
+              15.0,
+              7.0,
+              7.0,
+              4.0,
+              18.0,
+              61.0,
+              214.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "175637",
+      "metadata": {
+        "id": "175637",
+        "task_type": "basic calculations",
+        "domain": "Traffic",
+        "response": "B) 960.42. To find the average, add all values together and divide by the number of values: (187.0 + 55.0 + 13.0 + 14.0 + 37.0 + ... + 1172.0 + 1279.0) / 24. The sum is 23041 and the average is 23041/24 = 960.42.",
+        "question": "Calculate the average of the data points [187.0, 55.0, 13.0, 14.0, 37.0, 49.0, 96.0, 308.0, 856.0, 1545.0, 918.0, 623.0, 797.0, 1122.0, 1028.0, 1027.0, 1129.0, 1674.0, 2290.0, 2177.0, 1943.0, 884.0, 1172.0, 1279.0]? Options: A) 832.67 B) 960.42 C) 880.15 D) 1023.33."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              187.0,
+              55.0,
+              13.0,
+              14.0,
+              37.0,
+              49.0,
+              96.0,
+              308.0,
+              856.0,
+              1545.0,
+              918.0,
+              623.0,
+              797.0,
+              1122.0,
+              1028.0,
+              1027.0,
+              1129.0,
+              1674.0,
+              2290.0,
+              2177.0,
+              1943.0,
+              884.0,
+              1172.0,
+              1279.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "172092",
+      "metadata": {
+        "task_type": "summary_statistic",
+        "question": "Calculate and interpret the mean of the data points [57.0, 4.0, 4.0, 0.0, 6.0, 3.0, 8.0, 28.0, 58.0, 95.0].",
+        "response": "Mean = (57.0 + 4.0 + 4.0 + 0.0 + 6.0 + 3.0 + 8.0 + 28.0 + 58.0 + 95.0) / 10 = 26.3. The mean suggests that the average data point value over this series is 26.3, indicating central tendency between lower and a few much higher values.",
+        "domain": "Traffic",
+        "id": "172092"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              57.0,
+              4.0,
+              4.0,
+              0.0,
+              6.0,
+              3.0,
+              8.0,
+              28.0,
+              58.0,
+              95.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "178856",
+      "metadata": {
+        "domain": "Traffic",
+        "id": "178856",
+        "response": "The arithmetic mean is calculated by dividing the sum of all the data points by the number of points: (400.0 + 374.0 + ... + 467.0) / 24 = 201.083. Hence, the arithmetic mean is approximately 201.083.",
+        "task_type": "mean_calculation",
+        "question": "Find the arithmetic mean of the selected time series data points: [400.0, 374.0, 380.0, 476.0, 339.0, 392.0, 410.0, 97.0, 26.0, 31.0, 34.0, 21.0, 20.0, 4.0, 0.0, 0.0, 3.0, 0.0, 1.0, 26.0, 81.0, 501.0, 374.0, 467.0]."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              400.0,
+              374.0,
+              380.0,
+              476.0,
+              339.0,
+              392.0,
+              410.0,
+              97.0,
+              26.0,
+              31.0,
+              34.0,
+              21.0,
+              20.0,
+              4.0,
+              0.0,
+              0.0,
+              3.0,
+              0.0,
+              1.0,
+              26.0,
+              81.0,
+              501.0,
+              374.0,
+              467.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "189874",
+      "metadata": {
+        "domain": "Traffic",
+        "task_type": "mean_calculation",
+        "id": "189874",
+        "response": "To find the mean, sum all the values and divide by 24. The total sum is 34035.0. Dividing by 24 gives an approximate mean of 1418.13.",
+        "question": "Calculate the mean of the series [284.0, 167.0, 87.0, 39.0, 54.0, 82.0, 226.0, 338.0, 408.0, 596.0, 880.0, 1503.0, 1710.0, 1703.0, 1621.0, 1816.0, 1604.0, 2236.0, 2190.0, 1890.0, 2234.0, 2330.0, 2494.0, 2239.0]."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              284.0,
+              167.0,
+              87.0,
+              39.0,
+              54.0,
+              82.0,
+              226.0,
+              338.0,
+              408.0,
+              596.0,
+              880.0,
+              1503.0,
+              1710.0,
+              1703.0,
+              1621.0,
+              1816.0,
+              1604.0,
+              2236.0,
+              2190.0,
+              1890.0,
+              2234.0,
+              2330.0,
+              2494.0,
+              2239.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "178780",
+      "metadata": {
+        "domain": "Traffic",
+        "id": "178780",
+        "task_type": "seasonality_detection",
+        "response": "False. The data does not show a clear repetitive pattern or seasonality. The increase appears more like a trend rather than seasonal fluctuations.",
+        "question": "The following data points [212.0, 210.0, 300.0, 593.0, 772.0, 994.0, 1342.0, 1948.0, 2624.0, 1899.0, 2234.0, 2330.0] exhibit a clear seasonal pattern. True or False?"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 12,
+            "serie": [
+              212.0,
+              210.0,
+              300.0,
+              593.0,
+              772.0,
+              994.0,
+              1342.0,
+              1948.0,
+              2624.0,
+              1899.0,
+              2234.0,
+              2330.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "187022",
+      "metadata": {
+        "domain": "Traffic",
+        "id": "187022",
+        "task_type": "seasonality identification",
+        "question": "Can you identify any seasonal pattern in this subset of data? [3.0, 11.0, 104.0, 613.0, 148.0, 545.0, 315.0, 977.0, 780.0, 1127.0, 1383.0, 901.0, 1150.0, 2134.0, 1786.0, 531.0, 263.0, 148.0, 141.0, 179.0, 112.0, 41.0, 17.0, 27.0]. Options: a) Yes, there is a winter peak pattern b) No, the series does not show a clear seasonal pattern c) Yes, there is a summer trough pattern",
+        "response": "b) No, the series does not show a clear seasonal pattern. The data fluctuates considerably without a repeated interval or recognizable seasonal pattern across the selected points."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              3.0,
+              11.0,
+              104.0,
+              613.0,
+              148.0,
+              545.0,
+              315.0,
+              977.0,
+              780.0,
+              1127.0,
+              1383.0,
+              901.0,
+              1150.0,
+              2134.0,
+              1786.0,
+              531.0,
+              263.0,
+              148.0,
+              141.0,
+              179.0,
+              112.0,
+              41.0,
+              17.0,
+              27.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "170915",
+      "metadata": {
+        "task_type": "data_summarization",
+        "response": "The series posts a peak at 3496 before undergoing a substantial decline down to 106. This suggests a significant downturn after an initial peak. The series illustrates a volatile movement with a decisively downward trend.",
+        "id": "170915",
+        "question": "Provide a summary of the time series [2877.0, 3496.0, 2581.0, 1274.0, 520.0, 201.0, 123.0, 114.0, 106.0, 182.0]. What main patterns can be observed?",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              2877.0,
+              3496.0,
+              2581.0,
+              1274.0,
+              520.0,
+              201.0,
+              123.0,
+              114.0,
+              106.0,
+              182.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "181834",
+      "metadata": {
+        "id": "181834",
+        "question": "Does the segment [98.0, 98.0, 88.0, 161.0, 208.0, 298.0, 470.0, 660.0, 684.0, 716.0, 588.0, 598.0, 556.0, 494.0, 435.0, 442.0, 287.0, 157.0, 121.0, 70.0, 51.0, 16.0, 19.0, 11.0] display any of the following seasonal patterns? A) Annual, B) Monthly, C) Daily, D) No seasonality observed.",
+        "task_type": "seasonality",
+        "response": "D) No seasonality observed. The data shows no consistent repeating pattern typical of seasonal series.",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              98.0,
+              98.0,
+              88.0,
+              161.0,
+              208.0,
+              298.0,
+              470.0,
+              660.0,
+              684.0,
+              716.0,
+              588.0,
+              598.0,
+              556.0,
+              494.0,
+              435.0,
+              442.0,
+              287.0,
+              157.0,
+              121.0,
+              70.0,
+              51.0,
+              16.0,
+              19.0,
+              11.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "180759",
+      "metadata": {
+        "id": "180759",
+        "task_type": "statistical_property",
+        "question": "Calculate the mean of the data points [1083.0, 965.0, 1116.0, 1661.0, 1718.0, 1447.0, 1473.0, 1887.0, 2397.0, 1838.0, 1520.0, 1304.0, 1055.0, 735.0, 428.0, 196.0, 122.0, 112.0, 62.0, 31.0, 120.0, 389.0, 632.0, 1253.0].",
+        "response": "The mean is approximately 1014.2. This is calculated by summing all the data points (24869.0) and dividing by the number of points (24). This provides an overview of the central tendency of the dataset.",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              1083.0,
+              965.0,
+              1116.0,
+              1661.0,
+              1718.0,
+              1447.0,
+              1473.0,
+              1887.0,
+              2397.0,
+              1838.0,
+              1520.0,
+              1304.0,
+              1055.0,
+              735.0,
+              428.0,
+              196.0,
+              122.0,
+              112.0,
+              62.0,
+              31.0,
+              120.0,
+              389.0,
+              632.0,
+              1253.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "174843",
+      "metadata": {
+        "task_type": "seasonality",
+        "response": "b) Weak Seasonality. The data shows some repeating patterns but the peaks and valleys are not perfectly regular, which indicates some weak seasonality.",
+        "id": "174843",
+        "question": "Analyze the following data points: [0.0, 8.0, 26.0, 91.0, 82.0, 72.0, 61.0, 61.0, 102.0, 91.0, 75.0, 88.0, 123.0, 137.0, 67.0, 60.0, 32.0, 13.0, 11.0, 2.0, 2.0, 3.0, 1.0, 1.0]. Does the data show evidence of seasonality? \n(a) Strong Seasonality \n(b) Weak Seasonality \n(c) No Seasonality",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.0,
+              8.0,
+              26.0,
+              91.0,
+              82.0,
+              72.0,
+              61.0,
+              61.0,
+              102.0,
+              91.0,
+              75.0,
+              88.0,
+              123.0,
+              137.0,
+              67.0,
+              60.0,
+              32.0,
+              13.0,
+              11.0,
+              2.0,
+              2.0,
+              3.0,
+              1.0,
+              1.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "174578",
+      "metadata": {
+        "domain": "Traffic",
+        "response": "The correct answer is a) 1450.0. To determine the average, sum all data points and divide by the number of observations. The sum is 34823.0, and there are 24 points, resulting in an average of approximately 1450.96.",
+        "task_type": "statistical_property",
+        "question": "Given the data points [2234.0, 3339.0, 3882.0, 3308.0, 3263.0, 3669.0, 3591.0, 3060.0, 2500.0, 2243.0, 2001.0, 1524.0, 1427.0, 1260.0, 625.0, 345.0, 235.0, 119.0, 93.0, 107.0, 274.0, 630.0, 1055.0, 1512.0], what is the approximate average of these values? a) 1450.0 b) 1900.0 c) 2350.0 d) 1800.0",
+        "id": "174578"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              2234.0,
+              3339.0,
+              3882.0,
+              3308.0,
+              3263.0,
+              3669.0,
+              3591.0,
+              3060.0,
+              2500.0,
+              2243.0,
+              2001.0,
+              1524.0,
+              1427.0,
+              1260.0,
+              625.0,
+              345.0,
+              235.0,
+              119.0,
+              93.0,
+              107.0,
+              274.0,
+              630.0,
+              1055.0,
+              1512.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "183818",
+      "metadata": {
+        "id": "183818",
+        "domain": "Traffic",
+        "question": "Given the data [35.0, 13.0, 11.0, 9.0, 6.0, 3.0, 6.0, 1.0, 3.0, 21.0, 305.0, 653.0, 1511.0, 750.0, 331.0, 265.0, 800.0, 829.0, 384.0, 404.0, 799.0, 1511.0, 590.0, 224.0], calculate the mean and identify the median value.",
+        "response": "The mean is calculated by summing all data points (9351.0) and dividing by the number of points (24), resulting in a mean of approximately 389.625. The median, which is the middle value of the ordered series, is 221.5: (224.0 + 219.0)/2. The median is found by ordering the data and finding the middle point(s).",
+        "task_type": "statistical_analysis"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              35.0,
+              13.0,
+              11.0,
+              9.0,
+              6.0,
+              3.0,
+              6.0,
+              1.0,
+              3.0,
+              21.0,
+              305.0,
+              653.0,
+              1511.0,
+              750.0,
+              331.0,
+              265.0,
+              800.0,
+              829.0,
+              384.0,
+              404.0,
+              799.0,
+              1511.0,
+              590.0,
+              224.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "172670",
+      "metadata": {
+        "response": "Mean = 122.83. Reasoning: Sum of all values = 2948. Number of data points = 24. Mean is calculated as the total sum divided by the count of data points, which is 2948 / 24 = 122.83.",
+        "domain": "Traffic",
+        "task_type": "statistical property",
+        "question": "Calculate the mean of the data: [184.0, 173.0, 154.0, 193.0, 174.0, 265.0, 229.0, 143.0, 108.0, 123.0, 84.0, 45.0, 23.0, 22.0, 3.0, 5.0, 15.0, 5.0, 23.0, 57.0, 138.0, 142.0, 136.0, 146.0].",
+        "id": "172670"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              184.0,
+              173.0,
+              154.0,
+              193.0,
+              174.0,
+              265.0,
+              229.0,
+              143.0,
+              108.0,
+              123.0,
+              84.0,
+              45.0,
+              23.0,
+              22.0,
+              3.0,
+              5.0,
+              15.0,
+              5.0,
+              23.0,
+              57.0,
+              138.0,
+              142.0,
+              136.0,
+              146.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "183139",
+      "metadata": {
+        "response": "False. The dataset does not show clear seasonal patterns or regularly repeating cycles that occur at consistent intervals typical of seasonal trends. The variations observed are uneven and do not suggest seasonality.",
+        "id": "183139",
+        "domain": "Traffic",
+        "question": "The dataset [1.0, 2.0, 0.0, 3.0, 8.0, 24.0, 33.0, 46.0, 128.0, 96.0, 103.0, 134.0, 145.0, 154.0, 125.0, 71.0, 39.0, 36.0, 28.0, 15.0, 11.0] demonstrates a seasonal pattern. True or False?",
+        "task_type": "seasonality"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 21,
+            "serie": [
+              1.0,
+              2.0,
+              0.0,
+              3.0,
+              8.0,
+              24.0,
+              33.0,
+              46.0,
+              128.0,
+              96.0,
+              103.0,
+              134.0,
+              145.0,
+              154.0,
+              125.0,
+              71.0,
+              39.0,
+              36.0,
+              28.0,
+              15.0,
+              11.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "182029",
+      "metadata": {
+        "id": "182029",
+        "task_type": "statistical property",
+        "question": "Calculate the mean of the following time series subset: [716.0, 606.0, 595.0, 1213.0, 1483.0, 2687.0, 1001.0, 2367.0, 2041.0, 3201.0, 1317.0, 1218.0, 1607.0, 2061.0, 1954.0, 1848.0, 2114.0, 1415.0, 1910.0, 1971.0, 1811.0, 1564.0, 1011.0, 929.0]",
+        "domain": "Traffic",
+        "response": "The mean is calculated by adding all the numbers in the subset and then dividing by the total number of points, which is 24. The calculation results in a sum of 39192 divided by 24, yielding a mean of approximately 1633.0. This average provides a centralized value around which the data varies."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              716.0,
+              606.0,
+              595.0,
+              1213.0,
+              1483.0,
+              2687.0,
+              1001.0,
+              2367.0,
+              2041.0,
+              3201.0,
+              1317.0,
+              1218.0,
+              1607.0,
+              2061.0,
+              1954.0,
+              1848.0,
+              2114.0,
+              1415.0,
+              1910.0,
+              1971.0,
+              1811.0,
+              1564.0,
+              1011.0,
+              929.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "166492",
+      "metadata": {
+        "id": "166492",
+        "question": "The data set [1.0, 2.0, 4.0, 3.0, 21.0, 53.0, 76.0, 174.0, 85.0, 71.0, 135.0, 126.0, 87.0, 69.0, 100.0, 82.0, 89.0, 57.0, 20.0, 13.0, 22.0, 19.0, 11.0, 4.0] exhibits clear seasonal patterns. True or False?",
+        "response": "False. While there are ups and downs in the data, they do not exhibit a regular, repeated pattern characteristic of seasonality.",
+        "domain": "Traffic",
+        "task_type": "seasonality_patterns"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              1.0,
+              2.0,
+              4.0,
+              3.0,
+              21.0,
+              53.0,
+              76.0,
+              174.0,
+              85.0,
+              71.0,
+              135.0,
+              126.0,
+              87.0,
+              69.0,
+              100.0,
+              82.0,
+              89.0,
+              57.0,
+              20.0,
+              13.0,
+              22.0,
+              19.0,
+              11.0,
+              4.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "167901",
+      "metadata": {
+        "id": "167901",
+        "task_type": "summary statistics",
+        "domain": "Traffic",
+        "response": "The mean is the average of the numbers, calculated as the sum of all numbers divided by the count of numbers. The variance measures the dispersion and is calculated using the formula: sum((x_i - mean)^2) / (n-1). Mean = 51412 / 24 = 2142.17. Variance = sum of squared differences from the Mean / 23. Calculation values would be filled step by step.",
+        "question": "Calculate the mean and variance of the data points [98.0, 74.0, 114.0, 48.0, 14.0, 30.0, 59.0, 155.0, 236.0, 288.0, 521.0, 911.0, 825.0, 583.0, 484.0, 582.0, 778.0, 1090.0, 1293.0, 1227.0, 996.0, 959.0, 737.0, 490.0]."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              98.0,
+              74.0,
+              114.0,
+              48.0,
+              14.0,
+              30.0,
+              59.0,
+              155.0,
+              236.0,
+              288.0,
+              521.0,
+              911.0,
+              825.0,
+              583.0,
+              484.0,
+              582.0,
+              778.0,
+              1090.0,
+              1293.0,
+              1227.0,
+              996.0,
+              959.0,
+              737.0,
+              490.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "187349",
+      "metadata": {
+        "id": "187349",
+        "response": "B) Weak or no seasonal pattern. The data does not display a repeating pattern at regular intervals that would indicate seasonality.",
+        "task_type": "seasonal pattern",
+        "domain": "Traffic",
+        "question": "Does the following set [4.0, 2.0, 59.0, 229.0, 707.0, 670.0, 621.0, 558.0, 1105.0, 899.0, 581.0, 578.0, 455.0, 522.0, 354.0, 205.0, 208.0, 460.0, 540.0] show signs of a seasonal pattern? A) Strong seasonal pattern B) Weak or no seasonal pattern C) Definite seasonal pattern every 4 steps D) Random fluctuations"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 19,
+            "serie": [
+              4.0,
+              2.0,
+              59.0,
+              229.0,
+              707.0,
+              670.0,
+              621.0,
+              558.0,
+              1105.0,
+              899.0,
+              581.0,
+              578.0,
+              455.0,
+              522.0,
+              354.0,
+              205.0,
+              208.0,
+              460.0,
+              540.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "178787",
+      "metadata": {
+        "question": "Based on the data points [86.0, 152.0, 149.0, 173.0, 172.0, 124.0, 112.0, 85.0, 77.0, 92.0, 37.0, 34.0, 22.0, 9.0, 6.0, 8.0, 7.0, 10.0, 26.0, 62.0, 91.0, 84.0, 80.0, 100.0], what is the most notable trend? A) Steady increase, B) Steady decrease, C) Short increase followed by a long decrease, D) Short decrease followed by a long increase",
+        "id": "178787",
+        "domain": "Traffic",
+        "task_type": "trend analysis",
+        "response": "C) Short increase followed by a long decrease. The series starts with an increase reaching 172.0, then drops significantly to 9.0, before a slight upward trend at the end."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              86.0,
+              152.0,
+              149.0,
+              173.0,
+              172.0,
+              124.0,
+              112.0,
+              85.0,
+              77.0,
+              92.0,
+              37.0,
+              34.0,
+              22.0,
+              9.0,
+              6.0,
+              8.0,
+              7.0,
+              10.0,
+              26.0,
+              62.0,
+              91.0,
+              84.0,
+              80.0,
+              100.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "168847",
+      "metadata": {
+        "id": "168847",
+        "question": "Based on the data points [987.0, 1156.0, 1058.0, 841.0, 896.0, 830.0, 735.0, 554.0, 538.0, 348.0, 241.0, 202.0, 127.0, 136.0, 162.0, 315.0, 423.0, 641.0, 849.0, 886.0, 925.0, 807.0, 798.0, 749.0], there is a clear pattern of seasonality present.",
+        "response": "Answer: False. The data points do not present any recurring seasonal patterns over time, indicating a lack of clear seasonality in the series.",
+        "task_type": "seasonality_analysis",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              987.0,
+              1156.0,
+              1058.0,
+              841.0,
+              896.0,
+              830.0,
+              735.0,
+              554.0,
+              538.0,
+              348.0,
+              241.0,
+              202.0,
+              127.0,
+              136.0,
+              162.0,
+              315.0,
+              423.0,
+              641.0,
+              849.0,
+              886.0,
+              925.0,
+              807.0,
+              798.0,
+              749.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "190965",
+      "metadata": {
+        "domain": "Traffic",
+        "id": "190965",
+        "task_type": "seasonality detection",
+        "response": "False. The subset does not exhibit clear patterns of seasonality. Seasonality involves repeating patterns at regular intervals, but this data does not show such periodicity; instead, it shows irregular fluctuations with peaks and troughs.",
+        "question": "Does the subset of data [399.0, 311.0, 234.0, 103.0, 89.0, 44.0, 31.0, 19.0, 12.0, 7.0, 18.0, 99.0, 233.0, 615.0, 597.0, 996.0, 1483.0, 2687.0, 3142.0, 2061.0, 1954.0, 1848.0, 2114.0, 1415.0] show any signs of seasonality?"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              399.0,
+              311.0,
+              234.0,
+              103.0,
+              89.0,
+              44.0,
+              31.0,
+              19.0,
+              12.0,
+              7.0,
+              18.0,
+              99.0,
+              233.0,
+              615.0,
+              597.0,
+              996.0,
+              1483.0,
+              2687.0,
+              3142.0,
+              2061.0,
+              1954.0,
+              1848.0,
+              2114.0,
+              1415.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "185122",
+      "metadata": {
+        "domain": "Traffic",
+        "response": "The mean is approximately 852.4, calculated by summing up all data points (20,457) and dividing by the number of data points (24). This suggests that on average, the data oscillates around this central point.",
+        "question": "Calculate and interpret the mean of the selected data points [186.0, 322.0, 347.0, 442.0, 643.0, 1375.0, 1336.0, 791.0, 754.0, 965.0, 1370.0, 1379.0, 1255.0, 1214.0, 1147.0, 1311.0, 1294.0, 1035.0, 744.0, 700.0, 420.0, 330.0, 128.0, 90.0].",
+        "task_type": "statistical_property_calculation",
+        "id": "185122"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              186.0,
+              322.0,
+              347.0,
+              442.0,
+              643.0,
+              1375.0,
+              1336.0,
+              791.0,
+              754.0,
+              965.0,
+              1370.0,
+              1379.0,
+              1255.0,
+              1214.0,
+              1147.0,
+              1311.0,
+              1294.0,
+              1035.0,
+              744.0,
+              700.0,
+              420.0,
+              330.0,
+              128.0,
+              90.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "183971",
+      "metadata": {
+        "response": "b) No. The data does not show a repeating pattern or periodicity that would indicate seasonality.",
+        "question": "Is there any sign of seasonality in the sequence [25.0, 17.0, 14.0, 8.0, 12.0, 8.0, 15.0, 66.0, 152.0, 125.0, 209.0, 353.0, 732.0, 633.0, 498.0, 377.0, 505.0, 682.0, 814.0, 880.0, 669.0, 577.0, 493.0, 377.0]? a) Yes b) No",
+        "domain": "Traffic",
+        "id": "183971",
+        "task_type": "seasonality identification"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              25.0,
+              17.0,
+              14.0,
+              8.0,
+              12.0,
+              8.0,
+              15.0,
+              66.0,
+              152.0,
+              125.0,
+              209.0,
+              353.0,
+              732.0,
+              633.0,
+              498.0,
+              377.0,
+              505.0,
+              682.0,
+              814.0,
+              880.0,
+              669.0,
+              577.0,
+              493.0,
+              377.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "181819",
+      "metadata": {
+        "question": "Do the data points [1012.0, 1978.0, 2389.0, 1777.0, 2162.0, 1826.0, 2081.0, 1434.0, 1244.0, 1059.0, 755.0, 504.0, 182.0, 107.0, 70.0, 37.0, 21.0, 19.0, 40.0, 131.0, 493.0, 958.0, 753.0, 953.0] show any seasonal patterns?",
+        "id": "181819",
+        "task_type": "seasonality identification",
+        "response": "Yes, possible seasonal patterns with two distinct periods where high values are clustered around the start (1012.0 to 2081.0) and a dip in the middle (183.0 to 964.0), suggesting a seasonal repeat.",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              1012.0,
+              1978.0,
+              2389.0,
+              1777.0,
+              2162.0,
+              1826.0,
+              2081.0,
+              1434.0,
+              1244.0,
+              1059.0,
+              755.0,
+              504.0,
+              182.0,
+              107.0,
+              70.0,
+              37.0,
+              21.0,
+              19.0,
+              40.0,
+              131.0,
+              493.0,
+              958.0,
+              753.0,
+              953.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "172428",
+      "metadata": {
+        "id": "172428",
+        "question": "Does the series [385.0, 939.0, 1522.0, 841.0, 838.0, 946.0, 1087.0, 1059.0, 1047.0, 1206.0, 1640.0, 2180.0, 1341.0, 1041.0, 618.0, 442.0, 556.0, 153.0, 75.0, 14.0, 23.0, 21.0, 40.0, 115.0] exhibit seasonal patterns?",
+        "domain": "Traffic",
+        "response": "False. The data does not show clear seasonality, which would require repetitive and predictable periodic patterns, usually over regular intervals, while this series exhibits more irregular cycles.",
+        "task_type": "seasonality identification"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              385.0,
+              939.0,
+              1522.0,
+              841.0,
+              838.0,
+              946.0,
+              1087.0,
+              1059.0,
+              1047.0,
+              1206.0,
+              1640.0,
+              2180.0,
+              1341.0,
+              1041.0,
+              618.0,
+              442.0,
+              556.0,
+              153.0,
+              75.0,
+              14.0,
+              23.0,
+              21.0,
+              40.0,
+              115.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "191580",
+      "metadata": {
+        "question": "Analyze the data points [90.0, 184.0, 279.0, 271.0, 375.0, 489.0, 970.0, 989.0, 701.0, 666.0, 772.0, 848.0, 730.0, 623.0, 514.0, 422.0, 355.0, 264.0, 142.0, 79.0, 29.0, 40.0, 39.0, 51.0] and describe the overall trend observed.",
+        "domain": "Traffic",
+        "response": "The data shows an initial increasing trend from 90.0 to a peak of 989.0, followed by a general decreasing trend down to 51.0. The fluctuations suggest a peak followed by a decline over time.",
+        "id": "191580",
+        "task_type": "trend_analysis"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              90.0,
+              184.0,
+              279.0,
+              271.0,
+              375.0,
+              489.0,
+              970.0,
+              989.0,
+              701.0,
+              666.0,
+              772.0,
+              848.0,
+              730.0,
+              623.0,
+              514.0,
+              422.0,
+              355.0,
+              264.0,
+              142.0,
+              79.0,
+              29.0,
+              40.0,
+              39.0,
+              51.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "170449",
+      "metadata": {
+        "task_type": "mean_calculation",
+        "question": "Calculate the mean of the data points [85.0, 73.0, 56.0, 45.0, 37.0, 42.0, 58.0, 77.0, 94.0, 109.0, 117.0, 120.0, 124.0, 132.0, 140.0, 147.0, 152.0, 156.0, 162.0, 169.0, 174.0, 178.0, 182.0, 191.0].",
+        "domain": "Traffic",
+        "response": "The mean is calculated as the sum of all values divided by their count. Sum = 2713.0; Count = 24. Mean = 2713.0/24 = 113.04.",
+        "id": "170449"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              85.0,
+              73.0,
+              56.0,
+              45.0,
+              37.0,
+              42.0,
+              58.0,
+              77.0,
+              94.0,
+              109.0,
+              117.0,
+              120.0,
+              124.0,
+              132.0,
+              140.0,
+              147.0,
+              152.0,
+              156.0,
+              162.0,
+              169.0,
+              174.0,
+              178.0,
+              182.0,
+              191.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "167151",
+      "metadata": {
+        "task_type": "trend_analysis",
+        "domain": "Traffic",
+        "question": "Based on the data points [2424.0, 2406.0, 1949.0, 1767.0, 1700.0, 1203.0, 785.0, 293.0, 76.0, 101.0, 118.0, 28.0, 68.0, 187.0, 328.0, 634.0, 679.0, 818.0, 780.0, 1854.0, 2323.0, 1972.0, 2046.0, 2090.0], what trend do you observe? (a) Increasing (b) Decreasing (c) Stable (d) Cyclical",
+        "id": "167151",
+        "response": "The correct answer is (b) Decreasing. The data shows a downward trend from the beginning towards the middle, indicating a general decline before a partial recovery at the end."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              2424.0,
+              2406.0,
+              1949.0,
+              1767.0,
+              1700.0,
+              1203.0,
+              785.0,
+              293.0,
+              76.0,
+              101.0,
+              118.0,
+              28.0,
+              68.0,
+              187.0,
+              328.0,
+              634.0,
+              679.0,
+              818.0,
+              780.0,
+              1854.0,
+              2323.0,
+              1972.0,
+              2046.0,
+              2090.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "174793",
+      "metadata": {
+        "id": "174793",
+        "domain": "Traffic",
+        "task_type": "seasonality_patterns",
+        "question": "Does the sequence [10.0, 12.0, 5.0, 7.0, 20.0, 18.0, 25.0, 30.0, 14.0, 16.0, 9.0, 11.0, 23.0, 21.0, 26.0, 31.0, 12.0, 15.0, 8.0, 10.0, 22.0, 20.0, 24.0, 28.0] show any seasonality?",
+        "response": "Yes, the data potentially exhibits seasonality. The recurrent increase in values with a somewhat repetitive pattern suggests a seasonal component, though more data might be needed for a definitive conclusion."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              10.0,
+              12.0,
+              5.0,
+              7.0,
+              20.0,
+              18.0,
+              25.0,
+              30.0,
+              14.0,
+              16.0,
+              9.0,
+              11.0,
+              23.0,
+              21.0,
+              26.0,
+              31.0,
+              12.0,
+              15.0,
+              8.0,
+              10.0,
+              22.0,
+              20.0,
+              24.0,
+              28.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "181120",
+      "metadata": {
+        "id": "181120",
+        "response": "The mean is approximately 569.8. This value represents the average of the data points, calculated by summing all values and dividing by the total number of data points: (∑ data points) / 24.",
+        "question": "Calculate and interpret the mean of the dataset [20.0, 10.0, 2.0, 26.0, 46.0, 198.0, 766.0, 1974.0, 1192.0, 751.0, 637.0, 1533.0, 1644.0, 845.0, 680.0, 774.0, 1399.0, 725.0, 296.0, 178.0, 110.0, 72.0, 74.0, 21.0].",
+        "task_type": "summary statistic",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              20.0,
+              10.0,
+              2.0,
+              26.0,
+              46.0,
+              198.0,
+              766.0,
+              1974.0,
+              1192.0,
+              751.0,
+              637.0,
+              1533.0,
+              1644.0,
+              845.0,
+              680.0,
+              774.0,
+              1399.0,
+              725.0,
+              296.0,
+              178.0,
+              110.0,
+              72.0,
+              74.0,
+              21.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "180698",
+      "metadata": {
+        "response": "The mean of the dataset is 170.17. This is calculated by summing all the data points (4084.0) and dividing by the number of points (24). The mean is relatively low compared to the spike values like 680, indicating that higher values may be outliers.",
+        "task_type": "summary_statistics",
+        "id": "180698",
+        "question": "Calculate and interpret the mean of the dataset [45.0, 295.0, 1.0, 4.0, 0.0, 1.0, 8.0, 18.0, 144.0, 267.0, 680.0, 331.0, 132.0, 164.0, 323.0, 328.0, 139.0, 120.0, 201.0, 379.0, 195.0, 117.0, 118.0, 65.0].",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              45.0,
+              295.0,
+              1.0,
+              4.0,
+              0.0,
+              1.0,
+              8.0,
+              18.0,
+              144.0,
+              267.0,
+              680.0,
+              331.0,
+              132.0,
+              164.0,
+              323.0,
+              328.0,
+              139.0,
+              120.0,
+              201.0,
+              379.0,
+              195.0,
+              117.0,
+              118.0,
+              65.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "169412",
+      "metadata": {
+        "task_type": "volatility_measurement",
+        "response": "To calculate the mean absolute deviation, first determine the mean of the data points: (589.0 + 509.0 + ... + 510.0) / 24 = 233.0. Next, find the absolute deviations from the mean, then average them. Calculation: |589.0−233.0| + |509.0−233.0| + ... + |510.0−233.0| / 24 = 175.54. Thus, the mean absolute deviation is approximately 175.54, indicating high volatility.",
+        "question": "Calculate the mean absolute deviation for the following data points: [589.0, 509.0, 447.0, 588.0, 364.0, 425.0, 509.0, 77.0, 56.0, 26.0, 23.0, 18.0, 13.0, 7.0, 2.0, 3.0, 1.0, 1.0, 25.0, 108.0, 418.0, 358.0, 518.0, 510.0].",
+        "id": "169412",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              589.0,
+              509.0,
+              447.0,
+              588.0,
+              364.0,
+              425.0,
+              509.0,
+              77.0,
+              56.0,
+              26.0,
+              23.0,
+              18.0,
+              13.0,
+              7.0,
+              2.0,
+              3.0,
+              1.0,
+              1.0,
+              25.0,
+              108.0,
+              418.0,
+              358.0,
+              518.0,
+              510.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "192533",
+      "metadata": {
+        "task_type": "statistical properties",
+        "question": "The mean of the selected points [756.0, 566.0, 1050.0, 1240.0, 1625.0, 1542.0, 1537.0, 1675.0, 1441.0, 1377.0, 1092.0, 1083.0, 969.0, 568.0, 300.0, 110.0, 45.0, 37.0, 33.0, 17.0, 37.0, 111.0, 404.0, 899.0] is greater than 800. True or False?",
+        "response": "True. After calculating the mean = sum of numbers (approximately 20952.0)/24 = 873.0, it is clearly greater than 800.",
+        "domain": "Traffic",
+        "id": "192533"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              756.0,
+              566.0,
+              1050.0,
+              1240.0,
+              1625.0,
+              1542.0,
+              1537.0,
+              1675.0,
+              1441.0,
+              1377.0,
+              1092.0,
+              1083.0,
+              969.0,
+              568.0,
+              300.0,
+              110.0,
+              45.0,
+              37.0,
+              33.0,
+              17.0,
+              37.0,
+              111.0,
+              404.0,
+              899.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "168101",
+      "metadata": {
+        "domain": "Traffic",
+        "question": "Compute the first differences of the data points [286.0, 321.0, 435.0, 801.0, 499.0, 619.0, 888.0, 1488.0, 563.0, 744.0, 689.0, 911.0, 1088.0, 1145.0, 1588.0, 931.0, 789.0, 758.0, 613.0, 902.0, 1001.0, 819.0, 207.0, 250.0].",
+        "response": "The first differences are \n[35.0, 114.0, 366.0, -302.0, 120.0, 269.0, 600.0, -925.0, 181.0, -55.0, 222.0, 177.0, 57.0, 443.0, -657.0, -142.0, -31.0, -145.0, 289.0, 99.0, -182.0, -612.0, 43.0]. These show the change between consecutive points, highlighting key changes in the series.",
+        "task_type": "difference_computation",
+        "id": "168101"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              286.0,
+              321.0,
+              435.0,
+              801.0,
+              499.0,
+              619.0,
+              888.0,
+              1488.0,
+              563.0,
+              744.0,
+              689.0,
+              911.0,
+              1088.0,
+              1145.0,
+              1588.0,
+              931.0,
+              789.0,
+              758.0,
+              613.0,
+              902.0,
+              1001.0,
+              819.0,
+              207.0,
+              250.0
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 23,
+            "serie": [
+              35.0,
+              114.0,
+              366.0,
+              -302.0,
+              120.0,
+              269.0,
+              600.0,
+              -925.0,
+              181.0,
+              -55.0,
+              222.0,
+              177.0,
+              57.0,
+              443.0,
+              -657.0,
+              -142.0,
+              -31.0,
+              -145.0,
+              289.0,
+              99.0,
+              -182.0,
+              -612.0,
+              43.0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "171585",
+      "metadata": {
+        "question": "Analyze the trend in the data points [410.0, 97.0, 39.0, 25.0, 10.0, 22.0, 42.0, 133.0, 385.0, 939.0, 1522.0, 841.0, 838.0, 946.0, 1087.0, 1059.0, 1047.0, 1206.0, 1640.0, 2180.0, 1341.0, 1041.0, 618.0, 442.0] and describe the overall trend in this series.",
+        "response": "The trend starts with a decline from 410.0 to 10.0, followed by a gradual increase culminating at 2180.0. It later shows a decline towards 442.0. The series has repeated up and down cycles indicating volatility, but the overall trend after the trough around 10.0 to 22.0 is upward until a peak, followed by a decrease.",
+        "domain": "Traffic",
+        "id": "171585",
+        "task_type": "trend analysis"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              410.0,
+              97.0,
+              39.0,
+              25.0,
+              10.0,
+              22.0,
+              42.0,
+              133.0,
+              385.0,
+              939.0,
+              1522.0,
+              841.0,
+              838.0,
+              946.0,
+              1087.0,
+              1059.0,
+              1047.0,
+              1206.0,
+              1640.0,
+              2180.0,
+              1341.0,
+              1041.0,
+              618.0,
+              442.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "165668",
+      "metadata": {
+        "domain": "Traffic",
+        "question": "Review the following time series data points [124.0, 139.0, 202.0, 476.0, 474.0, 375.0, 168.0, 118.0, 45.0, 295.0, 1.0, 4.0, 0.0, 1.0, 8.0, 18.0, 144.0, 267.0, 680.0, 331.0, 132.0, 164.0, 323.0, 328.0] and describe the underlying trend you observe within this segment.",
+        "id": "165668",
+        "task_type": "trend_analysis",
+        "response": "The data appears to exhibit a significant increase followed by a steep decline and another increase. Initially, there is an upward trend moving towards the highest point at 680, then falls drastically but subsequently shows a recovery by the end of this sequence. This indicates cyclic behavior with increased volatility."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              124.0,
+              139.0,
+              202.0,
+              476.0,
+              474.0,
+              375.0,
+              168.0,
+              118.0,
+              45.0,
+              295.0,
+              1.0,
+              4.0,
+              0.0,
+              1.0,
+              8.0,
+              18.0,
+              144.0,
+              267.0,
+              680.0,
+              331.0,
+              132.0,
+              164.0,
+              323.0,
+              328.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "164621",
+      "metadata": {
+        "domain": "Traffic",
+        "id": "164621",
+        "response": "(B) Between 2000 and 3000. The sum of the points when divided by the number of observations (21) results in a mean that falls between 2000 and 3000.",
+        "question": "What can be inferred about the mean value from the data points [463.0, 171.0, 80.0, 71.0, 101.0, 319.0, 739.0, 1680.0, 3500.0, 2776.0, 2759.0, 3832.0, 4897.0, 5045.0, 4301.0, 4545.0, 4583.0, 5146.0, 3862.0, 2800.0, 2271.0]? Options: (A) Less than 2000 (B) Between 2000 and 3000 (C) Greater than 3000",
+        "task_type": "statistical property analysis"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 21,
+            "serie": [
+              463.0,
+              171.0,
+              80.0,
+              71.0,
+              101.0,
+              319.0,
+              739.0,
+              1680.0,
+              3500.0,
+              2776.0,
+              2759.0,
+              3832.0,
+              4897.0,
+              5045.0,
+              4301.0,
+              4545.0,
+              4583.0,
+              5146.0,
+              3862.0,
+              2800.0,
+              2271.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "182384",
+      "metadata": {
+        "response": "C) No cycle. The data shows a rise and then a decrease but lacks repetition or predictability in the rise-and-fall patterns characteristic of cycles.",
+        "id": "182384",
+        "question": "Does the sequence [114.0, 145.0, 154.0, 125.0, 71.0, 39.0, 36.0, 28.0, 15.0, 11.0, 8.0, 0.0, 1.0, 3.0, 21.0, 35.0, 60.0, 85.0, 127.0] suggest any cyclicality? Options: A) Strong cycle, B) Weak cycle, C) No cycle.",
+        "domain": "Traffic",
+        "task_type": "cyclical patterns"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 19,
+            "serie": [
+              114.0,
+              145.0,
+              154.0,
+              125.0,
+              71.0,
+              39.0,
+              36.0,
+              28.0,
+              15.0,
+              11.0,
+              8.0,
+              0.0,
+              1.0,
+              3.0,
+              21.0,
+              35.0,
+              60.0,
+              85.0,
+              127.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "192637",
+      "metadata": {
+        "question": "Examine the pattern in the data points [1494.0, 3317.0, 3075.0, 3008.0, 3527.0, 4366.0, 4807.0, 4460.0, 4756.0, 5487.0, 4792.0, 3198.0, 2338.0, 2089.0, 2297.0, 1437.0, 624.0, 278.0, 339.0, 347.0, 402.0, 329.0, 668.0, 1537.0]. What patterns or sequences dominate this dataset?",
+        "id": "192637",
+        "response": "The pattern suggests initial fluctuations leading to growth and a pronounced peak followed by a significant drop. The initial point is in the mid-1000, peaks at 5487.0, and sharply decreases to the low-1500s and further down.",
+        "domain": "Traffic",
+        "task_type": "pattern summarization"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              1494.0,
+              3317.0,
+              3075.0,
+              3008.0,
+              3527.0,
+              4366.0,
+              4807.0,
+              4460.0,
+              4756.0,
+              5487.0,
+              4792.0,
+              3198.0,
+              2338.0,
+              2089.0,
+              2297.0,
+              1437.0,
+              624.0,
+              278.0,
+              339.0,
+              347.0,
+              402.0,
+              329.0,
+              668.0,
+              1537.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "167723",
+      "metadata": {
+        "task_type": "trend_analysis",
+        "question": "The sequence [8.0, 84.0, 246.0, 321.0, 168.0, 82.0, 149.0, 216.0, 245.0, 161.0, 130.0, 210.0, 379.0, 195.0, 117.0, 118.0, 65.0, 46.0, 19.0, 8.0, 8.0, 0.0, 2.0, 3.0] shows an overall increasing trend. True or False?",
+        "id": "167723",
+        "domain": "Traffic",
+        "response": "False. The data does not show an overall increasing trend. Although there are periods of increase (e.g., increasing from 8.0 to 321.0), the series eventually declines to a lower level, starting and ending with low values."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              8.0,
+              84.0,
+              246.0,
+              321.0,
+              168.0,
+              82.0,
+              149.0,
+              216.0,
+              245.0,
+              161.0,
+              130.0,
+              210.0,
+              379.0,
+              195.0,
+              117.0,
+              118.0,
+              65.0,
+              46.0,
+              19.0,
+              8.0,
+              8.0,
+              0.0,
+              2.0,
+              3.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "176831",
+      "metadata": {
+        "response": "The mean of this segment is approximately 537.65. It indicates a general level around which the values fluctuate, reflecting the moderate-to-high values in the second half compared to lower ones in the earlier part.",
+        "task_type": "statistical_property",
+        "domain": "Traffic",
+        "question": "Based on the series [604.0, 700.0, 617.0, 612.0, 733.0, 708.0, 774.0, 808.0, 893.0, 915.0, 907.0, 856.0, 639.0, 461.0, 375.0, 141.0, 98.0, 98.0, 88.0, 161.0, 208.0, 298.0, 470.0, 660.0], calculate the mean and explain how it reflects the data.",
+        "id": "176831"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              604.0,
+              700.0,
+              617.0,
+              612.0,
+              733.0,
+              708.0,
+              774.0,
+              808.0,
+              893.0,
+              915.0,
+              907.0,
+              856.0,
+              639.0,
+              461.0,
+              375.0,
+              141.0,
+              98.0,
+              98.0,
+              88.0,
+              161.0,
+              208.0,
+              298.0,
+              470.0,
+              660.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "188779",
+      "metadata": {
+        "task_type": "statistics_summarization",
+        "domain": "Web",
+        "id": "188779",
+        "response": "The mean is approximately 16.58, the median is 16.0, and the range is 13.0. Calculations are based on: Mean = Sum of all values / Number of values = 397 / 24. Median is the middle value of the ordered dataset, which is 16.0. Range = Maximum value (24.0) - Minimum value (11.0) = 13.0.",
+        "question": "Summarize the statistical properties of the time series data points [17.0, 23.0, 16.0, 17.0, 17.0, 11.0, 19.0, 11.0, 13.0, 17.0, 22.0, 17.0, 14.0, 13.0, 18.0, 13.0, 24.0, 13.0, 15.0, 15.0, 16.0, 22.0, 11.0, 20.0]. What are the mean, median, and range?"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              17.0,
+              23.0,
+              16.0,
+              17.0,
+              17.0,
+              11.0,
+              19.0,
+              11.0,
+              13.0,
+              17.0,
+              22.0,
+              17.0,
+              14.0,
+              13.0,
+              18.0,
+              13.0,
+              24.0,
+              13.0,
+              15.0,
+              15.0,
+              16.0,
+              22.0,
+              11.0,
+              20.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "180070",
+      "metadata": {
+        "question": "Identify the peak value in this subset of time series data and its position: [619.0, 503.0, 481.0, 602.0, 576.0, 131.0, 30.0, 25.0, 23.0, 17.0, 9.0, 9.0, 6.0, 0.0, 1.0, 0.0, 2.0, 28.0, 108.0, 418.0, 358.0, 518.0, 510.0, 609.0].",
+        "task_type": "peak_detection",
+        "id": "180070",
+        "response": "The peak value is 619.0, which occurs at the first position in this subset (index 0). This is calculated by scanning for the maximum value in the provided data subset.",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              619.0,
+              503.0,
+              481.0,
+              602.0,
+              576.0,
+              131.0,
+              30.0,
+              25.0,
+              23.0,
+              17.0,
+              9.0,
+              9.0,
+              6.0,
+              0.0,
+              1.0,
+              0.0,
+              2.0,
+              28.0,
+              108.0,
+              418.0,
+              358.0,
+              518.0,
+              510.0,
+              609.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "191944",
+      "metadata": {
+        "question": "Calculate the mean of the data points [393.0, 295.0, 173.0, 123.0, 73.0, 126.0, 50.0, 23.0, 9.0, 11.0, 7.0, 11.0, 43.0, 100.0, 241.0, 502.0, 540.0, 362.0, 246.0, 876.0, 766.0, 341.0, 253.0, 280.0].",
+        "response": "The mean is 276.5. This is calculated by summing the data (6637.0) and dividing by the number of data points (24).",
+        "task_type": "mean calculation",
+        "id": "191944",
+        "domain": "Traffic"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              393.0,
+              295.0,
+              173.0,
+              123.0,
+              73.0,
+              126.0,
+              50.0,
+              23.0,
+              9.0,
+              11.0,
+              7.0,
+              11.0,
+              43.0,
+              100.0,
+              241.0,
+              502.0,
+              540.0,
+              362.0,
+              246.0,
+              876.0,
+              766.0,
+              341.0,
+              253.0,
+              280.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "168323",
+      "metadata": {
+        "task_type": "statistical_property",
+        "domain": "Traffic",
+        "question": "Which of the following statements is true about the dataset [653.0, 666.0, 367.0, 61.0, 72.0, 77.0, 7.0, 12.0, 4.0, 10.0, 55.0, 91.0, 158.0, 201.0, 273.0, 453.0, 478.0, 542.0, 578.0, 285.0, 695.0, 249.0, 602.0, 110.0]? A) The dataset is normally distributed. B) The dataset is positively skewed. C) The dataset is negatively skewed. D) The dataset is uniform.",
+        "id": "168323",
+        "response": "Correct answer: B) The dataset is positively skewed. The presence of many lower values as compared to few extremely high values (695.0, 666.0) indicates a long tail on the right, characterizing a positive skew."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              653.0,
+              666.0,
+              367.0,
+              61.0,
+              72.0,
+              77.0,
+              7.0,
+              12.0,
+              4.0,
+              10.0,
+              55.0,
+              91.0,
+              158.0,
+              201.0,
+              273.0,
+              453.0,
+              478.0,
+              542.0,
+              578.0,
+              285.0,
+              695.0,
+              249.0,
+              602.0,
+              110.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "167203",
+      "metadata": {
+        "task_type": "arithmetic operations",
+        "domain": "Traffic",
+        "id": "167203",
+        "question": "Calculate the average of the series [5.0, 15.0, 25.0, 35.0, 45.0, 55.0, 65.0, 75.0, 85.0, 95.0, 105.0, 115.0].",
+        "response": "The average is calculated as (5 + 15 + 25 + 35 + 45 + 55 + 65 + 75 + 85 + 95 + 105 + 115) / 12 = 65. There are 12 data points with a total sum of 780."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 12,
+            "serie": [
+              5.0,
+              15.0,
+              25.0,
+              35.0,
+              45.0,
+              55.0,
+              65.0,
+              75.0,
+              85.0,
+              95.0,
+              105.0,
+              115.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "181279",
+      "metadata": {
+        "response": "The mean is calculated as the sum of all values divided by their count. The sum is 8180.0 and count is 24. Thus, the mean is 8180.0 / 24 = 340.8333.",
+        "domain": "Traffic",
+        "task_type": "statistical property analysis",
+        "question": "Calculate the mean of the points [440.0, 497.0, 477.0, 369.0, 406.0, 364.0, 260.0, 269.0, 99.0, 28.0, 20.0, 6.0, 29.0, 39.0, 126.0, 298.0, 667.0, 381.0, 342.0, 727.0, 553.0, 620.0, 524.0, 471.0].",
+        "id": "181279"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              440.0,
+              497.0,
+              477.0,
+              369.0,
+              406.0,
+              364.0,
+              260.0,
+              269.0,
+              99.0,
+              28.0,
+              20.0,
+              6.0,
+              29.0,
+              39.0,
+              126.0,
+              298.0,
+              667.0,
+              381.0,
+              342.0,
+              727.0,
+              553.0,
+              620.0,
+              524.0,
+              471.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    }
+  ]
+}

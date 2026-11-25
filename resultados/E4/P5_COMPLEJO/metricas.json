@@ -1,0 +1,32 @@
+{
+  "escenario": "E4_llama_llama",
+  "tipo_escenario": "Intra-Familia",
+  "perfil": "P5_COMPLEJO",
+  "teacher": "meta-llama/Llama-3.1-8B-Instruct",
+  "student": "meta-llama/Llama-3.2-1B-Instruct",
+  "downstream": {
+    "r2": 0.9826567184149683,
+    "mape": 21649549.974730518,
+    "rmse": 26.081752372063253,
+    "mae": 10.647238656550716
+  },
+  "juez": {
+    "aprobado": true,
+    "confianza": 0.925,
+    "score_alucinacion": 0.07499999999999996
+  },
+  "alucinaciones": {
+    "tasa_alucinacion": 0.002631578947368421,
+    "total_predictions": 1140,
+    "total_hallucinations": 3,
+    "range_violations": 0,
+    "temporal_violations": 2,
+    "correlation_violations": 0,
+    "statistical_violations": 1,
+    "is_clean": false
+  },
+  "eficiencia": {
+    "tiempo_segundos": 929.89,
+    "vram_pico_gb": 6.65
+  }
+}

@@ -1,0 +1,898 @@
+{
+  "escenario": "E1_qwen_qwen",
+  "perfil": "P3_TEND_ESTAC",
+  "query": "Simular las ventas diarias de una plataforma de comercio electrónico en expansión durante un año. Dominio: Retail y Ventas. Variable estricta: Únicamente 'Ventas_Diarias'. Perfil matemático: P3_TENDENCIA_ESTACIONAL, con tendencia creciente sostenida y ciclos semanales marcados por mayor consumo en fines de semana. Escala: promedio inicial de 2500 USD creciendo hacia 4000 USD.",
+  "dominio": "retail",
+  "structured_prompt": {
+    "values": {
+      "tema": "Simulación de ventas diarias de una plataforma de comercio electrónico",
+      "dominio": "Retail y Ventas",
+      "localizacion": "Online",
+      "frecuencia": "Diaria",
+      "start_date": "2024-01-01",
+      "variables": [
+        "Ventas_Diarias"
+      ],
+      "target_value": 3250.0,
+      "tipo_serie": "univariada",
+      "profile_id": "P3_TENDENCIA_ESTACIONAL",
+      "num_series_configuradas": 20,
+      "puntos_por_serie_configurados": 400
+    },
+    "missing_parameters": [],
+    "pending_questions": [],
+    "justification": "La serie temporal se basa en la tendencia creciente de ventas con ciclos semanales más altos durante fines de semana.",
+    "suggested_search": "Time series analysis for online retail sales with weekly seasonality",
+    "search_strategy": "Use a time series model that incorporates both trend and seasonal components to simulate the data.",
+    "confidence": 0.9
+  },
+  "metadata_summary": {
+    "count": 21,
+    "refinements_applied": [
+      "adjust_frequency"
+    ],
+    "domain": "Retail y Ventas",
+    "rag_dataset": "TSQA",
+    "diversity_score": 0.5476190476190477
+  },
+  "seed_dataset": [
+    {
+      "id": "187562",
+      "metadata": {
+        "question": "Analyzing these data points [6.38, 4.81, 4.91, 7.44, 9.88, 9.97, 10.41, 13.34, 16.53, 16.94, 15.84, 16.38, 17.53, 17.31, 15.56, 15.84, 18.38, 19.47, 17.84, 16.38, 16.88, 16.66, 14.06, 18.41], which time point hints at a seasonal peak? Options: a) 16.94, b) 18.38, c) 19.47, d) 13.34",
+        "domain": "Healthcare",
+        "task_type": "seasonality_detection",
+        "id": "187562",
+        "response": "c) 19.47. This value is among the highest within the chosen dataset, indicating a possible seasonal peak when compared to adjacent lower values."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              6.38,
+              4.81,
+              4.91,
+              7.44,
+              9.88,
+              9.97,
+              10.41,
+              13.34,
+              16.53,
+              16.94,
+              15.84,
+              16.38,
+              17.53,
+              17.31,
+              15.56,
+              15.84,
+              18.38,
+              19.47,
+              17.84,
+              16.38,
+              16.88,
+              16.66,
+              14.06,
+              18.41
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "184288",
+      "metadata": {
+        "id": "184288",
+        "domain": "Healthcare",
+        "response": "A) 16.34-19.19. This segment shows a repeated pattern of increase and decrease, potentially indicating seasonality in the data, where similar values appear in a cyclical pattern.",
+        "question": "Which data segment shows potential seasonality: [16.34, 17.72, 19.0, 17.12, 15.94, 15.66, 17.72, 19.19, 18.78, 16.28, 15.31, 16.75, 17.78, 19.94, 22.28, 21.44, 22.12, 23.78, 23.41, 22.66, 21.97, 23.88, 21.75, 23.84]?\nA) 16.34-19.19\nB) 18.78-23.84\nC) 16.34-22.12\nD) None",
+        "task_type": "seasonality_detection"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              16.34,
+              17.72,
+              19.0,
+              17.12,
+              15.94,
+              15.66,
+              17.72,
+              19.19,
+              18.78,
+              16.28,
+              15.31,
+              16.75,
+              17.78,
+              19.94,
+              22.28,
+              21.44,
+              22.12,
+              23.78,
+              23.41,
+              22.66,
+              21.97,
+              23.88,
+              21.75,
+              23.84
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "188277",
+      "metadata": {
+        "id": "188277",
+        "question": "Which segment appears to exhibit seasonal behavior? A) [-42.0, -54.0, -62.5, -69.0, -71.5, -70.0, -65.5, -58.5] B) [248.0, 282.0, 311.5, 334.5, 349.0, 360.0, 363.5] C) [20.0, 15.0, 10.0, 5.0, 0.0, -5.0]",
+        "response": "A) [-42.0, -54.0, -62.5, -69.0, -71.5, -70.0, -65.5, -58.5] shows a possible seasonal pattern. The data appears to decrease consistently up to a certain point and then begins to increase, which is indicative of a seasonal pattern.",
+        "domain": "Healthcare",
+        "task_type": "seasonality"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 8,
+            "serie": [
+              -42.0,
+              -54.0,
+              -62.5,
+              -69.0,
+              -71.5,
+              -70.0,
+              -65.5,
+              -58.5
+            ]
+          },
+          {
+            "longitud_puntos": 7,
+            "serie": [
+              248.0,
+              282.0,
+              311.5,
+              334.5,
+              349.0,
+              360.0,
+              363.5
+            ]
+          },
+          {
+            "longitud_puntos": 6,
+            "serie": [
+              20.0,
+              15.0,
+              10.0,
+              5.0,
+              0.0,
+              -5.0
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 8,
+            "serie": [
+              -42.0,
+              -54.0,
+              -62.5,
+              -69.0,
+              -71.5,
+              -70.0,
+              -65.5,
+              -58.5
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "192767",
+      "metadata": {
+        "task_type": "seasonality_detection",
+        "question": "Given the data points [0.29, 0.29, 0.28, 0.29, 0.3, 0.32, 0.34, 0.37, 0.41, 0.45, 0.5, 0.55, 0.59, 0.63, 0.66, 0.69, 0.7, 0.72, 0.73, 0.74, 0.74, 0.74, 0.73, 0.73], is there any apparent seasonal pattern? \na) Yes, there is a strong seasonal pattern\nb) No, there does not seem to be any seasonal pattern\nc) The data is too short to determine seasonality\nd) There is a weak seasonal pattern",
+        "domain": "Healthcare",
+        "id": "192767",
+        "response": "b) No, there does not seem to be any seasonal pattern. The data shows a consistent upward trend followed by a stabilization at the end, but does not appear to repeat or cycle over the period provided, indicating a lack of seasonality."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.29,
+              0.29,
+              0.28,
+              0.29,
+              0.3,
+              0.32,
+              0.34,
+              0.37,
+              0.41,
+              0.45,
+              0.5,
+              0.55,
+              0.59,
+              0.63,
+              0.66,
+              0.69,
+              0.7,
+              0.72,
+              0.73,
+              0.74,
+              0.74,
+              0.74,
+              0.73,
+              0.73
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "189693",
+      "metadata": {
+        "question": "Is there any seasonality in the data [4.0, 4.0, 5.0, 2.0, 4.0, 6.0, 6.0, 18.0, 9.0, 10.0, 7.0, 8.0, 12.0, 7.0, 7.0, 11.0, 5.0, 1.0, 6.0, 2.0, 8.0, 12.0, 5.0, 3.0]? Options: (A) Yes, (B) No, (C) Cannot determine",
+        "id": "189693",
+        "response": "B) No. The data does not display consistent repeating patterns that could suggest seasonality, particularly given sharp erratic spikes like the 18.0 and varied values without regular intervals.",
+        "task_type": "seasonality detection",
+        "domain": "Web"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              4.0,
+              4.0,
+              5.0,
+              2.0,
+              4.0,
+              6.0,
+              6.0,
+              18.0,
+              9.0,
+              10.0,
+              7.0,
+              8.0,
+              12.0,
+              7.0,
+              7.0,
+              11.0,
+              5.0,
+              1.0,
+              6.0,
+              2.0,
+              8.0,
+              12.0,
+              5.0,
+              3.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "183330",
+      "metadata": {
+        "question": "Looking at data points [-6612.31, -6608.29, -6612.86, -6616.32, -6613.56, -6610.41, -6609.44, -6609.91, -6610.6, -6606.17, -6601.08, -6599.93], can you identify any seasonality in the series? Options: (a) Strong seasonality (b) Weak seasonality (c) No seasonality",
+        "id": "183330",
+        "response": "The correct answer is (c) No seasonality. The data points don't show any significant repeating pattern or regular intervals that would suggest seasonality. The fluctuations appear random without consistent periods of increase or decrease, indicating no seasonality.",
+        "task_type": "seasonality analysis",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 12,
+            "serie": [
+              -6612.31,
+              -6608.29,
+              -6612.86,
+              -6616.32,
+              -6613.56,
+              -6610.41,
+              -6609.44,
+              -6609.91,
+              -6610.6,
+              -6606.17,
+              -6601.08,
+              -6599.93
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "189340",
+      "metadata": {
+        "question": "Considering the data points [0.37, 0.41, 0.44, 0.48, 0.51, 0.54, 0.57, 0.59, 0.61, 0.62, 0.63, 0.64, 0.64, 0.64, 0.65, 0.65, 0.65, 0.65, 0.65, 0.66, 0.66, 0.66, 0.66, 0.66], which statement best describes any seasonality present? (a) Strong seasonal trend with regular interval increases, (b) Weak or no apparent seasonality, (c) Rapid oscillations representing seasonal shifts.",
+        "domain": "Healthcare",
+        "id": "189340",
+        "response": "The correct choice is (b) Weak or no apparent seasonality. The data shows a steady linear increase with minor fluctuations with no evident seasonality.",
+        "task_type": "seasonality_detection"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.37,
+              0.41,
+              0.44,
+              0.48,
+              0.51,
+              0.54,
+              0.57,
+              0.59,
+              0.61,
+              0.62,
+              0.63,
+              0.64,
+              0.64,
+              0.64,
+              0.65,
+              0.65,
+              0.65,
+              0.65,
+              0.65,
+              0.66,
+              0.66,
+              0.66,
+              0.66,
+              0.66
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "183463",
+      "metadata": {
+        "domain": "Healthcare",
+        "id": "183463",
+        "response": "There appears to be a pattern where the values decrease and then gradually increase again, suggesting a form of seasonality. However, upon inspection, it might also be part of a broader cycle. Further data would be needed to determine true seasonal effects.",
+        "task_type": "seasonality_detection",
+        "question": "Is there any observable seasonal pattern in the following data: [19.38, 19.53, 19.22, 19.97, 19.91, 18.44, 17.06, 16.5, 16.16, 14.94, 12.88, 12.34, 13.12, 13.66, 14.06, 15.38, 17.78, 19.75, 20.0, 19.62, 20.03, 20.06, 18.38, 17.06]?"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              19.38,
+              19.53,
+              19.22,
+              19.97,
+              19.91,
+              18.44,
+              17.06,
+              16.5,
+              16.16,
+              14.94,
+              12.88,
+              12.34,
+              13.12,
+              13.66,
+              14.06,
+              15.38,
+              17.78,
+              19.75,
+              20.0,
+              19.62,
+              20.03,
+              20.06,
+              18.38,
+              17.06
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "184086",
+      "metadata": {
+        "task_type": "seasonality_detection",
+        "response": "A) 11.38 to 16.56. The data from 11.38 to 16.56 suggests a seasonal pattern with fluctuations typical of cyclical behavior between 11.38 and 16.56, potentially corresponding to significant rises and falls seen seasonally.",
+        "domain": "Healthcare",
+        "id": "184086",
+        "question": "Which part of the data suggests a seasonal pattern? Options: A) 11.38 to 16.56 B) 9.06 to -5.28 C) 15.69 to 13.31 D) -11.06 to 3.22"
+      },
+      "series": {
+        "input": [],
+        "output": []
+      }
+    },
+    {
+      "id": "189538",
+      "metadata": {
+        "response": "A) Yes. The series shows fluctuations that occur approximately at the same amplitude at different intervals. These cycles, peaking at 18.47 and bottoming out at lower values like 6.75, suggest an underlying seasonal pattern within the selected window.",
+        "id": "189538",
+        "task_type": "seasonality_detection",
+        "domain": "Healthcare",
+        "question": "Does the selected time series data points [14.91, 15.81, 15.28, 12.06, 9.22, 8.59, 8.5, 6.75, 5.31, 6.75, 9.41, 10.53, 10.81, 13.19, 16.72, 18.47, 17.97, 17.28, 17.84, 16.91, 13.78, 10.19, 9.09, 9.34] exhibit any obvious seasonality? A) Yes, B) No, C) Uncertain"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              14.91,
+              15.81,
+              15.28,
+              12.06,
+              9.22,
+              8.59,
+              8.5,
+              6.75,
+              5.31,
+              6.75,
+              9.41,
+              10.53,
+              10.81,
+              13.19,
+              16.72,
+              18.47,
+              17.97,
+              17.28,
+              17.84,
+              16.91,
+              13.78,
+              10.19,
+              9.09,
+              9.34
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "188237",
+      "metadata": {
+        "question": "Which data set shows a seasonal pattern? A: [0.59, 0.58, 0.59, 0.6, 0.59, 0.58] B: [0.41, 0.4, 0.39, 0.39, 0.39]",
+        "response": "Option A shows a seasonal pattern. The repeating pattern of increase and decrease between 0.59 and 0.6 over a short period implies seasonality. Option B, however, exhibits a consistent trend with no repetition or variation indicative of seasonality.",
+        "id": "188237",
+        "task_type": "seasonality_detection",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 6,
+            "serie": [
+              0.59,
+              0.58,
+              0.59,
+              0.6,
+              0.59,
+              0.58
+            ]
+          },
+          {
+            "longitud_puntos": 5,
+            "serie": [
+              0.41,
+              0.4,
+              0.39,
+              0.39,
+              0.39
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "181723",
+      "metadata": {
+        "response": "B exhibits more signs of seasonality. This data has a clear recurring increase toward the middle of the sequence and a decrease at the end, which resembles a seasonal pattern.",
+        "task_type": "seasonality_assessment",
+        "id": "181723",
+        "question": "Does the following set of data points exhibit seasonality? A) [500.44, 496.3, 498.19, 503.09, 507.34, 508.93, 503.22, 504.7, 514.0, 524.36, 536.82, 537.91] B) [541.31, 534.62, 520.27, 512.68, 516.55, 523.33, 531.18, 537.78, 542.53, 541.79, 537.83, 532.46]",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 12,
+            "serie": [
+              500.44,
+              496.3,
+              498.19,
+              503.09,
+              507.34,
+              508.93,
+              503.22,
+              504.7,
+              514.0,
+              524.36,
+              536.82,
+              537.91
+            ]
+          },
+          {
+            "longitud_puntos": 12,
+            "serie": [
+              541.31,
+              534.62,
+              520.27,
+              512.68,
+              516.55,
+              523.33,
+              531.18,
+              537.78,
+              542.53,
+              541.79,
+              537.83,
+              532.46
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "187046",
+      "metadata": {
+        "id": "187046",
+        "response": "B) Negative values becoming less negative then transitioning to positive values. As the sequence progresses, the initial range of negative values becomes increasingly less negative, eventually crossing into positive values, indicating a seasonal rise likely corresponding to a shift or variation in the cycle.",
+        "task_type": "seasonality_detection",
+        "domain": "Healthcare",
+        "question": "Considering the data subset (-4.88, -4.94, -4.94, -7.06, -9.31, -9.16, -7.94, -7.59, -8.22, -7.66, -5.66, -5.0, -6.25, -6.72, -4.81, -2.88, -3.06, -3.12, -1.22, 1.03, 0.94, -0.16, 0.25, 1.31), what seasonal pattern is visible?"
+      },
+      "series": {
+        "input": [],
+        "output": []
+      }
+    },
+    {
+      "id": "182987",
+      "metadata": {
+        "response": "False. The data does not clearly show repeating patterns over each cycle of 24 points, which suggests an absence of seasonality.",
+        "question": "Is there any obvious seasonality in the data points [0.68, 0.7, 0.72, 0.73, 0.74, 0.73, 0.72, 0.71, 0.7, 0.69, 0.68, 0.67, 0.66, 0.65, 0.64, 0.63, 0.62, 0.61, 0.6, 0.59, 0.58, 0.57, 0.56, 0.55]?",
+        "task_type": "seasonality_detection",
+        "domain": "Healthcare",
+        "id": "182987"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.68,
+              0.7,
+              0.72,
+              0.73,
+              0.74,
+              0.73,
+              0.72,
+              0.71,
+              0.7,
+              0.69,
+              0.68,
+              0.67,
+              0.66,
+              0.65,
+              0.64,
+              0.63,
+              0.62,
+              0.61,
+              0.6,
+              0.59,
+              0.58,
+              0.57,
+              0.56,
+              0.55
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "186945",
+      "metadata": {
+        "question": "The sequence [3.62, 7.94, 10.03, 10.47, 8.22, 4.53, -0.41, -4.5, -8.97, -12.28, -15.59, -17.28] exhibits strong seasonality. True or False?",
+        "task_type": "seasonality_detection",
+        "domain": "Healthcare",
+        "id": "186945",
+        "response": "True. The pattern shows a repeated increase leading to highs around 10.47 followed by a decline to significant lows around -17.28. This cyclical pattern appearing within the dataset suggests a potential seasonality aspect."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 12,
+            "serie": [
+              3.62,
+              7.94,
+              10.03,
+              10.47,
+              8.22,
+              4.53,
+              -0.41,
+              -4.5,
+              -8.97,
+              -12.28,
+              -15.59,
+              -17.28
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "191489",
+      "metadata": {
+        "question": "Do the data points [4.0, 6.0, 0.0, 8.0, 3.0, 5.0, 5.0, 10.0, 3.0, 1.0, 10.0, 8.0, 5.0, 0.0, 2.0, 3.0, 4.0, 5.0, 9.0, 2.0, 3.0, 1.0, 7.0, 6.0] exhibit any seasonality? (A) Yes, weekly (B) Yes, monthly (C) No seasonality (D) Seasonality with undefined cycle",
+        "domain": "Web",
+        "task_type": "seasonality_detection",
+        "response": "C) No seasonality. The time series data does not display any repeated patterns or cycles characteristic of seasonality. The values fluctuate without following a repetitive cycle.",
+        "id": "191489"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              4.0,
+              6.0,
+              0.0,
+              8.0,
+              3.0,
+              5.0,
+              5.0,
+              10.0,
+              3.0,
+              1.0,
+              10.0,
+              8.0,
+              5.0,
+              0.0,
+              2.0,
+              3.0,
+              4.0,
+              5.0,
+              9.0,
+              2.0,
+              3.0,
+              1.0,
+              7.0,
+              6.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "182958",
+      "metadata": {
+        "domain": "Healthcare",
+        "task_type": "seasonality_detection",
+        "question": "There is a clear seasonal pattern evident in the data points [8.09, 8.12, 8.44, 8.53, 9.59, 10.66, 10.72, 9.59, 9.09, 44.06, 43.97, 43.38, 42.75, 41.88, 41.41, 41.34, 41.44, 42.0, 42.47, 42.62, 42.41, 42.97, 43.88, 45.19].",
+        "id": "182958",
+        "response": "False. While there is an abrupt increase leading to higher values, particularly around 44.06, there isn't a repeating seasonal pattern across the given data points."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              8.09,
+              8.12,
+              8.44,
+              8.53,
+              9.59,
+              10.66,
+              10.72,
+              9.59,
+              9.09,
+              44.06,
+              43.97,
+              43.38,
+              42.75,
+              41.88,
+              41.41,
+              41.34,
+              41.44,
+              42.0,
+              42.47,
+              42.62,
+              42.41,
+              42.97,
+              43.88,
+              45.19
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "190265",
+      "metadata": {
+        "domain": "Web",
+        "task_type": "seasonality_detection",
+        "question": "The time series data [36.0, 64.0, 41.0, 31.0, 23.0, 20.0, 29.0, 25.0, 53.0, 25.0, 22.0, 31.0, 32.0, 28.0, 34.0, 33.0, 23.0, 31.0, 41.0, 44.0, 32.0, 32.0, 97.0, 26.0] shows clear seasonality. True or false?",
+        "response": "False. The data provided does not exhibit clear signs of seasonality, which would typically be indicated by a regular, repeating pattern over consistent intervals. The data seems more sporadic with no clear seasonal pattern.",
+        "id": "190265"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              36.0,
+              64.0,
+              41.0,
+              31.0,
+              23.0,
+              20.0,
+              29.0,
+              25.0,
+              53.0,
+              25.0,
+              22.0,
+              31.0,
+              32.0,
+              28.0,
+              34.0,
+              33.0,
+              23.0,
+              31.0,
+              41.0,
+              44.0,
+              32.0,
+              32.0,
+              97.0,
+              26.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "187003",
+      "metadata": {
+        "question": "The data points [0.47, -3.53, -4.88, -3.56, -2.72, -3.59, -3.81, -2.25, -0.53, -0.69, -0.41, 2.78, 6.78, 9.12, 9.97, 11.5, 12.62, 11.75, 8.5, 6.28, 6.28, 6.22, 4.5, 3.03] show strong seasonality. True or False?",
+        "task_type": "seasonality_identification",
+        "response": "False. The data does not exhibit clear periodic or consistent recurring patterns that are indicative of seasonality.",
+        "id": "187003",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.47,
+              -3.53,
+              -4.88,
+              -3.56,
+              -2.72,
+              -3.59,
+              -3.81,
+              -2.25,
+              -0.53,
+              -0.69,
+              -0.41,
+              2.78,
+              6.78,
+              9.12,
+              9.97,
+              11.5,
+              12.62,
+              11.75,
+              8.5,
+              6.28,
+              6.28,
+              6.22,
+              4.5,
+              3.03
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "184753",
+      "metadata": {
+        "task_type": "seasonality_detection",
+        "question": "Look at these data points: [0.27, 0.42, 0.55, 0.69, 0.77, 0.83, 0.94, 0.98, 0.93, 0.8, 0.69, 0.69, 0.8, 0.92, 0.97, 0.98, 0.97, 0.98, 0.94, 0.89, 0.87, 0.83, 0.8, 0.76]. Do these points suggest a seasonal pattern? a) Yes, there is periodic repetition b) No, there is no evident pattern c) There is a one-time spike",
+        "domain": "Healthcare",
+        "response": "a) Yes, there is periodic repetition. The data suggests a repeating pattern of increase and slight decrease, indicative of seasonality without a specific time period provided.",
+        "id": "184753"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.27,
+              0.42,
+              0.55,
+              0.69,
+              0.77,
+              0.83,
+              0.94,
+              0.98,
+              0.93,
+              0.8,
+              0.69,
+              0.69,
+              0.8,
+              0.92,
+              0.97,
+              0.98,
+              0.97,
+              0.98,
+              0.94,
+              0.89,
+              0.87,
+              0.83,
+              0.8,
+              0.76
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "192386",
+      "metadata": {
+        "domain": "Healthcare",
+        "response": "B) Weakly seasonal. There are some repeating patterns visible, but they are not pronounced enough to indicate strong seasonality.",
+        "task_type": "seasonality_detection",
+        "id": "192386",
+        "question": "Are there any seasonal patterns visible in the data points [26.62, 27.0, 26.38, 26.66, 28.75, 30.72, 31.0, 30.38, 30.78, 30.88, 29.38, 27.12, 25.81, 25.69, 24.62, 23.09, 22.81, 24.25, 25.25, 24.59, 24.25, 24.34, 24.38, 22.25]? \n A) Strongly seasonal \n B) Weakly seasonal \n C) Non-seasonal"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              26.62,
+              27.0,
+              26.38,
+              26.66,
+              28.75,
+              30.72,
+              31.0,
+              30.38,
+              30.78,
+              30.88,
+              29.38,
+              27.12,
+              25.81,
+              25.69,
+              24.62,
+              23.09,
+              22.81,
+              24.25,
+              25.25,
+              24.59,
+              24.25,
+              24.34,
+              24.38,
+              22.25
+            ]
+          }
+        ],
+        "output": []
+      }
+    }
+  ]
+}

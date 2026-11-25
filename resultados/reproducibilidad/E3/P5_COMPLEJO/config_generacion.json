@@ -1,0 +1,2184 @@
+{
+  "escenario": "E3_qwen_gemma",
+  "perfil": "P5_COMPLEJO",
+  "query": "Monitorear el consumo de ancho de banda en un centro de datos empresarial. Dominio: Telecomunicaciones y Servidores. Variable estricta: Únicamente 'Ancho_Banda_Gbps'. Perfil matemático: P5_COMPLEJO, con fuerte estacionalidad por horario laboral, alto ruido de tráfico y picos anómalos esporádicos por sobrecarga. Escala: promedio de 45 Gbps.",
+  "dominio": "servidores",
+  "structured_prompt": {
+    "values": {
+      "tema": "Monitorización del ancho de banda en un centro de datos empresarial",
+      "dominio": "Telecomunicaciones y Servidores",
+      "localizacion": "Centro de datos empresarial",
+      "frecuencia": "Minuto",
+      "start_date": "2024-01-01",
+      "variables": [
+        "Ancho_Banda_Gbps"
+      ],
+      "target_value": 45.0,
+      "tipo_serie": "univariada",
+      "profile_id": "P5_COMPLEJO",
+      "num_series_configuradas": 20,
+      "puntos_por_serie_configurados": 400
+    },
+    "missing_parameters": [],
+    "pending_questions": [],
+    "justification": "La monitorización del ancho de banda en un centro de datos empresarial presenta patrones estacionales debido a las horas laborales, con picos anómalos por sobrecarga y ruido de tráfico.",
+    "suggested_search": "Análisis de series temporales para monitorización de ancho de banda en centros de datos",
+    "search_strategy": "Utilizar técnicas de detección de anomalías y pronóstico para identificar picos de sobrecarga y prevenir posibles interrupciones.",
+    "confidence": 0.9
+  },
+  "metadata_summary": {
+    "count": 49,
+    "refinements_applied": [
+      "adjust_frequency"
+    ],
+    "domain": "Telecomunicaciones y Servidores",
+    "rag_dataset": "TSQA",
+    "diversity_score": 0.31207482993197283
+  },
+  "seed_dataset": [
+    {
+      "id": "156185",
+      "metadata": {
+        "response": "Between the range 5851.81 and 5844.77, the values are relatively stable; however, the drop to 5827.97 and further to 5815.3 is abrupt compared to the previous observations, representing a potential anomaly. Anomalies are points that deviate markedly from others in a data series, and the decline in this context appears unusual.",
+        "question": "Identify if there are any anomalies in the following data set [5847.38, 5843.57, 5848.45, 5851.57, 5851.81, 5852.4, 5846.86, 5844.44, 5850.97, 5853.05, 5844.77, 5827.97, 5815.3, 5808.95, 5803.17, 5802.98, 5806.97, 5812.21, 5818.1, 5824.1, 5828.61, 5829.21, 5822.64, 5817.99].",
+        "task_type": "anomalies",
+        "domain": "Healthcare",
+        "id": "156185"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              5847.38,
+              5843.57,
+              5848.45,
+              5851.57,
+              5851.81,
+              5852.4,
+              5846.86,
+              5844.44,
+              5850.97,
+              5853.05,
+              5844.77,
+              5827.97,
+              5815.3,
+              5808.95,
+              5803.17,
+              5802.98,
+              5806.97,
+              5812.21,
+              5818.1,
+              5824.1,
+              5828.61,
+              5829.21,
+              5822.64,
+              5817.99
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "184980",
+      "metadata": {
+        "id": "184980",
+        "question": "The data points [28.31, 28.44, 27.31, 27.53, 27.88, 28.19, 28.78, 29.06, 30.12, 29.25, 30.06, 30.94, 31.38, 32.53, 34.56, 36.0, 36.56, 36.75, 36.66, 34.75, 33.56, 31.31, 30.19, 29.59] contain significant anomalies. True or False?",
+        "response": "False. The given data points do not exhibit significant anomalies as they depict a smooth increasing trend with minor fluctuations. No sudden spikes or drops are observed in this series.",
+        "domain": "Healthcare",
+        "task_type": "anomalies"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              28.31,
+              28.44,
+              27.31,
+              27.53,
+              27.88,
+              28.19,
+              28.78,
+              29.06,
+              30.12,
+              29.25,
+              30.06,
+              30.94,
+              31.38,
+              32.53,
+              34.56,
+              36.0,
+              36.56,
+              36.75,
+              36.66,
+              34.75,
+              33.56,
+              31.31,
+              30.19,
+              29.59
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "186227",
+      "metadata": {
+        "question": "Identify any potential anomaly in the data points [0.36, 0.39, 0.44, 0.49, 0.54, 0.58, 0.63, 0.66, 0.68, 0.71, 0.72, 0.73, 0.74, 0.74, 0.74, 0.73, 0.72, 0.71, 0.7, 0.69, 0.67, 0.66, 0.65, 0.63]. Is there an anomaly? A) Yes, at 0.36 B) Yes, at 0.74 C) No anomaly",
+        "task_type": "anomalies_detection",
+        "domain": "Healthcare",
+        "id": "186227",
+        "response": "A) Yes, at 0.36. The data shows an upward trend, yet 0.36 is significantly lower and appears isolated compared to the rest of the data points."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.36,
+              0.39,
+              0.44,
+              0.49,
+              0.54,
+              0.58,
+              0.63,
+              0.66,
+              0.68,
+              0.71,
+              0.72,
+              0.73,
+              0.74,
+              0.74,
+              0.74,
+              0.73,
+              0.72,
+              0.71,
+              0.7,
+              0.69,
+              0.67,
+              0.66,
+              0.65,
+              0.63
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "183181",
+      "metadata": {
+        "task_type": "anomalies",
+        "domain": "Healthcare",
+        "id": "183181",
+        "question": "In the data sample [170.0, 169.0, 161.0, 146.5, 130.0, 107.5, 81.5, 53.5, 24.0, -4.5, 73.0, 106.5, 134.5, 154.0, 145.0, 129.0, 113.0, 96.0, 81.0, 64.0, 52.5, 32.0, -0.5, -45.0], identify any anomalies.",
+        "response": "Answer: The point 73.0 appears as an anomaly. Reasoning: This value does not fit the general decreasing pattern in this section of the data."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              170.0,
+              169.0,
+              161.0,
+              146.5,
+              130.0,
+              107.5,
+              81.5,
+              53.5,
+              24.0,
+              -4.5,
+              73.0,
+              106.5,
+              134.5,
+              154.0,
+              145.0,
+              129.0,
+              113.0,
+              96.0,
+              81.0,
+              64.0,
+              52.5,
+              32.0,
+              -0.5,
+              -45.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "184431",
+      "metadata": {
+        "question": "Identify any anomalies within the data points [10.03, 10.47, 8.22, 4.53, -0.41, -4.5, -8.97, -12.28, -15.59, -17.28, -18.38, -18.69, -17.81, -15.53, -11.91, -7.75, -3.72, 0.12, 2.28, 3.78, 3.56, 2.06, 0.0, -1.03]. What is an anomaly in these data points? A) 10.47 B) -18.38 C) 3.78 D) -4.5",
+        "response": "A) 10.47. The value 10.47, along with 10.03 and 8.22, are significantly higher than the surrounding values, which are mostly negative. These high values could indicate an anomaly or outlier in the overall downward or near-zero trend.",
+        "id": "184431",
+        "domain": "Healthcare",
+        "task_type": "anomalies detection"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              10.03,
+              10.47,
+              8.22,
+              4.53,
+              -0.41,
+              -4.5,
+              -8.97,
+              -12.28,
+              -15.59,
+              -17.28,
+              -18.38,
+              -18.69,
+              -17.81,
+              -15.53,
+              -11.91,
+              -7.75,
+              -3.72,
+              0.12,
+              2.28,
+              3.78,
+              3.56,
+              2.06,
+              0.0,
+              -1.03
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "184382",
+      "metadata": {
+        "question": "Based on the following data points [40.56, -2.19, -3.72, -4.75, -6.12, -4.91, -3.84, 40.56, 39.97, 40.12, 40.91, 41.94, 42.25, 43.59, 43.5, 42.62, 41.41, 40.75, 39.31, 37.25, 37.53, 36.94, 38.16, 38.56], which data points could be considered anomalies? A) [40.56, 39.97] B) [-2.19, -3.72] C) [37.25, 37.53] D) [41.94, 42.25]",
+        "domain": "Healthcare",
+        "task_type": "anomaly detection",
+        "id": "184382",
+        "response": "B) [-2.19, -3.72]. These points stand out as anomalies because they are significantly lower than the rest of the data, which generally ranges in the 30s and 40s."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              40.56,
+              -2.19,
+              -3.72,
+              -4.75,
+              -6.12,
+              -4.91,
+              -3.84,
+              40.56,
+              39.97,
+              40.12,
+              40.91,
+              41.94,
+              42.25,
+              43.59,
+              43.5,
+              42.62,
+              41.41,
+              40.75,
+              39.31,
+              37.25,
+              37.53,
+              36.94,
+              38.16,
+              38.56
+            ]
+          },
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              40.56,
+              39.97
+            ]
+          },
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -2.19,
+              -3.72
+            ]
+          },
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              37.25,
+              37.53
+            ]
+          },
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              41.94,
+              42.25
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -2.19,
+              -3.72
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "183956",
+      "metadata": {
+        "question": "Identify the anomaly in the following data points: [58.88, 59.88, 59.44, 59.0, 57.03, 54.91, 53.31, 51.84, 51.47, 51.31, 51.16, 70.34, 50.12, 50.59, 49.38, 49.16, 49.28, 49.81, 49.41, 49.41, 49.06, 48.0, 46.94, 46.56]. Options: a) 58.88 b) 51.47 c) 70.34 d) 49.38",
+        "id": "183956",
+        "domain": "Healthcare",
+        "response": "c) 70.34. The data points primarily show values in the 40s and 50s range, with all points reasonably close to each other. 70.34 is significantly higher, suggesting it is an anomaly.",
+        "task_type": "anomalies_detection"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              58.88,
+              59.88,
+              59.44,
+              59.0,
+              57.03,
+              54.91,
+              53.31,
+              51.84,
+              51.47,
+              51.31,
+              51.16,
+              70.34,
+              50.12,
+              50.59,
+              49.38,
+              49.16,
+              49.28,
+              49.81,
+              49.41,
+              49.41,
+              49.06,
+              48.0,
+              46.94,
+              46.56
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "184141",
+      "metadata": {
+        "task_type": "anomaly detection",
+        "domain": "Healthcare",
+        "question": "Analyze these data points for anomalies: [32.66, 33.16, 33.5, 34.47, 34.19, 35.75, 36.0, 34.75, 35.53, 34.09, 32.25, 28.56, 27.53, 24.25, 22.03, 19.53, 18.06, 15.56, 13.19, 59.25, 60.44, 62.25, 61.34, 61.81]. Which of the following points could be an anomaly? A) 33.5 B) 28.56 C) 59.25",
+        "id": "184141",
+        "response": "C) 59.25. The data points predominantly show a decreasing trend till 15.56, then suddenly jumps to 59.25 which is an outlier as it is not consistent with the previous trend."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              32.66,
+              33.16,
+              33.5,
+              34.47,
+              34.19,
+              35.75,
+              36.0,
+              34.75,
+              35.53,
+              34.09,
+              32.25,
+              28.56,
+              27.53,
+              24.25,
+              22.03,
+              19.53,
+              18.06,
+              15.56,
+              13.19,
+              59.25,
+              60.44,
+              62.25,
+              61.34,
+              61.81
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "187330",
+      "metadata": {
+        "response": "False. Within this subset of data, there is no clear anomaly detected as all the values appear to fall within a trend of general decrease.",
+        "task_type": "anomalies_detection",
+        "question": "Determine if there is a significant anomaly present in this subset of data points: [11.0, 13.69, 12.56, 12.06, 12.19, 13.69, 13.56, 11.94, 12.0, 10.34, 8.78, 9.31, 8.06, 7.19, 7.69, 5.75, 6.72, 4.38, 5.81, 4.5, 3.69, 5.72, 5.06, 5.91].",
+        "id": "187330",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              11.0,
+              13.69,
+              12.56,
+              12.06,
+              12.19,
+              13.69,
+              13.56,
+              11.94,
+              12.0,
+              10.34,
+              8.78,
+              9.31,
+              8.06,
+              7.19,
+              7.69,
+              5.75,
+              6.72,
+              4.38,
+              5.81,
+              4.5,
+              3.69,
+              5.72,
+              5.06,
+              5.91
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "188304",
+      "metadata": {
+        "id": "188304",
+        "task_type": "anomalies_detection",
+        "domain": "Healthcare",
+        "response": "The data seems relatively stable with small fluctuations. However, the point at 1978.36 appears notably lower compared to surrounding values, which may be deemed an anomaly. Anomalies can be identified by looking at the deviation from the moving average or using statistical techniques like z-scores.",
+        "question": "Identify any anomalies in the time series data points [1989.12, 1987.91, 1992.07, 1992.93, 1993.37, 1992.43, 1989.17, 1990.89, 1990.71, 1981.52, 1978.36, 1984.97, 1985.96, 1988.62, 1989.4, 1979.05, 1980.32, 1983.5, 1979.77, 1979.8, 1980.01, 1983.36, 1987.88, 1990.22]."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              1989.12,
+              1987.91,
+              1992.07,
+              1992.93,
+              1993.37,
+              1992.43,
+              1989.17,
+              1990.89,
+              1990.71,
+              1981.52,
+              1978.36,
+              1984.97,
+              1985.96,
+              1988.62,
+              1989.4,
+              1979.05,
+              1980.32,
+              1983.5,
+              1979.77,
+              1979.8,
+              1980.01,
+              1983.36,
+              1987.88,
+              1990.22
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "190930",
+      "metadata": {
+        "id": "190930",
+        "domain": "Healthcare",
+        "task_type": "anomalies_summation",
+        "question": "Summarize any anomalies seen in the data points: [-28.72, -26.94, -26.97, -24.75, -25.53, -25.66, -25.66, -24.31, -23.97, -21.09, -20.88, -19.75, -19.66, -21.16, -22.19, -20.16, -20.75, -21.66, -21.62, -21.88, -23.72].",
+        "response": "The values -28.72 through -26.97 stand out as possible anomalies, indicating a marked deviation from the rest, which shows a noteworthy dip and deviation compared to the general trend of surrounding values indicating a sudden drop."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 21,
+            "serie": [
+              -28.72,
+              -26.94,
+              -26.97,
+              -24.75,
+              -25.53,
+              -25.66,
+              -25.66,
+              -24.31,
+              -23.97,
+              -21.09,
+              -20.88,
+              -19.75,
+              -19.66,
+              -21.16,
+              -22.19,
+              -20.16,
+              -20.75,
+              -21.66,
+              -21.62,
+              -21.88,
+              -23.72
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "155533",
+      "metadata": {
+        "question": "Looking at these data points [3.72, 6.0, 8.0, 9.41, 11.72, 12.25, 11.75, 10.78, 9.34, 8.69, 8.69, 9.16], is there an anomaly present? A) Yes, at 8.0 B) Yes, at 12.25 C) Yes, at 3.72 D) No anomalies",
+        "response": "C) Yes, at 3.72. The beginning value 3.72 is significantly lower than the majority of subsequent values, suggesting it is a low outlier compared to the more stable higher values that follow.",
+        "domain": "Healthcare",
+        "task_type": "anomalies_detection",
+        "id": "155533"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 12,
+            "serie": [
+              3.72,
+              6.0,
+              8.0,
+              9.41,
+              11.72,
+              12.25,
+              11.75,
+              10.78,
+              9.34,
+              8.69,
+              8.69,
+              9.16
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "188121",
+      "metadata": {
+        "response": "False. While there are fluctuations and some variations, they do not significantly diverge from the general trend or range established by the data, hence not considered anomalies. All data points seem to follow the common movement pattern observed in the series.",
+        "domain": "Healthcare",
+        "question": "An anomaly is present in the data set [5985.92, 5984.11, 5980.52, 5960.93, 5996.61, 5994.48, 5987.01, 5980.46, 5985.2, 5972.7, 5983.47, 5990.86, 5993.3, 5992.28, 5993.47, 5994.75, 5989.2, 5975.59, 5988.7, 6003.83, 6004.7, 6005.56, 6002.44, 6004.68].",
+        "id": "188121",
+        "task_type": "anomaly_detection"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              5985.92,
+              5984.11,
+              5980.52,
+              5960.93,
+              5996.61,
+              5994.48,
+              5987.01,
+              5980.46,
+              5985.2,
+              5972.7,
+              5983.47,
+              5990.86,
+              5993.3,
+              5992.28,
+              5993.47,
+              5994.75,
+              5989.2,
+              5975.59,
+              5988.7,
+              6003.83,
+              6004.7,
+              6005.56,
+              6002.44,
+              6004.68
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "181525",
+      "metadata": {
+        "task_type": "anomaly_detection",
+        "domain": "Healthcare",
+        "question": "Analyze the following data points for anomalies: [1665.99, 1668.16, 1665.65, 1664.31, 1666.19, 1669.5, 1674.88, 1678.49, 1673.0, 1671.13, 1678.67, 1671.39, 1665.42, 1677.47, 1677.42, 1669.44, 1665.81, 1663.91, 1667.62, 1664.45, 1660.08, 1668.64, 1675.26, 1666.99]. Which point could be considered an anomaly? A) 1650.74 B) 1674.88 C) 1683.24 D) None of the above",
+        "response": "D) None of the above. All values lie within a similar range and relative to each other, they do not deviate sharply enough to be considered anomalies.",
+        "id": "181525"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              1665.99,
+              1668.16,
+              1665.65,
+              1664.31,
+              1666.19,
+              1669.5,
+              1674.88,
+              1678.49,
+              1673.0,
+              1671.13,
+              1678.67,
+              1671.39,
+              1665.42,
+              1677.47,
+              1677.42,
+              1669.44,
+              1665.81,
+              1663.91,
+              1667.62,
+              1664.45,
+              1660.08,
+              1668.64,
+              1675.26,
+              1666.99
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "192556",
+      "metadata": {
+        "question": "In this dataset [37.0, 36.94, 37.03, 58.03, 61.09, 62.5, 62.47, 63.12, 64.5, 65.34], which point appears most anomalous? (a) 37.03 (b) 58.03 (c) 62.47 (d) 64.5",
+        "task_type": "anomalous point investigation",
+        "response": "b) 58.03. The data points are relatively stable initially (around 37) and then show a growth to the 60-65 range. The abrupt increase from 37.03 to 58.03 is stark, making 58.03 an outlier compared to surrounding values.",
+        "domain": "Healthcare",
+        "id": "192556"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              37.0,
+              36.94,
+              37.03,
+              58.03,
+              61.09,
+              62.5,
+              62.47,
+              63.12,
+              64.5,
+              65.34
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "185151",
+      "metadata": {
+        "question": "Identify any anomalies in the data points [54.0, 23.0, 17.0, 8.0, 20.0, 59.0, 11.0, 13.0, 16.0, 10.0, 16.0, 16.0, 29.0, 636.0, 119.0, 123.0, 210.0, 47.0, 100.0, 8.0, 20.0, 59.0, 11.0, 13.0] and explain your reasoning.",
+        "id": "185151",
+        "response": "The value 636.0 is an anomaly in this set. This conclusion is based on examining the data points, where 636.0 is significantly higher than the others, indicating it does not match the general pattern or trend of the series.",
+        "task_type": "anomalies_detection",
+        "domain": "Web"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              54.0,
+              23.0,
+              17.0,
+              8.0,
+              20.0,
+              59.0,
+              11.0,
+              13.0,
+              16.0,
+              10.0,
+              16.0,
+              16.0,
+              29.0,
+              636.0,
+              119.0,
+              123.0,
+              210.0,
+              47.0,
+              100.0,
+              8.0,
+              20.0,
+              59.0,
+              11.0,
+              13.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "181319",
+      "metadata": {
+        "task_type": "anomalies_detection",
+        "question": "Identify the anomaly in the given data points [0.37, 0.37, 0.37, 0.35, 0.36, 0.36, 0.36, 0.5, 0.36, 0.35, 0.34, 0.33, 0.32, 0.31, 0.3, 0.29, 0.28, 0.27, 0.26, 0.26, 0.28, 0.29, 0.31, 0.35]. Options: A) 0.5, B) 0.37, C) 0.26",
+        "response": "A) 0.5. The value 0.5 is the only point that stands out significantly higher than the surrounding data, which are mostly in the 0.26 to 0.37 range. This indicates an anomaly.",
+        "id": "181319",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.37,
+              0.37,
+              0.37,
+              0.35,
+              0.36,
+              0.36,
+              0.36,
+              0.5,
+              0.36,
+              0.35,
+              0.34,
+              0.33,
+              0.32,
+              0.31,
+              0.3,
+              0.29,
+              0.28,
+              0.27,
+              0.26,
+              0.26,
+              0.28,
+              0.29,
+              0.31,
+              0.35
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "191045",
+      "metadata": {
+        "id": "191045",
+        "response": "True. A potential anomaly is the period from 0.68 dropping to 0.59 abruptly, given the previous steady values. The abrupt decrease compared to the gradual increases might suggest an anomaly.",
+        "question": "The data points [0.37, 0.42, 0.47, 0.52, 0.57, 0.61, 0.64, 0.67, 0.69, 0.71, 0.72, 0.73, 0.74, 0.74, 0.74, 0.74, 0.73, 0.73, 0.68, 0.67, 0.65, 0.63, 0.61, 0.59] contain anomalies. True or False?",
+        "task_type": "anomaly_detection",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.37,
+              0.42,
+              0.47,
+              0.52,
+              0.57,
+              0.61,
+              0.64,
+              0.67,
+              0.69,
+              0.71,
+              0.72,
+              0.73,
+              0.74,
+              0.74,
+              0.74,
+              0.74,
+              0.73,
+              0.73,
+              0.68,
+              0.67,
+              0.65,
+              0.63,
+              0.61,
+              0.59
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "185050",
+      "metadata": {
+        "response": "False. There does not appear to be any significant anomaly in this series. The values decrease initially, then stabilize and slightly decrease again. None of these variations are drastic enough to constitute an anomaly.",
+        "question": "The data series [-0.31, -0.29, -0.25, -0.22, -0.19, -0.16, -0.14, -0.12, -0.1, -0.08, -0.08, -0.07, -0.07, -0.08, -0.09, -0.09, -0.1, -0.11, -0.12, -0.15, -0.16, -0.17, -0.2, -0.23] contains a significant anomaly. True or false?",
+        "task_type": "anomalies",
+        "domain": "Healthcare",
+        "id": "185050"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -0.31,
+              -0.29,
+              -0.25,
+              -0.22,
+              -0.19,
+              -0.16,
+              -0.14,
+              -0.12,
+              -0.1,
+              -0.08,
+              -0.08,
+              -0.07,
+              -0.07,
+              -0.08,
+              -0.09,
+              -0.09,
+              -0.1,
+              -0.11,
+              -0.12,
+              -0.15,
+              -0.16,
+              -0.17,
+              -0.2,
+              -0.23
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "185198",
+      "metadata": {
+        "id": "185198",
+        "question": "Identify the anomaly in the dataset [25.0, 20.5, 18.5, 16.5, 15.0, 15.0, 14.5, 12.0, 6.5, -1.5, -13.0, -24.0, -36.5, -47.5, -58.5, -67.0, -73.5, -78.5, -82.5, -84.5, -86.5, -83.0, -82.0, -76.5]. \nA) -24.0 \nB) 25.0 \nC) -82.0 \nD) -76.5",
+        "domain": "Healthcare",
+        "task_type": "anomalies_detection",
+        "response": "B) 25.0. The majority of the data shows a clear decreasing trend, moving into negative values. The value 25.0 stands out at the beginning, not following the continued descent, indicating an anomaly."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              25.0,
+              20.5,
+              18.5,
+              16.5,
+              15.0,
+              15.0,
+              14.5,
+              12.0,
+              6.5,
+              -1.5,
+              -13.0,
+              -24.0,
+              -36.5,
+              -47.5,
+              -58.5,
+              -67.0,
+              -73.5,
+              -78.5,
+              -82.5,
+              -84.5,
+              -86.5,
+              -83.0,
+              -82.0,
+              -76.5
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "191452",
+      "metadata": {
+        "response": "B) 47.88. This value is an anomaly as there is a sudden jump from a much lower value of around 13.03 to 47.88. This abrupt change in value is much higher than the surrounding values and suggests an outlier or potential error.",
+        "id": "191452",
+        "domain": "Healthcare",
+        "task_type": "anomaly detection",
+        "question": "Identify any anomalies in this data set: [14.94, 13.0, 12.41, 13.03, 47.88, 49.47, 50.31, 50.69, 50.56, 50.56, 50.72, 51.34, 52.38, 53.81, 55.75, 57.88, 59.72, 61.28, 62.69, 63.19, 63.44, 63.19, 63.03, 62.31]. Which point can be considered an anomaly? Options: A) 13.03, B) 47.88, C) 62.31"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              14.94,
+              13.0,
+              12.41,
+              13.03,
+              47.88,
+              49.47,
+              50.31,
+              50.69,
+              50.56,
+              50.56,
+              50.72,
+              51.34,
+              52.38,
+              53.81,
+              55.75,
+              57.88,
+              59.72,
+              61.28,
+              62.69,
+              63.19,
+              63.44,
+              63.19,
+              63.03,
+              62.31
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "182365",
+      "metadata": {
+        "task_type": "anomaly_detection",
+        "domain": "Healthcare",
+        "response": "c) -0.85. Anomalies in data are points that do not fit the expected pattern or trend. The point -0.85 indicates a significant dip in the data, which could be considered an outlier or an anomaly due to its considerable drop relative to the surrounding points.",
+        "question": "In the data set [-0.27, -0.31, -0.34, -0.34, -0.36, -0.34, -0.32, -0.32, -0.34, -0.38, -0.44, -0.49, -0.58, -0.72, -0.85, -0.93, -0.97, -0.9, -0.8, -0.69], identify any anomalies. a) -0.34 b) -0.36 c) -0.85 d) -0.69",
+        "id": "182365"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 20,
+            "serie": [
+              -0.27,
+              -0.31,
+              -0.34,
+              -0.34,
+              -0.36,
+              -0.34,
+              -0.32,
+              -0.32,
+              -0.34,
+              -0.38,
+              -0.44,
+              -0.49,
+              -0.58,
+              -0.72,
+              -0.85,
+              -0.93,
+              -0.97,
+              -0.9,
+              -0.8,
+              -0.69
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "190676",
+      "metadata": {
+        "id": "190676",
+        "response": "True. One potential anomaly is at 21.97, which is significantly higher than the preceding values, suggesting an unusual spike that deviates from the general upward trend just before it.",
+        "question": "In the data points [10.75, 9.97, 10.78, 10.62, 8.88, 8.38, 10.31, 11.5, 10.88, 10.34, 12.38, 14.44, 14.0, 12.22, 12.78, 14.5, 14.59, 14.44, 16.09, 19.72, 21.97, 21.59, 20.84, 21.25], there is at least one anomaly present.",
+        "task_type": "anomalies_detection",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              10.75,
+              9.97,
+              10.78,
+              10.62,
+              8.88,
+              8.38,
+              10.31,
+              11.5,
+              10.88,
+              10.34,
+              12.38,
+              14.44,
+              14.0,
+              12.22,
+              12.78,
+              14.5,
+              14.59,
+              14.44,
+              16.09,
+              19.72,
+              21.97,
+              21.59,
+              20.84,
+              21.25
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "192692",
+      "metadata": {
+        "question": "Which of the following points appear to be anomalies in the data set [313.07, 305.71, 311.61, 322.6, 327.83, 332.74, 342.08, 355.39, 365.88, 368.1, 363.67, 361.85, 364.36, 364.56, 363.12, 362.06, 355.44, 358.21, 358.39, 345.4, 340.37, 338.18, 329.62, 320.69]? Options: A) 305.71, B) 368.1, C) 329.62",
+        "response": "A) 305.71. This point appears to be an anomaly as it is significantly lower compared to the neighboring values, which are generally higher indicating a down spike.",
+        "id": "192692",
+        "domain": "Healthcare",
+        "task_type": "anomaly_detection"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              313.07,
+              305.71,
+              311.61,
+              322.6,
+              327.83,
+              332.74,
+              342.08,
+              355.39,
+              365.88,
+              368.1,
+              363.67,
+              361.85,
+              364.36,
+              364.56,
+              363.12,
+              362.06,
+              355.44,
+              358.21,
+              358.39,
+              345.4,
+              340.37,
+              338.18,
+              329.62,
+              320.69
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "182659",
+      "metadata": {
+        "response": "D) None. The data decreases steadily without any significant deviations, indicating there are no anomalies in this dataset.",
+        "task_type": "anomaly_detection",
+        "id": "182659",
+        "question": "Which of the following values in the data [0.56, 0.54, 0.52, 0.5, 0.48, 0.46, 0.44, 0.43, 0.42, 0.41, 0.4, 0.39, 0.39, 0.38, 0.38, 0.38, 0.38, 0.37, 0.37, 0.37, 0.36, 0.36, 0.35, 0.35] could be considered an anomaly, if any? A) 0.46 B) 0.52 C) 0.42 D) None",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.56,
+              0.54,
+              0.52,
+              0.5,
+              0.48,
+              0.46,
+              0.44,
+              0.43,
+              0.42,
+              0.41,
+              0.4,
+              0.39,
+              0.39,
+              0.38,
+              0.38,
+              0.38,
+              0.38,
+              0.37,
+              0.37,
+              0.37,
+              0.36,
+              0.36,
+              0.35,
+              0.35
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "182899",
+      "metadata": {
+        "response": "c) 0.56. The value 0.56 appears only once as the lowest value among the nearby measurements, making it an anomaly. All other values in the vicinity are significantly higher.",
+        "task_type": "anomalies",
+        "domain": "Healthcare",
+        "question": "Review the data points [0.56, 0.65, 0.61, 0.65, 0.68, 0.71, 0.72, 0.73, 0.74, 0.74, 0.74, 0.74, 0.73, 0.73, 0.71, 0.7, 0.69, 0.68, 0.66, 0.65, 0.64, 0.62, 0.61, 0.6]. Identify the anomaly if any: a) 0.74 b) 0.61 c) 0.56 d) 0.64",
+        "id": "182899"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.56,
+              0.65,
+              0.61,
+              0.65,
+              0.68,
+              0.71,
+              0.72,
+              0.73,
+              0.74,
+              0.74,
+              0.74,
+              0.74,
+              0.73,
+              0.73,
+              0.71,
+              0.7,
+              0.69,
+              0.68,
+              0.66,
+              0.65,
+              0.64,
+              0.62,
+              0.61,
+              0.6
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "188279",
+      "metadata": {
+        "response": "a) 3.44. This value stands out as positive and large compared to the others which are predominantly negative, thus it appears to be an anomaly.",
+        "id": "188279",
+        "task_type": "anomalies",
+        "domain": "Healthcare",
+        "question": "Which data point in the series: [-2.75, -2.62, -3.97, -5.03, -5.03, -5.31, -6.97, -8.56, -8.84, -8.81, -9.69, -10.47, -9.47, -7.81, -7.06, -7.38, -7.34, 3.44, 4.09, 2.06, -0.59, -0.38, 0.91, 1.0] appears to be an anomaly? Options: a) 3.44, b) -5.03, c) -10.47, d) 1.0"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -2.75,
+              -2.62,
+              -3.97,
+              -5.03,
+              -5.03,
+              -5.31,
+              -6.97,
+              -8.56,
+              -8.84,
+              -8.81,
+              -9.69,
+              -10.47,
+              -9.47,
+              -7.81,
+              -7.06,
+              -7.38,
+              -7.34,
+              3.44,
+              4.09,
+              2.06,
+              -0.59,
+              -0.38,
+              0.91,
+              1.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "191027",
+      "metadata": {
+        "question": "In the dataset [27.78, 25.62, 24.5, 24.25, 23.41, 23.88, 25.94, 26.72, 26.38, 25.94, 26.62, 27.0, 26.38, 26.66, 28.75, 30.72, 31.0, 30.38, 30.78, 30.88, 29.38, 27.12, 25.81, 25.69], is the point 23.41 an anomaly? True/False.",
+        "response": "False. The value 23.41, while one of the lower points, does not significantly deviate from the pattern formed by the nearby points, like 24.25 and 22.91.",
+        "task_type": "anomalies",
+        "id": "191027",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              27.78,
+              25.62,
+              24.5,
+              24.25,
+              23.41,
+              23.88,
+              25.94,
+              26.72,
+              26.38,
+              25.94,
+              26.62,
+              27.0,
+              26.38,
+              26.66,
+              28.75,
+              30.72,
+              31.0,
+              30.38,
+              30.78,
+              30.88,
+              29.38,
+              27.12,
+              25.81,
+              25.69
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "185999",
+      "metadata": {
+        "id": "185999",
+        "domain": "Healthcare",
+        "question": "Identify the potential anomaly in the data: [-3.22, -2.16, -2.66, -2.22, -2.97, -2.97, -4.0, -3.66, -4.75, -4.97, -6.59, -7.28, -8.06, -9.5, -10.53, -11.62, -13.12, -14.56, -16.12, -17.47, -17.88, -19.0, -19.91, -21.0]. Options: A) -2.16 B) -19.91 C) -21.0 D) -4.75",
+        "response": "A) -2.16. The majority of the points are negative and in the range of -4.0 to -21.0, with a gradual decline. The value -2.16 seems unusually high compared to the other values, making it a potential anomaly.",
+        "task_type": "anomalies"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -3.22,
+              -2.16,
+              -2.66,
+              -2.22,
+              -2.97,
+              -2.97,
+              -4.0,
+              -3.66,
+              -4.75,
+              -4.97,
+              -6.59,
+              -7.28,
+              -8.06,
+              -9.5,
+              -10.53,
+              -11.62,
+              -13.12,
+              -14.56,
+              -16.12,
+              -17.47,
+              -17.88,
+              -19.0,
+              -19.91,
+              -21.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "189785",
+      "metadata": {
+        "question": "Identify any anomalies in the data points [0.58, 0.56, 0.54, 0.52, 0.5, 0.48, 0.46, 0.44, 0.43, 0.42, 0.41, 0.4, 0.4, 0.39, 0.39, 0.38, 0.38, 0.38, 0.38, 0.37, 0.37, 0.37, 0.36, 0.4].",
+        "task_type": "anomaly detection",
+        "domain": "Healthcare",
+        "id": "189785",
+        "response": "A. 0.52 B. 0.5 C. 0.4 D. None; Answer: D. None. Explanation: All the values follow a consistent downward trend with no significant deviations from the general pattern, hence there are no anomalies."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.58,
+              0.56,
+              0.54,
+              0.52,
+              0.5,
+              0.48,
+              0.46,
+              0.44,
+              0.43,
+              0.42,
+              0.41,
+              0.4,
+              0.4,
+              0.39,
+              0.39,
+              0.38,
+              0.38,
+              0.38,
+              0.38,
+              0.37,
+              0.37,
+              0.37,
+              0.36,
+              0.4
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "187455",
+      "metadata": {
+        "response": "True. The data shows an anomaly between the values 22.31 and 55.12. There is a sudden, significant increase from 22.31 to 55.12, which is inconsistent with the preceding and following values, indicating an anomaly.",
+        "domain": "Healthcare",
+        "task_type": "anomaly_detection",
+        "question": "Analyze the data points [20.66, 22.94, 23.06, 22.31, 55.12, 55.59, 56.28, 57.03, 57.81, 58.47, 58.66, 59.03, 59.31, 59.12, 58.5, 58.12, 58.5, 58.84, 59.34, 60.06, 61.25, 61.91, 61.62, 60.81] for any anomalies. There is an anomaly present in this dataset.",
+        "id": "187455"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              20.66,
+              22.94,
+              23.06,
+              22.31,
+              55.12,
+              55.59,
+              56.28,
+              57.03,
+              57.81,
+              58.47,
+              58.66,
+              59.03,
+              59.31,
+              59.12,
+              58.5,
+              58.12,
+              58.5,
+              58.84,
+              59.34,
+              60.06,
+              61.25,
+              61.91,
+              61.62,
+              60.81
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "181961",
+      "metadata": {
+        "id": "181961",
+        "domain": "Healthcare",
+        "response": "Answer: (B) 18th position. Reasoning: The value 0.45 is significantly higher than its neighboring values and the general trend of the series, indicating it as an outlier.",
+        "question": "Is there an outlier in the data points [0.32, 0.32, 0.31, 0.31, 0.31, 0.31, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.29, 0.29, 0.29, 0.29, 0.29, 0.45, 0.29, 0.29, 0.29, 0.29, 0.3, 0.3]? If yes, at what position does it occur? (A) No outlier (B) 18th position (C) 12th position",
+        "task_type": "anomalies"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.32,
+              0.32,
+              0.31,
+              0.31,
+              0.31,
+              0.31,
+              0.3,
+              0.3,
+              0.3,
+              0.3,
+              0.3,
+              0.3,
+              0.29,
+              0.29,
+              0.29,
+              0.29,
+              0.29,
+              0.45,
+              0.29,
+              0.29,
+              0.29,
+              0.29,
+              0.3,
+              0.3
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "191688",
+      "metadata": {
+        "task_type": "anomaly_detection",
+        "id": "191688",
+        "question": "Which data point in the set [13.69, 11.09, 9.28, 8.81, 9.47, 10.38, 12.16, 15.41, 19.06, 22.06, 24.84, 27.97, 30.72, 32.12] can be considered an anomaly? \n A) 30.72 \n B) 8.81 \n C) 15.41 \n D) 22.06",
+        "response": "B) 8.81. The overall trend of the data is increasing from around 13.69 to 32.12. The value 8.81 is significantly lower compared to its neighboring data points, indicating it as an anomaly.",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 14,
+            "serie": [
+              13.69,
+              11.09,
+              9.28,
+              8.81,
+              9.47,
+              10.38,
+              12.16,
+              15.41,
+              19.06,
+              22.06,
+              24.84,
+              27.97,
+              30.72,
+              32.12
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "185430",
+      "metadata": {
+        "question": "Identify any anomalous data points in the following series: [530.47, 535.67, 534.63, 539.46, 544.62, 543.4, 546.01, 546.27, 536.19, 521.52, 506.44, 497.51, 496.69, 499.49, 501.09, 505.05, 511.55, 519.97, 526.91, 528.23, 526.24, 526.4, 527.89, 529.45]. Which point stands out as atypical? A) 546.27 B) 521.52 C) 502.44 D) 536.19",
+        "domain": "Healthcare",
+        "task_type": "identifying_anomalies",
+        "response": "B) 521.52. This point appears to be an anomaly as it is significantly lower than the points immediately before and after it, disrupting the otherwise smooth upward trend.",
+        "id": "185430"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              530.47,
+              535.67,
+              534.63,
+              539.46,
+              544.62,
+              543.4,
+              546.01,
+              546.27,
+              536.19,
+              521.52,
+              506.44,
+              497.51,
+              496.69,
+              499.49,
+              501.09,
+              505.05,
+              511.55,
+              519.97,
+              526.91,
+              528.23,
+              526.24,
+              526.4,
+              527.89,
+              529.45
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "190538",
+      "metadata": {
+        "id": "190538",
+        "task_type": "anomalies",
+        "response": "A) 0.38. This value is significantly higher than the surrounding data, indicating it is an outlier or anomaly in the context of this dataset.",
+        "domain": "Healthcare",
+        "question": "Identify the anomaly or outlier in this dataset [0.29, 0.28, 0.28, 0.28, 0.28, 0.27, 0.27, 0.27, 0.27, 0.27, 0.26, 0.26, 0.38, 0.25, 0.25, 0.25, 0.25, 0.25, 0.24, 0.24, 0.24, 0.24, 0.24, 0.24]. (A) 0.38, (B) 0.28, (C) 0.25, (D) 0.26"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.29,
+              0.28,
+              0.28,
+              0.28,
+              0.28,
+              0.27,
+              0.27,
+              0.27,
+              0.27,
+              0.27,
+              0.26,
+              0.26,
+              0.38,
+              0.25,
+              0.25,
+              0.25,
+              0.25,
+              0.25,
+              0.24,
+              0.24,
+              0.24,
+              0.24,
+              0.24,
+              0.24
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "189185",
+      "metadata": {
+        "id": "189185",
+        "task_type": "anomalies_detection",
+        "question": "Identify possible anomalies in the time series data points [0.58, 0.56, 0.54, 0.52, 0.5, 0.48, 0.46, 0.44, 0.43, 0.42, 0.41, 0.41, 0.4, 0.4, 0.39, 0.39, 0.38, 0.38, 0.37, 0.37, 0.37, 0.36, 0.36, 0.35].",
+        "response": "There are no clear anomalies in this dataset. The data follows a decreasing trend without sharp deviations or single data points that are dramatically different from the surrounding points.",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.58,
+              0.56,
+              0.54,
+              0.52,
+              0.5,
+              0.48,
+              0.46,
+              0.44,
+              0.43,
+              0.42,
+              0.41,
+              0.41,
+              0.4,
+              0.4,
+              0.39,
+              0.39,
+              0.38,
+              0.38,
+              0.37,
+              0.37,
+              0.37,
+              0.36,
+              0.36,
+              0.35
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "185102",
+      "metadata": {
+        "domain": "Healthcare",
+        "response": "False. An examination of the data points does not reveal large deviations or outliers that would constitute significant anomalies. The data follows a fairly consistent upward trend with no single point deviating significantly from this pattern.",
+        "question": "Is there a significant anomaly in the selected data points [-13.0, -6.5, -1.0, 6.0, 13.0, 19.0, 25.5, 31.5, 37.0, 44.0, 48.5, 54.5, 60.0, 62.0, 66.5, 69.0, 70.5, 70.5, 68.5, 67.0, 64.0, 60.5, 54.5, 48.5]?",
+        "task_type": "anomaly_detection",
+        "id": "185102"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -13.0,
+              -6.5,
+              -1.0,
+              6.0,
+              13.0,
+              19.0,
+              25.5,
+              31.5,
+              37.0,
+              44.0,
+              48.5,
+              54.5,
+              60.0,
+              62.0,
+              66.5,
+              69.0,
+              70.5,
+              70.5,
+              68.5,
+              67.0,
+              64.0,
+              60.5,
+              54.5,
+              48.5
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "183852",
+      "metadata": {
+        "question": "True or False: In the series [123.5, 139.5, 152.5, 164.5, 174.5, 181.0, 189.0, 197.5, 208.5, 223.5, 241.0, 260.5, 280.5, 301.5, 319.0, 334.0, 345.5, 353.5, 353.5, 350.0], the point 319.0 can be considered an anomaly.",
+        "response": "False. The data shows a continuous rising trend, including the point 319.0. The point fits within the overarching pattern of increase, hence it does not deviate significantly from the trend.",
+        "task_type": "anomalous_detection",
+        "domain": "Healthcare",
+        "id": "183852"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 20,
+            "serie": [
+              123.5,
+              139.5,
+              152.5,
+              164.5,
+              174.5,
+              181.0,
+              189.0,
+              197.5,
+              208.5,
+              223.5,
+              241.0,
+              260.5,
+              280.5,
+              301.5,
+              319.0,
+              334.0,
+              345.5,
+              353.5,
+              353.5,
+              350.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "182003",
+      "metadata": {
+        "response": "False. While the data shows a very large and gradual increase followed by a more steady segment, there are no sudden deviations or outliers from this general pattern that would be considered significant anomalies.",
+        "id": "182003",
+        "domain": "Healthcare",
+        "question": "The data points [2.91, 3.31, 5.31, 8.59, 13.12, 18.12, 23.0, 25.19, 27.81, 29.97, 28.81, 29.72, 30.5, 31.28, 30.25, 29.19, 27.31, 24.5, 21.47, 16.62, 16.22, 15.59, 15.31, 18.72] contain a significant anomaly. True or false?",
+        "task_type": "anomalies detection"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              2.91,
+              3.31,
+              5.31,
+              8.59,
+              13.12,
+              18.12,
+              23.0,
+              25.19,
+              27.81,
+              29.97,
+              28.81,
+              29.72,
+              30.5,
+              31.28,
+              30.25,
+              29.19,
+              27.31,
+              24.5,
+              21.47,
+              16.62,
+              16.22,
+              15.59,
+              15.31,
+              18.72
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "189366",
+      "metadata": {
+        "id": "189366",
+        "domain": "Healthcare",
+        "task_type": "anomaly detection",
+        "response": "B) 17.38. This value is significantly lower than surrounding values, indicating it might be an anomaly. The other data points are relatively consistent with each other.",
+        "question": "Which data point among [21.03, 21.62, 21.28, 18.94, 17.38, 18.38, 19.88, 19.0, 17.59, 18.0, 19.78, 19.91, 18.91, 19.75, 21.75, 21.94, 20.25, 19.66, 20.72, 21.88, 20.66, 19.69, 20.25, 21.09] could be considered an anomaly due to its significant deviation from the others? Options: A) 21.38 B) 17.38 C) 19.69 D) 21.88"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              21.03,
+              21.62,
+              21.28,
+              18.94,
+              17.38,
+              18.38,
+              19.88,
+              19.0,
+              17.59,
+              18.0,
+              19.78,
+              19.91,
+              18.91,
+              19.75,
+              21.75,
+              21.94,
+              20.25,
+              19.66,
+              20.72,
+              21.88,
+              20.66,
+              19.69,
+              20.25,
+              21.09
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "188419",
+      "metadata": {
+        "id": "188419",
+        "question": "Consider the data points [25.78, 27.62, 29.16, 31.28, 32.38, 31.69, 29.53, 27.69, 25.47, 22.97, 21.03, 20.25, 21.25, 22.78, 23.75, 24.62, 26.0, 26.72, 26.0, 25.38, 25.94, 27.0, 27.56, 113.75]. Is there an anomaly in this data set?",
+        "domain": "Healthcare",
+        "task_type": "anomaly_detection",
+        "response": "True. By examining the data for consistency, we observe that most values range between 20 and 30, except for a sudden spike to 113.75, which acts as an outlier, suggesting a potential anomaly."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              25.78,
+              27.62,
+              29.16,
+              31.28,
+              32.38,
+              31.69,
+              29.53,
+              27.69,
+              25.47,
+              22.97,
+              21.03,
+              20.25,
+              21.25,
+              22.78,
+              23.75,
+              24.62,
+              26.0,
+              26.72,
+              26.0,
+              25.38,
+              25.94,
+              27.0,
+              27.56,
+              113.75
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "189832",
+      "metadata": {
+        "id": "189832",
+        "question": "There is an outlier in the time series data [37.0, 35.0, 33.5, 35.0, 36.5, 36.5, 38.0, 36.5, 35.0, 31.5, 27.0, 25.0, 20.5, 18.5, 16.5, 15.0, 15.0, 14.5, 12.0, 6.5, -1.5, -13.0, -24.0].",
+        "task_type": "anomalies_detection",
+        "response": "True. Although the data starts with relatively stable values, the point -24.0 deviates significantly from the prior values and indicates a potential outlier due to its substantial drop.",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 23,
+            "serie": [
+              37.0,
+              35.0,
+              33.5,
+              35.0,
+              36.5,
+              36.5,
+              38.0,
+              36.5,
+              35.0,
+              31.5,
+              27.0,
+              25.0,
+              20.5,
+              18.5,
+              16.5,
+              15.0,
+              15.0,
+              14.5,
+              12.0,
+              6.5,
+              -1.5,
+              -13.0,
+              -24.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "159088",
+      "metadata": {
+        "task_type": "anomaly identification",
+        "domain": "Healthcare",
+        "question": "Out of these data points [0.48, 0.48, 0.48, 0.48, 0.48, 0.47, 0.47, 0.46, 0.46, 0.45, 0.45, 0.45, 0.44, 0.44, 0.44, 0.43, 0.43, 0.44, 0.43, 0.42, 0.52, 0.54, 0.55, 0.56], which point is the anomaly? a) 0.43 b) 0.52 c) 0.56",
+        "response": "b) 0.52. The value 0.52 deviates significantly compared to its preceding trend, where numbers were consistently decreasing in the range of lower values like 0.42 and 0.44.",
+        "id": "159088"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.48,
+              0.48,
+              0.48,
+              0.48,
+              0.48,
+              0.47,
+              0.47,
+              0.46,
+              0.46,
+              0.45,
+              0.45,
+              0.45,
+              0.44,
+              0.44,
+              0.44,
+              0.43,
+              0.43,
+              0.44,
+              0.43,
+              0.42,
+              0.52,
+              0.54,
+              0.55,
+              0.56
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "187277",
+      "metadata": {
+        "response": "The value 55.12 appears to be an anomaly in this dataset. All other values are clustered between 7.72 and 18.66, while 55.12 is significantly higher, suggesting it is an outlier.",
+        "task_type": "anomaly_detection",
+        "question": "Identify any anomalies in the following data points: [13.78, 14.28, 15.72, 17.44, 18.44, 55.12, 18.66, 17.69, 16.97, 17.5, 13.28, 12.53, 13.06, 11.66, 10.62, 10.5, 10.38, 9.03, 7.72, 8.22, 9.59, 10.41, 11.31, 13.25].",
+        "id": "187277",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              13.78,
+              14.28,
+              15.72,
+              17.44,
+              18.44,
+              55.12,
+              18.66,
+              17.69,
+              16.97,
+              17.5,
+              13.28,
+              12.53,
+              13.06,
+              11.66,
+              10.62,
+              10.5,
+              10.38,
+              9.03,
+              7.72,
+              8.22,
+              9.59,
+              10.41,
+              11.31,
+              13.25
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "188705",
+      "metadata": {
+        "question": "Given the data points [24.75, 25.5, 25.25, 22.0, 19.78, 16.06, 13.16, 8.81, 8.44, 8.81, 9.75, 10.03, 11.06, 12.06, 13.03, 0.44, 1.0, -0.91, -0.75, -2.34, -4.28, -4.69, -6.19, -6.53], is -20.31 considered an anomaly in this subset?",
+        "id": "188705",
+        "task_type": "anomaly_detection",
+        "domain": "Healthcare",
+        "response": "True. Compared to the rest of the data, -20.31 is significantly lower than even the minimum, indicating it is an anomaly. Typically, anomalies are values that significantly deviate from the overall pattern or values within the data."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              24.75,
+              25.5,
+              25.25,
+              22.0,
+              19.78,
+              16.06,
+              13.16,
+              8.81,
+              8.44,
+              8.81,
+              9.75,
+              10.03,
+              11.06,
+              12.06,
+              13.03,
+              0.44,
+              1.0,
+              -0.91,
+              -0.75,
+              -2.34,
+              -4.28,
+              -4.69,
+              -6.19,
+              -6.53
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "182230",
+      "metadata": {
+        "question": "Identify the anomalous value in the series [11.53, 11.88, 12.06, 9.94, 5.84, 2.16, -1.38, -4.94, -7.78, -10.16, -13.06, -15.28, -16.78, -18.03, -18.66, 100.0, -18.28, -17.97, -16.09, -14.66, -12.84, -11.44, -10.22, -9.56]. Options: (a) -18.66 (b) 100.0 (c) -18.28",
+        "response": "Correct answer: (b) 100.0. The value 100.0 is anomalously high compared to the rest of the data points, which are much lower, indicating it is an outlier.",
+        "id": "182230",
+        "task_type": "anomalies",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              11.53,
+              11.88,
+              12.06,
+              9.94,
+              5.84,
+              2.16,
+              -1.38,
+              -4.94,
+              -7.78,
+              -10.16,
+              -13.06,
+              -15.28,
+              -16.78,
+              -18.03,
+              -18.66,
+              100.0,
+              -18.28,
+              -17.97,
+              -16.09,
+              -14.66,
+              -12.84,
+              -11.44,
+              -10.22,
+              -9.56
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "181483",
+      "metadata": {
+        "question": "Identify the anomaly in the data points: [0.34, 0.34, 0.34, 0.33, 0.33, 0.32, 0.32, 0.31, 0.3, 0.3, 0.29, 0.29, 0.28, 0.28, 0.27, 0.27, 0.27, 0.26, 0.26, 0.29, 0.3, 0.32, 0.35, 0.5]. The anomaly is: (A) 0.26, (B) 0.29, (C) 0.5, (D) 0.33",
+        "response": "(C) 0.5 is the anomaly. The majority of the data points fall within the range of 0.26 to 0.35. The value 0.5 is significantly higher than the others, indicating it is an outlier.",
+        "id": "181483",
+        "domain": "Healthcare",
+        "task_type": "anomaly_detection"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.34,
+              0.34,
+              0.34,
+              0.33,
+              0.33,
+              0.32,
+              0.32,
+              0.31,
+              0.3,
+              0.3,
+              0.29,
+              0.29,
+              0.28,
+              0.28,
+              0.27,
+              0.27,
+              0.27,
+              0.26,
+              0.26,
+              0.29,
+              0.3,
+              0.32,
+              0.35,
+              0.5
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "184421",
+      "metadata": {
+        "question": "Identify any anomalies in the following data set: [24.94, 26.66, 27.72, 26.22, 25.0, 26.19, 28.31, 28.62, 27.97, 28.0, 28.25, 26.41, 23.12, 21.38, 22.75, 23.69, 23.12, 23.28, 8.53, 8.09, 8.56, 8.16, 6.62, 4.88].",
+        "id": "184421",
+        "response": "The values 8.53, 8.09, 8.56, 8.16, 6.62, and 4.88 appear to be anomalies in this data set as there is a sudden drop in the data compared to the higher values recorded before these points, indicating that these might be outliers or an abrupt structural break.",
+        "task_type": "anomaly_detection",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              24.94,
+              26.66,
+              27.72,
+              26.22,
+              25.0,
+              26.19,
+              28.31,
+              28.62,
+              27.97,
+              28.0,
+              28.25,
+              26.41,
+              23.12,
+              21.38,
+              22.75,
+              23.69,
+              23.12,
+              23.28,
+              8.53,
+              8.09,
+              8.56,
+              8.16,
+              6.62,
+              4.88
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "184105",
+      "metadata": {
+        "task_type": "anomaly_detection",
+        "response": "False. All data points present relatively consistent changes and in line with overall observed variations, indicating no significant anomalies within this subset.",
+        "domain": "Healthcare",
+        "id": "184105",
+        "question": "Is there a point that deviates significantly as an anomaly in the series [-502.42, -498.55, -495.42, -491.22, -482.85, -478.11, -480.97, -483.45, -484.03, -482.74, -481.86, -485.85, -491.24, -493.68, -495.98, -496.02, -496.87, -498.57, -498.42, -498.98, -496.29, -499.03, -507.79, -511.79]?"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -502.42,
+              -498.55,
+              -495.42,
+              -491.22,
+              -482.85,
+              -478.11,
+              -480.97,
+              -483.45,
+              -484.03,
+              -482.74,
+              -481.86,
+              -485.85,
+              -491.24,
+              -493.68,
+              -495.98,
+              -496.02,
+              -496.87,
+              -498.57,
+              -498.42,
+              -498.98,
+              -496.29,
+              -499.03,
+              -507.79,
+              -511.79
+            ]
+          }
+        ],
+        "output": []
+      }
+    }
+  ]
+}

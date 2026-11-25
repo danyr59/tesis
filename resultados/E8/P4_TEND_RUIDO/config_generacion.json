@@ -1,0 +1,1930 @@
+{
+  "escenario": "E8_gemma_qwen",
+  "perfil": "P4_TEND_RUIDO",
+  "query": "Simular la cotización diaria de una acción tecnológica durante un ciclo correctivo de mercado. Dominio: Finanzas y Mercados. Variable estricta: Únicamente 'Precio_Accion'. Perfil matemático: P4_TENDENCIA_RUIDO, con tendencia fluctuante descendente y alto nivel de ruido o volatilidad, sin componentes estacionales. Escala: cotizando alrededor de 120 USD.",
+  "dominio": "finanzas",
+  "structured_prompt": {
+    "values": {
+      "tema": "Stock market correction",
+      "dominio": "Finanzas",
+      "localizacion": null,
+      "frecuencia": "Daily",
+      "start_date": "2024-01-01",
+      "variables": [
+        "Precio_Accion"
+      ],
+      "target_value": 120.0,
+      "tipo_serie": "univariada",
+      "profile_id": "P4_TENDENCIA_RUIDO",
+      "num_series_configuradas": 20,
+      "puntos_por_serie_configurados": 400
+    },
+    "missing_parameters": [],
+    "pending_questions": [],
+    "justification": "The scenario involves a stock market correction, which is characterized by a downward trend with high volatility. The time series would reflect the daily price of a technology stock during this period.",
+    "suggested_search": "Stock market correction, technology stock, daily price, volatility",
+    "search_strategy": "Search for historical stock market data, specifically for technology stocks, during periods of market correction. The time series should be sampled daily for a duration of 20 days, with 400 data points in total.",
+    "confidence": 0.9
+  },
+  "metadata_summary": {
+    "count": 50,
+    "refinements_applied": [
+      "broaden_domain"
+    ],
+    "domain": "Finanzas",
+    "rag_dataset": "TSQA",
+    "diversity_score": 0.060000000000000005
+  },
+  "seed_dataset": [
+    {
+      "id": "153820",
+      "metadata": {
+        "id": "153820",
+        "task_type": "forecasting",
+        "response": "[-0.15344292363406498, 'down']",
+        "domain": "Finance",
+        "question": "The CFO’s comments during COIN's recent earnings call were: \"founder and CEO; Emilie Choi, president and COO; Alesia Haas, CFO; and Paul Grewal, chief legal officer. I hope you've all had the opportunity to read our shareholder letter, which was published on our investor relations website earlier today. Before we get started, I'd like to remind you that during today's call, we may make forward\nInformation concerning risks, uncertainties, and other factors that could cause these results to differ is included in our SEC filings. Our discussion today will also include certain non-GAAP financial measures. Reconciliations to the most directly comparable GAAP financial measures are provided in the shareholder letter on our investor relations website. Non-GAAP financial measures should be considered in addition to, not as a substitute for, GAAP measures.\nWe are once again using the Say Technologies platform to enable our shareholders to ask questions. In addition, we'll take live questions from our research analysts. And with that, I'll turn it over to Brian for opening comments.\".\nAdditionally, the historical return of COIN two weeks prior to the earnings call was [-0.029836558850115935, 0.07840357495050787, -0.02947189180915355, -0.014037057752502857, -0.055951065283894486, 0.05142518153610509, -0.019697888237907524, 0.05394075877650173, 0.016473842934036975, -0.03605571354322745].\nYour goal is to predict whether COIN's stock price and return will increase or decrease the day after the earnings call."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.029836558850115935,
+              0.07840357495050787,
+              -0.02947189180915355,
+              -0.014037057752502857,
+              -0.055951065283894486,
+              0.05142518153610509,
+              -0.019697888237907524,
+              0.05394075877650173,
+              0.016473842934036975,
+              -0.03605571354322745
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.15344292363406498,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "151313",
+      "metadata": {
+        "question": "The CFO’s comments during VRNS's recent earnings call were: \"quarter and full\nAfter preliminary remarks, we will open the call to a question-and-answer session. During this call, we may make statements related to our business that would be considered forward-looking statements under federal securities laws, including projections of future operating results for our first quarter and full year ending December 31st, 2024. Due to a number of factors, actual results may differ materially from those set forth in such statements. These factors are set forth in the earnings press release that we issued today under the section captioned Forward-Looking Statements, and these and other important risk factors are described more fully in our reports filed with the Securities and Exchange Commission.\nWe encourage all investors to read our SEC filings. These statements reflect our views only as of today and should not be relied upon as representing our views as of any subsequent date. Varonis expressly disclaims any application or undertaking to release publicly any updates or revisions to any forward-looking statements made herein. Additionally, non-GAAP financial measures will be discussed on this conference call.\nA reconciliation to the most directly comparable GAAP financial measures is also available in our fourth-quarter 2023 earnings press release and investor presentation, which can be found at www.varonis.com in the Investor Relations section. Lastly, please note that a webcast of today's call is available on our website in the Investor Relations section. With that, I'd like to turn the call over to our chief executive officer, Yaki Faitelson. Yaki?\".\nAdditionally, the historical return of VRNS two weeks prior to the earnings call was [-0.0048405108253049, 0.0, 0.0064116939744061074, -0.006151115476298763, 0.017241351687839135, 0.008909166521812617, -0.03338357154582572, 0.020944710435330194, -0.008948054346199052, 0.0028628290806445023].\nYour goal is to predict whether VRNS's stock price and return will increase or decrease the day after the earnings call.",
+        "task_type": "forecasting",
+        "id": "151313",
+        "domain": "Finance",
+        "response": "[0.06719362092833014, 'up']"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.0048405108253049,
+              0.0,
+              0.0064116939744061074,
+              -0.006151115476298763,
+              0.017241351687839135,
+              0.008909166521812617,
+              -0.03338357154582572,
+              0.020944710435330194,
+              -0.008948054346199052,
+              0.0028628290806445023
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.06719362092833014,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "146309",
+      "metadata": {
+        "id": "146309",
+        "task_type": "forecasting",
+        "response": "[-0.2149212500640515, 'down']",
+        "question": "The CFO’s comments during VYX's recent earnings call were: \"Walsh, our CFO.\nThis call is being recorded and webcast on the investor relations section of our website. Before we begin, please be advised that remarks today will contain forward-looking statements. These forward-looking statements are subject to risks and uncertainties and other factors which could cause actual results to differ materially from those expressed or implied by such forward-looking statements. For additional information on these factors, please refer to our earnings release and other reports filed with the SEC.\nWe caution you not to place undue reliance on these statements. Forward-looking statements during this call speak only as of the date of this call, and we undertake no obligation to update them. In addition, we will be discussing or providing certain non-GAAP financial measures today, which we believe are more reflective of our ongoing performance. For a full reconciliation of the non-GAAP financial measures discussed in this call to the most comparable GAAP measure in accordance with SEC regulations, please see our press release furnished as an exhibit to our Form 8-K file this afternoon and our supplemental materials available on the investor relations section of our website.\nAs a reminder, you will see the financials of the NCR Atleos business, which was spun off as an independent publicly traded company on October 16th, 2023 in the discontinued operations line within the P&L. With that, I would like to turn the call over to David.\".\nAdditionally, the historical return of VYX two weeks prior to the earnings call was [-0.036662448476267095, 0.009842557379092787, -0.027940240128866867, -0.022058818373300593, 0.028024596322963058, -0.023936147446166123, -0.014305179412900437, -0.011057349306114572, 0.020964306657133003].\nYour goal is to predict whether VYX's stock price and return will increase or decrease the day after the earnings call.",
+        "domain": "Finance"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 9,
+            "serie": [
+              -0.036662448476267095,
+              0.009842557379092787,
+              -0.027940240128866867,
+              -0.022058818373300593,
+              0.028024596322963058,
+              -0.023936147446166123,
+              -0.014305179412900437,
+              -0.011057349306114572,
+              0.020964306657133003
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.2149212500640515,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "153135",
+      "metadata": {
+        "response": "[0.019229789402174013, 'up']",
+        "id": "153135",
+        "question": "The CFO’s comments during VRTX's recent earnings call were: \"looking statements on this call that are subject to the risks and uncertainties discussed in detail in today's press release and in our filings with the Securities and Exchange Commission.\nThese statements, including, without limitation, those regarding Vertex's marketed medicines for cystic fibrosis, sickle cell disease, and beta-thalassemia, our pipeline Vertex' anticipated acquisition of Alpine Immune Sciences, and Vertex's future financial performance are based on management's current assumptions. Actual outcomes and events could differ materially. I would also note that select financial results and guidance that we will review on the call this evening are presented on a non-GAAP basis. In addition, the impact of foreign exchange is presented inclusive of our foreign exchange risk management program.\nI will now turn the call over to Reshma.\".\nAdditionally, the historical return of VRTX two weeks prior to the earnings call was [0.012477470661209411, -0.010249176011831729, -0.007635486286127535, -0.0005531838419673418, -0.0032202846531089735, -0.0085563214134029, 0.023751984796293257, -0.004923685567722269, 0.0022990376392866274, 0.0035404744072875527].\nYour goal is to predict whether VRTX's stock price and return will increase or decrease the day after the earnings call.",
+        "task_type": "forecasting",
+        "domain": "Finance"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.012477470661209411,
+              -0.010249176011831729,
+              -0.007635486286127535,
+              -0.0005531838419673418,
+              -0.0032202846531089735,
+              -0.0085563214134029,
+              0.023751984796293257,
+              -0.004923685567722269,
+              0.0022990376392866274,
+              0.0035404744072875527
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.019229789402174013,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "152411",
+      "metadata": {
+        "id": "152411",
+        "domain": "Finance",
+        "question": "The CFO’s comments during ZTS's recent earnings call were: \"quarter and full\nFor a list and description of certain factors that could cause results to differ, I refer you to the forward-looking statements in today's press release and our SEC filings, including, but not limited to, our annual report on Form 10-K and our reports on Form 10-Q. Our remarks today will also include references to certain financial measures, which were not prepared in accordance with generally accepted accounting principles or U.S. GAAP. A reconciliation of these non-GAAP financial measures to the most directly comparable U.S.\nGAAP measures is included in the financial tables that accompany our earnings press release and the company's 8-K filing dated today, Tuesday, February 13th, 2024. We also cite operational results, which exclude the impact of foreign exchange. With that, I will turn the call over to Kristin.\".\nAdditionally, the historical return of ZTS two weeks prior to the earnings call was [-0.018910186313264243, 0.007081556729243044, -0.0005287863398352188, 0.0059775929728960175, 0.03139299650910443, 0.004843522454036853, -0.0067989060153476055, 0.008020391349982114, -0.0031927445260502285, -0.06711066082348904].\nYour goal is to predict whether ZTS's stock price and return will increase or decrease the day after the earnings call.",
+        "response": "[0.0032154440524549965, 'up']",
+        "task_type": "forecasting"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.018910186313264243,
+              0.007081556729243044,
+              -0.0005287863398352188,
+              0.0059775929728960175,
+              0.03139299650910443,
+              0.004843522454036853,
+              -0.0067989060153476055,
+              0.008020391349982114,
+              -0.0031927445260502285,
+              -0.06711066082348904
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.0032154440524549965,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "145435",
+      "metadata": {
+        "question": "The CFO’s comments during NET's recent earnings call were: \"founder and CEO; Michelle Zatlyn, co\nOur actual results may differ significantly from those projected or suggested in any of our forward-looking statements. These forward-looking statements apply as of today, and you should not rely on them as representing our views in the future. We undertake no obligation to update these statements after this call. For a more complete discussion of the risks and uncertainties that could impact our future operating results and financial condition, please see our filings with the SEC as well as in today's earnings press release. Unless otherwise noted, all numbers we talk about today other than revenue will be on an adjusted non-GAAP basis. You may find a reconciliation of GAAP to non-GAAP financial measures that are included in our earnings release on our Investor Relations website.\nFor historical periods, a GAAP to non-GAAP reconciliation can be found in the supplemental financial information referenced a few moments ago. We would also like to inform you that we will be participating in Baird's Software Silicon Slopes event on February 28th and the Morgan Stanley Technology, Media, and Telecom Conference on March 6th. Before wrapping up, please save the date for our Investor Day on Thursday, May 30th, which is being held in conjunction with our user conference Cloudflare Connect in New York City. A live webcast will also be accessible from our Investor Relations website. Now, I'd like to turn the call over to Matthew.\".\nAdditionally, the historical return of NET two weeks prior to the earnings call was [-0.020522847454796378, 0.051384419193075015, -0.01589565739947163, -0.04713110023944855, 0.00683103434897081, 0.038447108038519806, -0.022141582544093374, 0.009527303216702698, 0.021571298139807737, 0.08350328988468592].\nYour goal is to predict whether NET's stock price and return will increase or decrease the day after the earnings call.",
+        "domain": "Finance",
+        "response": "[0.19499502919293143, 'up']",
+        "task_type": "forecasting",
+        "id": "145435"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.020522847454796378,
+              0.051384419193075015,
+              -0.01589565739947163,
+              -0.04713110023944855,
+              0.00683103434897081,
+              0.038447108038519806,
+              -0.022141582544093374,
+              0.009527303216702698,
+              0.021571298139807737,
+              0.08350328988468592
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.19499502919293143,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "153256",
+      "metadata": {
+        "task_type": "forecasting",
+        "question": "The CFO’s comments during DV's recent earnings call were: \"looking statements that are subject to inherent risks, uncertainties and changes and reflect our current expectations and information currently available to us, and our actual results could differ materially. For more information, please refer to the risk factors in our recent SEC filings, including our annual report or our Form 10\nIn addition, our discussion today will include references to certain supplemental non-GAAP financial measures and should be considered in addition to and not as a substitute for our GAAP results. Reconciliations to the most comparable GAAP measures are available in today's earnings press release, which is available on our Investor Relations website at ir.doubleverify.com. Also, during the call today, we'll be referring to the slide deck posted on our website. With that, I'll turn it over to Mark.\".\nAdditionally, the historical return of DV two weeks prior to the earnings call was [0.005301234233810348, 0.008868622268907167, -0.01853168867828847, 0.007262145414851373, 0.016342232521059152, 0.0016552303927361844, 0.0033049902651376417, -0.022352959127987182, -0.055595610132607276].\nYour goal is to predict whether DV's stock price and return will increase or decrease the day after the earnings call.",
+        "id": "153256",
+        "response": "[-0.21279311752426544, 'down']",
+        "domain": "Finance"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 9,
+            "serie": [
+              0.005301234233810348,
+              0.008868622268907167,
+              -0.01853168867828847,
+              0.007262145414851373,
+              0.016342232521059152,
+              0.0016552303927361844,
+              0.0033049902651376417,
+              -0.022352959127987182,
+              -0.055595610132607276
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.21279311752426544,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "151890",
+      "metadata": {
+        "question": "The CFO’s comments during MDB's recent earnings call were: \"looking statements, including statements related to our market and future growth opportunities.\nOur expectations for the macroeconomic environment in fiscal 2025 and the impact of AI, the benefits of our product platform, our competitive landscape, customer behaviors, our financial guidance and our planned investments and growth opportunities. These statements are subject to a variety of risks and uncertainties, including the results of operation and financial conditions that could cause actual results to differ materially from our expectations. For a discussion of material risks and uncertainties that could affect our actual results, please refer to the risk factors described in our annual report on Form 10-K for the period ended January 31, 2024, that was filed with the SEC on March 15, 2024. Any forward-looking statements made on this call reflect our views only as of today and we undertake no obligation to update them, except as required by law.\nAdditionally, we will discuss non-GAAP financial measures on this conference call. Please refer to the tables in our earnings release on the Investor Relations portion of our website. For a reconciliation of these measures to the most directly comparable GAAP financial measures. With that, I'd like to turn the call over to Dev.\".\nAdditionally, the historical return of MDB two weeks prior to the earnings call was [0.0023787773071441976, -0.007577793816655909, -0.007472622828252451, -0.010896377593818563, -0.01688442793436251, -0.015316184902261831, -0.039686639418932135, -0.005567781810119743, -0.07182847072015597].\nYour goal is to predict whether MDB's stock price and return will increase or decrease the day after the earnings call.",
+        "id": "151890",
+        "response": "[-0.23851613690776208, 'down']",
+        "task_type": "forecasting",
+        "domain": "Finance"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 9,
+            "serie": [
+              0.0023787773071441976,
+              -0.007577793816655909,
+              -0.007472622828252451,
+              -0.010896377593818563,
+              -0.01688442793436251,
+              -0.015316184902261831,
+              -0.039686639418932135,
+              -0.005567781810119743,
+              -0.07182847072015597
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.23851613690776208,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "152325",
+      "metadata": {
+        "response": "[0.0572240554515997, 'up']",
+        "domain": "Finance",
+        "question": "The CFO’s comments during MNDY's recent earnings call were: \"CEOs of monday.com; and Eliran Glazer, monday.com's CFO. We released our results for the third quarter earlier today. You can find our quarterly shareholder letter, along with our investor presentation and a replay of today's webcast, under the news and events section of our IR website at ir.monday.com.\nCertain statements made on the call today will be forward-looking statements, which reflect management's best judgment based on the currently available information. These statements involve risks and uncertainties that may cause actual results to differ from our expectations. Please refer to our earnings release for more information on the specific factors that could cause actual results to differ materially from our forward-looking statements. Additionally, non-GAAP financial measures will be discussed on the call.\nReconciliations to our most directly comparable GAAP financial measures are available in the earnings release and the earnings presentation for today's call, which are posted on our investor relations website. Now, let me turn the call over to Roy.\".\nAdditionally, the historical return of MNDY two weeks prior to the earnings call was [0.0001539145362241534, -0.021001640445943104, 0.0032217195177786095, 0.03360232322745804, -0.015459294037058369, 0.09298031097064907, -0.0071126373720841185, -0.03858431257150363, 0.03371443720060041, 0.1049814960496156].\nYour goal is to predict whether MNDY's stock price and return will increase or decrease the day after the earnings call.",
+        "id": "152325",
+        "task_type": "forecasting"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.0001539145362241534,
+              -0.021001640445943104,
+              0.0032217195177786095,
+              0.03360232322745804,
+              -0.015459294037058369,
+              0.09298031097064907,
+              -0.0071126373720841185,
+              -0.03858431257150363,
+              0.03371443720060041,
+              0.1049814960496156
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.0572240554515997,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "151781",
+      "metadata": {
+        "response": "[-0.057197277491594645, 'down']",
+        "question": "The CFO’s comments during AMPL's recent earnings call were: \"founder of Amplitude; and Andrew Casey, chief financial officer.\nDuring today's call, management will make forward-looking statements, including statements regarding our financial outlook for the fourth quarter and full year 2024, the expected performance of our products, our expected quarterly and long-term growth investments, and our overall future prospects. These forward-looking statements are based on current information, assumptions, and expectations and are subject to risks and uncertainties, some of which are beyond our control that could cause actual results to differ materially from those described in these statements. Further information on the risks that could cause actual results to differ is included in our filings with the Securities and Exchange Commission. You are cautioned not to place undue reliance on these forward-looking statements, and we assume no obligation to update these statements after today's call, except as required by law.\nCertain financial measures used on today's call are expressed in a non-GAAP basis. We use these non-GAAP financial measures internally to facilitate analysis of our financial and business trends and for internal planning and forecasting purposes. These non-GAAP financial measures have limitations and should not be used in isolation from or as a substitute for financial information prepared in accordance with GAAP. A reconciliation between these GAAP and non-GAAP financial measures is included in our earnings press release, which can be found on Investor Relations website at investors.amplitude.com With that I'll hand the call over to Spenser.\".\nAdditionally, the historical return of AMPL two weeks prior to the earnings call was [0.00885934950960765, -0.010976886011418774, 0.025527140554231886, -0.003246724427955372, -0.023887108156089853, 0.03448280617454813, -0.0021505868122021488, 0.01508624432663952, 0.0583864316645788, 0.05215641827102191].\nYour goal is to predict whether AMPL's stock price and return will increase or decrease the day after the earnings call.",
+        "task_type": "forecasting",
+        "id": "151781",
+        "domain": "Finance"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.00885934950960765,
+              -0.010976886011418774,
+              0.025527140554231886,
+              -0.003246724427955372,
+              -0.023887108156089853,
+              0.03448280617454813,
+              -0.0021505868122021488,
+              0.01508624432663952,
+              0.0583864316645788,
+              0.05215641827102191
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.057197277491594645,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "152713",
+      "metadata": {
+        "task_type": "forecasting",
+        "id": "152713",
+        "question": "The CFO’s comments during YUMC's recent earnings call were: \"looking statements, which are subject to future events and uncertainties. Actual results may differ materially from these forward\nAll forward-looking statements should be considered in conjunction with the cautionary statement in our earnings release and the risk factors included in our filings with the SEC. This call also includes certain non-GAAP financial measures. You should carefully consider the comparable GAAP measures. Reconciliation of non-GAAP and GAAP measures is included in our earnings release, which is available to the public through our investor relations website located at ir.yumchina.com.\nYou can also find a webcast of this call and a PowerPoint presentation on our IR website. Please note that during today's call, our year-over-year growth results exclude the impact of foreign currency, unless otherwise noted. Now I would like to turn the call over to Joey Wat, CEO of Yum! China. Joey?\".\nAdditionally, the historical return of YUMC two weeks prior to the earnings call was [0.0016073408966825742, 0.006189831828865788, -0.008658033114597341, 0.002758049901432358, 0.024524402214745056, -0.00469796601540029, 0.0047201410777715225, -0.013199108333730836, 0.021763751330517334, 0.07166628720006973].\nYour goal is to predict whether YUMC's stock price and return will increase or decrease the day after the earnings call.",
+        "response": "[0.0008281763179955881, 'up']",
+        "domain": "Finance"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.0016073408966825742,
+              0.006189831828865788,
+              -0.008658033114597341,
+              0.002758049901432358,
+              0.024524402214745056,
+              -0.00469796601540029,
+              0.0047201410777715225,
+              -0.013199108333730836,
+              0.021763751330517334,
+              0.07166628720006973
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.0008281763179955881,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "142116",
+      "metadata": {
+        "domain": "Finance",
+        "task_type": "forecasting",
+        "id": "142116",
+        "response": "[-0.0463086943626172, 'down']",
+        "question": "The CFO’s comments during JWN's recent earnings call were: \"looking statements, so please refer to the slide with our safe harbor language. Participating in today's call are Erik Nordstrom, chief executive officer; Pete Nordstrom, president; and Cathy Smith, chief financial officer, who will provide a business update and discuss the company's third quarter performance.\nAnd now I'll turn the call over to Erik.\".\nAdditionally, the historical return of JWN two weeks prior to the earnings call was [-0.002123174340367462, -0.04539010090015838, 0.00445764616238975, -0.032544309574700336, 0.09480118770890322, 0.05726265092132787, -0.045574732971287446, 0.04429061895325215, 0.005301626745439325, -0.01779835847687461].\nYour goal is to predict whether JWN's stock price and return will increase or decrease the day after the earnings call."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.002123174340367462,
+              -0.04539010090015838,
+              0.00445764616238975,
+              -0.032544309574700336,
+              0.09480118770890322,
+              0.05726265092132787,
+              -0.045574732971287446,
+              0.04429061895325215,
+              0.005301626745439325,
+              -0.01779835847687461
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.0463086943626172,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "150526",
+      "metadata": {
+        "task_type": "forecasting",
+        "response": "[-0.06727830922355282, 'down']",
+        "domain": "Finance",
+        "question": "The CFO’s comments during MODG's recent earnings call were: \"quarter earnings conference call. I'm Katina Metzidakis, the company's vice president of investor relations and corporate communications. Joining me as speakers on today's call are Chip Brewer, our president and chief executive officer; and Brian Lynch, our chief financial officer and chief legal officer.\nEarlier today, the company issued a press release announcing its first-quarter financial results. We've also published an updated presentation. Our earnings presentation as well as the earnings press release are both available on the company's Investor Relations website under the Financial Results tab. Most of the financial numbers reported and discussed on today's call are based on U.S.\ngenerally accepted accounting principles. In the instances where we report non-GAAP measures, we identify the non-GAAP measures in the presentation and reconcile the measures to the corresponding GAAP measures in accordance with Regulation G. Please note that this call will include forward-looking statements that involve risks and uncertainties that could cause actual results to differ materially from management's current expectations. We encourage you to review the safe harbor statements contained in the presentation and the press release for a more complete description.\nAnd with that, I would now like to turn the call over to Mr. Chip Brewer.\".\nAdditionally, the historical return of MODG two weeks prior to the earnings call was [-0.02843016251364494, 0.008269727241263514, 0.0353311957390916, -0.023765959370800394, -0.00998756532549816, 0.017654460216416812, -0.008674064122841774, 0.02812504768371582, 0.010334350663189218, -0.016245514087237845].\nYour goal is to predict whether MODG's stock price and return will increase or decrease the day after the earnings call.",
+        "id": "150526"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.02843016251364494,
+              0.008269727241263514,
+              0.0353311957390916,
+              -0.023765959370800394,
+              -0.00998756532549816,
+              0.017654460216416812,
+              -0.008674064122841774,
+              0.02812504768371582,
+              0.010334350663189218,
+              -0.016245514087237845
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.06727830922355282,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "145852",
+      "metadata": {
+        "id": "145852",
+        "task_type": "forecasting",
+        "response": "[-0.07465825668339154, 'down']",
+        "question": "The CFO’s comments during VOXX's recent earnings call were: \"month results conference call. Yesterday, we filed our Form 10\nTheir remarks will be followed by questions and answers. As for today, I would like to remind everyone that, except for historical information contained herein, statements made on today's call and webcast that would constitute forward-looking statements are based on currently available information. The company assumes no responsibility to update any such forward-looking statements, and I'd like to point you to the risk factors associated with our business, which are detailed in our Form 10-K for the period ended February 28th, 2023. Thank you for your continued support, and I would like to now turn the call over to Pat.\".\nAdditionally, the historical return of VOXX two weeks prior to the earnings call was [-0.006363608620383543, -0.022872826442796645, -0.01591760968504463, -0.055185529122273036, -0.020141063121136837, -0.022610413535942286, 0.1009463738214702, 0.03629418383470151, -0.12350231386870936].\nYour goal is to predict whether VOXX's stock price and return will increase or decrease the day after the earnings call.",
+        "domain": "Finance"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 9,
+            "serie": [
+              -0.006363608620383543,
+              -0.022872826442796645,
+              -0.01591760968504463,
+              -0.055185529122273036,
+              -0.020141063121136837,
+              -0.022610413535942286,
+              0.1009463738214702,
+              0.03629418383470151,
+              -0.12350231386870936
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.07465825668339154,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "145406",
+      "metadata": {
+        "response": "[-0.04209327499030868, 'down']",
+        "domain": "Finance",
+        "id": "145406",
+        "question": "The CFO’s comments during SONO's recent earnings call were: \"looking statements regarding future events and our future financial performance.\nThese statements reflect our views as of today only and should not be considered as representing our views as of any subsequent date. These statements are also subject to material risks and uncertainties that could cause actual results to differ materially from the expectations reflected in the forward-looking statements. A discussion of these risk factors is fully detailed under the caption risk factors in our filings with the SEC. During this call, we will also refer to certain non-GAAP financial measures.\nFor information regarding our non-GAAP financials and a reconciliation of GAAP to non-GAAP measures, please refer to today's press release regarding our second quarter fiscal 2024 results posted to the Investor Relations portion of our website. As a reminder, the press release, supplemental earnings presentation, and conference call transcript will be available on our Investor Relations website, investors.sonos.com. I would also like to note that for convenience, we have separately posted an investor presentation to our investor relations website, which contains certain portions of our supplemental earnings presentation. I will now turn the call over to Patrick.\".\nAdditionally, the historical return of SONO two weeks prior to the earnings call was [-0.02089209209554188, -0.01211078373548613, -0.009340330137234454, 0.02003536631379399, -0.02368572270720104, -0.0017750757381073123, 0.004149359297091815, 0.00649342972461997, 0.04868034960974854, -0.01677848160747253].\nYour goal is to predict whether SONO's stock price and return will increase or decrease the day after the earnings call.",
+        "task_type": "forecasting"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.02089209209554188,
+              -0.01211078373548613,
+              -0.009340330137234454,
+              0.02003536631379399,
+              -0.02368572270720104,
+              -0.0017750757381073123,
+              0.004149359297091815,
+              0.00649342972461997,
+              0.04868034960974854,
+              -0.01677848160747253
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.04209327499030868,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "152569",
+      "metadata": {
+        "response": "[0.01842638566661914, 'up']",
+        "domain": "Finance",
+        "question": "The CFO’s comments during KVUE's recent earnings call were: \"looking statements regarding, among other things, our operating and financial performance, market opportunities and growth. These statements represent our current beliefs or expectations about future events and are subject to various risks, uncertainties and assumptions that could cause our actual results to differ materially.\nFor information regarding these risks and uncertainties, please refer to our earnings materials related to this call posted on our website and our filings with the SEC. During this call, we've also referenced certain non-GAAP financial information. The presentation of this non-GAAP financial information is not intended to be considered in isolation as a substitute for financial information presented in accordance with U.S. GAAP.\nThese non-GAAP financial measures should be viewed in conjunction with the most comparable GAAP financial measures. A reconciliation of these items to the nearest U.S. GAAP measure can be found in this morning's press release and our presentation available on our IR website, investors.kenvue.com. With that, I'll turn it over to Thibaut.\".\nAdditionally, the historical return of KVUE two weeks prior to the earnings call was [-0.012390387796078373, -0.005750034743566057, -0.008412158843465023, 0.01060427549610532, -0.012591707850893585, 0.0015940221789767506, 0.014323677592787076, 0.004184030144072315, -0.006249895465085364, 0.06355923602145319].\nYour goal is to predict whether KVUE's stock price and return will increase or decrease the day after the earnings call.",
+        "id": "152569",
+        "task_type": "forecasting"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.012390387796078373,
+              -0.005750034743566057,
+              -0.008412158843465023,
+              0.01060427549610532,
+              -0.012591707850893585,
+              0.0015940221789767506,
+              0.014323677592787076,
+              0.004184030144072315,
+              -0.006249895465085364,
+              0.06355923602145319
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.01842638566661914,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "151723",
+      "metadata": {
+        "domain": "Finance",
+        "question": "The CFO’s comments during PTON's recent earnings call were: \"CEOs, Karen Boone and Chris Bruzzo; as well as chief financial officer, Liz Coddington. Our comments and responses to your questions reflect management's views as of today only and will include statements related to our business that are forward\nActual results may differ materially from those contained in or implied by these forward-looking statements due to risks and uncertainties associated with our business. For a discussion of the material risks and other important factors that could impact our actual results, please refer to our SEC filings and today's shareholder letter, both of which can be found on our investor relations website. During this call, we will discuss both GAAP and non-GAAP financial measures. A reconciliation of GAAP to non-GAAP financial measures is provided in today's shareholder letter.\nI'll now turn over the call to interim co-CEO, Karen Boone.\".\nAdditionally, the historical return of PTON two weeks prior to the earnings call was [0.0033557014762590764, -0.033444784051375964, 0.04498265443026672, -0.04635757197675372, 0.11458330228924885, 0.0, 0.006230523579077385, -0.009287916784092132, 0.04999995157122683, 0.3541667657120864].\nYour goal is to predict whether PTON's stock price and return will increase or decrease the day after the earnings call.",
+        "response": "[0.06373625268050587, 'up']",
+        "id": "151723",
+        "task_type": "forecasting"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.0033557014762590764,
+              -0.033444784051375964,
+              0.04498265443026672,
+              -0.04635757197675372,
+              0.11458330228924885,
+              0.0,
+              0.006230523579077385,
+              -0.009287916784092132,
+              0.04999995157122683,
+              0.3541667657120864
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.06373625268050587,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "146809",
+      "metadata": {
+        "task_type": "forecasting",
+        "response": "[0.035051562811695414, 'up']",
+        "id": "146809",
+        "domain": "Finance",
+        "question": "The CFO’s comments during NIO's recent earnings call were: \"looking statements made under the safe harbor provisions of the U.S.\nPrivate Securities Litigation Reform Act of 1995. Forward-looking statements involve inherent risks and uncertainties. As such, the company's actual results may be materially different from the views expressed today. Further information regarding risks and uncertainties is included in certain filings of the company with the U.S.\nSecurities Exchange Commission, the Stock Exchange of Hong Kong Limited and the Singapore Exchange Securities Trading Limited. The company does not assume any obligation to update any forward-looking statements, except as required under applicable law. Please also note that NIO earnings press release and this conference call include discussions of unaudited GAAP financial information, as well as unaudited non-GAAP financial measures. Please refer to news press release, which contains a reconciliation of the unaudited non-GAAP measures to comparable GAAP measures.\nWith that, I will now turn the call over to our CEO, Mr. William Li. William, please go ahead.\".\nAdditionally, the historical return of NIO two weeks prior to the earnings call was [0.022556369412079613, -0.012254832066831978, -0.0074442204085583, -0.07499998807907104, 0.06486486660641755, 0.0253806860863639, 0.027227756077490284, 0.021686668357236316, 0.1438679637837661].\nYour goal is to predict whether NIO's stock price and return will increase or decrease the day after the earnings call."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 9,
+            "serie": [
+              0.022556369412079613,
+              -0.012254832066831978,
+              -0.0074442204085583,
+              -0.07499998807907104,
+              0.06486486660641755,
+              0.0253806860863639,
+              0.027227756077490284,
+              0.021686668357236316,
+              0.1438679637837661
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.035051562811695414,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "146300",
+      "metadata": {
+        "question": "The CFO’s comments during COIN's recent earnings call were: \"founder and CEO; Emilie Choi, president and COO; Alesia Haas, CFO; and Paul Grewal, chief legal officer. I hope you've all had the opportunity to read our shareholder letter, which was published on our investor relations website earlier today. Before we get started, I'd like to remind you that during today's call, we may make forward\nActual results may vary materially from today's statements. Information concerning risks, uncertainties, and other factors that could cause these results to differ is included in our SEC filings. Our discussion today will also include references to certain non-GAAP financial metrics. Reconciliations to the most directly comparable GAAP financial measures are provided in the shareholder letter on our investor relations website.\".\nAdditionally, the historical return of COIN two weeks prior to the earnings call was [0.0020938680019457756, -0.09224576734515255, 0.02122760271942048, 0.01903329795368025, 0.08585240749679413, 0.07121842492693231, 0.037467369952921104, -0.04697575374130891, 0.14238909879671957, 0.03298411974733462].\nYour goal is to predict whether COIN's stock price and return will increase or decrease the day after the earnings call.",
+        "response": "[0.08836844058342419, 'up']",
+        "domain": "Finance",
+        "task_type": "forecasting",
+        "id": "146300"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.0020938680019457756,
+              -0.09224576734515255,
+              0.02122760271942048,
+              0.01903329795368025,
+              0.08585240749679413,
+              0.07121842492693231,
+              0.037467369952921104,
+              -0.04697575374130891,
+              0.14238909879671957,
+              0.03298411974733462
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.08836844058342419,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "151158",
+      "metadata": {
+        "id": "151158",
+        "response": "[-0.04387992160929133, 'down']",
+        "task_type": "forecasting",
+        "domain": "Finance",
+        "question": "The CFO’s comments during DDD's recent earnings call were: \"quarter 2023 conference call. With me on today's call are Dr. Jeffrey Graves, president and chief executive officer; and Andrew Johnson, executive vice president and interim chief financial officer. The webcast portion of this call contains a slide presentation that we will refer to during the call.\nThose following along on the phone who wish to access the slide portion of this presentation may do so on the Investor Relations section of our website. The following discussion and responses to your questions reflect management's views as of today only and will include forward-looking statements as described on this slide. Actual results may differ materially. Additional information about factors that could potentially impact our financial results is included in this morning's press release and our recent filings with the SEC, including our most recent annual report on Form 10-K and quarterly reports on Form 10-Q.\nDuring this call, we will discuss certain non-GAAP financial measures. In our press release and slides accompanying this webcast, you will find additional disclosures regarding these non-GAAP measures, including reconciliations with comparable GAAP measures. Finally, unless otherwise stated, all comparisons in this call will be against our results for the comparable period of 2022. With that, I'll turn the call over to our CEO, Jeff Graves, for opening remarks.\".\nAdditionally, the historical return of DDD two weeks prior to the earnings call was [-0.06361323047159251, -0.0326087287502157, 0.042134858926518914, 0.005390830382983713, -0.018766738038833997, 0.11202187874747915, 0.07616705889547881, -0.0319635478686795, -0.004716976888241464, 0.026066383645343416].\nYour goal is to predict whether DDD's stock price and return will increase or decrease the day after the earnings call."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.06361323047159251,
+              -0.0326087287502157,
+              0.042134858926518914,
+              0.005390830382983713,
+              -0.018766738038833997,
+              0.11202187874747915,
+              0.07616705889547881,
+              -0.0319635478686795,
+              -0.004716976888241464,
+              0.026066383645343416
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.04387992160929133,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "148183",
+      "metadata": {
+        "id": "148183",
+        "response": "[0.07473310864630989, 'up']",
+        "task_type": "forecasting",
+        "question": "The CFO’s comments during SNCY's recent earnings call were: \"looking statements. Our remarks today may include forward\nActual results may differ materially. We encourage you to review the risk factors and cautionary statements outlined in our earnings release and on our most recent SEC filings. We assume no obligation to update any forward-looking statement. You can find our third quarter 2024 earnings press release on the Investor Relations portion of our website at ir.suncountry.com.\nWith that said, I'd like to turn it over to Jude.\".\nAdditionally, the historical return of SNCY two weeks prior to the earnings call was [0.08406305006422699, 0.024232648462169326, 0.005520480531506555, -0.007843167174096166, -0.02529641932601079, 0.023519867286897922, 0.033280513478811224, -0.0352760766482092, 0.015898236127033005, 0.09937405980433556].\nYour goal is to predict whether SNCY's stock price and return will increase or decrease the day after the earnings call.",
+        "domain": "Finance"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.08406305006422699,
+              0.024232648462169326,
+              0.005520480531506555,
+              -0.007843167174096166,
+              -0.02529641932601079,
+              0.023519867286897922,
+              0.033280513478811224,
+              -0.0352760766482092,
+              0.015898236127033005,
+              0.09937405980433556
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.07473310864630989,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "149659",
+      "metadata": {
+        "id": "149659",
+        "question": "The CFO’s comments during HD's recent earnings call were: \"quarter and fiscal year 2023 earnings call. Joining us on our call today are Ted Decker, chair, president, and CEO; Ann\nQuestions will be limited to analysts and investors. And as a reminder, please limit yourself to one question with one follow-up. If we are unable to get to your question during the call, please call our investor relations department at (770) 384-2387. Before I turn the call over to Ted, let me remind you that today's press release and the presentations made by our executives include forward-looking statements as defined in the Private Securities Litigation Reform Act of 1995.\nThese statements are subject to risks and uncertainties that could cause actual results to differ materially from our expectations and projections. These risks and uncertainties include, but are not limited, to the factors identified in the release and in our filings with the Securities and Exchange Commission. Today's presentation will also include certain non-GAAP measures. Reconciliation of these measures is provided on our website.\nNow, let me turn the call over to Ted.\".\nAdditionally, the historical return of HD two weeks prior to the earnings call was [0.01807715754954531, 0.002839839143525813, -0.0015670355775906364, 0.006333391199505822, -0.021507673239141267, 0.0017897654431413557, 0.007955774934464532, 0.0035172840899204694, 0.0006070908520514617].\nYour goal is to predict whether HD's stock price and return will increase or decrease the day after the earnings call.",
+        "task_type": "forecasting",
+        "domain": "Finance",
+        "response": "[0.004302643107338744, 'up']"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 9,
+            "serie": [
+              0.01807715754954531,
+              0.002839839143525813,
+              -0.0015670355775906364,
+              0.006333391199505822,
+              -0.021507673239141267,
+              0.0017897654431413557,
+              0.007955774934464532,
+              0.0035172840899204694,
+              0.0006070908520514617
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.004302643107338744,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "142666",
+      "metadata": {
+        "response": "[-0.01330116133769943, 'down']",
+        "question": "The CFO’s comments during TLYS's recent earnings call were: \"quarter earnings call. Ed Thomas, president and CEO; and Michael Henry, EVP and CFO, will discuss the company's results and then host a Q&A session. For a copy of Tilly's earnings press release, please visit the investor relations section of the company's website at tillys.com. From the same section, shortly after the conclusion of the call, you will also be able to find a recorded replay of this call for the next 30 days. Certain forward\nAccordingly, you should not place undue reliance on these forward-looking statements. For a more thorough discussion of the risks and uncertainties associated with any forward-looking statements, please see the disclaimer regarding forward-looking statements. It is included in our fiscal 2023 third-quarter earnings release, which is furnished to the SEC today on Form 8-K, as well as our other filings with the SEC referenced in that disclaimer. Today's call will be limited to one hour and will include a Q&A session after our prepared remarks.\nI now turn the call over to Ed.\".\nAdditionally, the historical return of TLYS two weeks prior to the earnings call was [0.010663525718303868, -0.002344607821269995, -0.014101043752245523, 0.0035756533663395818, 0.0, -0.0023753512568226443, -0.0011903899597163203, 0.03098918528822736, -0.04393054075430902].\nYour goal is to predict whether TLYS's stock price and return will increase or decrease the day after the earnings call.",
+        "task_type": "forecasting",
+        "id": "142666",
+        "domain": "Finance"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 9,
+            "serie": [
+              0.010663525718303868,
+              -0.002344607821269995,
+              -0.014101043752245523,
+              0.0035756533663395818,
+              0.0,
+              -0.0023753512568226443,
+              -0.0011903899597163203,
+              0.03098918528822736,
+              -0.04393054075430902
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.01330116133769943,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "145995",
+      "metadata": {
+        "response": "[-0.01363068907521714, 'down']",
+        "id": "145995",
+        "task_type": "forecasting",
+        "domain": "Finance",
+        "question": "The CFO’s comments during VYX's recent earnings call were: \"Walsh. The focus of our discussion on today's conference call will be on NCR Voyix segment results and key performance indicators for the third quarter 2023. We would appreciate it if you keep your questions focused on the NCR Voyix segment results during Q&A.\nPlease note that our presentation and discussions will include forward-looking statements. These statements reflect our current expectations and beliefs, but they are subject to risks and uncertainties that could cause actual results to differ materially from those expectations. These risks and uncertainties are described in our earnings release and our periodic filings with the SEC, including our annual report. On today's call, we'll also be discussing certain non-GAAP financial measures.\nThese non-GAAP measures are described and reconciled to their GAAP counterparts in the presentation materials the press release dated November 9, 2023, and on the Investor Relations page of our website. A replay of this call will be available later today on our website, ncrvoyix.com. Slides 2 and 3 of our earnings presentation provide further details. With that, I would now like to turn the call over to David.\".\nAdditionally, the historical return of VYX two weeks prior to the earnings call was [-0.030678806965856453, -0.004040432193629373, 0.03380662618591068, 0.018966642418348334, 0.03594348322751295, 0.03717474623044548, -0.005973738520729244, -0.005408663214487741, -0.0072506910825742565, -0.017650694469919626].\nYour goal is to predict whether VYX's stock price and return will increase or decrease the day after the earnings call."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.030678806965856453,
+              -0.004040432193629373,
+              0.03380662618591068,
+              0.018966642418348334,
+              0.03594348322751295,
+              0.03717474623044548,
+              -0.005973738520729244,
+              -0.005408663214487741,
+              -0.0072506910825742565,
+              -0.017650694469919626
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.01363068907521714,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "143379",
+      "metadata": {
+        "id": "143379",
+        "domain": "Finance",
+        "question": "The CFO’s comments during AMPL's recent earnings call were: \"founder of Amplitude; Andrew Casey, chief financial officer; and Mike Dean, VP, corporate controller.\nDuring today's call, management will make forward-looking statements, including statements regarding our financial outlook for the third quarter and full year 2024, the expected performance of our products, our expected quarterly and long-term growth, investments, and our overall future prospects. These forward-looking statements are based on current information, assumptions, and expectations, and are subject to risks and uncertainties, some of which are beyond our control, that could cause actual results to differ materially from those described in these statements. Further information on the risks that could cause actual results to differ is included in our filings with the Securities and Exchange Commission. You are cautioned not to place undue reliance on these forward-looking statements and we assume no obligation to update these statements after today's call except as required by law.\nCertain financial measures used on today's call are expressed on a non-GAAP basis. We use these non-GAAP financial measures internally to facilitate analysis of our financial and business trends and for internal planning and forecasting purposes. These non-GAAP financial measures have limitations and should not be used in isolation from or as a substitute for financial information prepared in accordance with GAAP. A reconciliation between these GAAP and non-GAAP financial measures is included in our earnings press release, which can be found on our investor relations website at investors.Amplitude.com.\nWith that, I'll hand the call over to Spenser.\".\nAdditionally, the historical return of AMPL two weeks prior to the earnings call was [0.028136076471937166, -0.02508554795274298, 0.01286545663431049, -0.011547278239882774, -0.04205614400748858, -0.031707287572239395, -0.027707841995384563, 0.0012953664706754076, 0.0064683299626764335, 0.0257069156647316].\nYour goal is to predict whether AMPL's stock price and return will increase or decrease the day after the earnings call.",
+        "task_type": "forecasting",
+        "response": "[-0.003759424779028131, 'down']"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.028136076471937166,
+              -0.02508554795274298,
+              0.01286545663431049,
+              -0.011547278239882774,
+              -0.04205614400748858,
+              -0.031707287572239395,
+              -0.027707841995384563,
+              0.0012953664706754076,
+              0.0064683299626764335,
+              0.0257069156647316
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.003759424779028131,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "143800",
+      "metadata": {
+        "id": "143800",
+        "response": "[0.037037065069791986, 'up']",
+        "question": "The CFO’s comments during MNKD's recent earnings call were: \"K report filed with the Securities and Exchange Commission this afternoon, the earning release, and the slides prepared for this presentation. Joining us today from MannKind are chief executive officer, Michael Castagna; and chief financial officer, Steve Binder. I will now turn the conference over to Mr. Castagna.\nPlease go ahead, sir.\".\nAdditionally, the historical return of MNKD two weeks prior to the earnings call was [0.05882347166332158, 0.030555593452336938, -0.016172491148951362, -0.0136986820351932, 0.0, -0.0027777752022684066, -0.011142050921826518, 0.008450696279642456, 0.05586593629775094].\nYour goal is to predict whether MNKD's stock price and return will increase or decrease the day after the earnings call.",
+        "domain": "Finance",
+        "task_type": "forecasting"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 9,
+            "serie": [
+              0.05882347166332158,
+              0.030555593452336938,
+              -0.016172491148951362,
+              -0.0136986820351932,
+              0.0,
+              -0.0027777752022684066,
+              -0.011142050921826518,
+              0.008450696279642456,
+              0.05586593629775094
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.037037065069791986,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "149196",
+      "metadata": {
+        "response": "[0.014621980962391312, 'up']",
+        "id": "149196",
+        "domain": "Finance",
+        "question": "The CFO’s comments during MNDY's recent earnings call were: \"quarter and fiscal year 2023. Joining me today are Roy Mann and Eran Zinman, co\nYou can find our quarterly shareholder letter, along with our investor presentation, and a replay of today's webcast under the News and Events section of our IR website at IR.monday.com. Certain statements made on the call today will be forward-looking statements which reflect management's best judgment based on the currently available information. These statements involve risks and uncertainties that may cause actual results to differ from our expectations. Please refer to our earnings release for more information on the specific factors that could cause actual results to differ materially from our forward-looking statements.\nAdditionally, non-GAAP financial measures will be discussed on the call. Reconciliations to the most directly comparable GAAP financial measures are available in the earnings release and the earnings presentation for today's call, which are posted on our investor relations website. Now, let me turn the call over to Roy.\".\nAdditionally, the historical return of MNDY two weeks prior to the earnings call was [-0.0032906819500034823, -0.03686724356848836, 0.00514188661958026, 0.013925741329116281, -0.009903742601917953, 0.016136633620596585, 0.012072836627725403, 0.04179666145042371, 0.03897472391450729, -0.10134793085657412].\nYour goal is to predict whether MNDY's stock price and return will increase or decrease the day after the earnings call.",
+        "task_type": "forecasting"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.0032906819500034823,
+              -0.03686724356848836,
+              0.00514188661958026,
+              0.013925741329116281,
+              -0.009903742601917953,
+              0.016136633620596585,
+              0.012072836627725403,
+              0.04179666145042371,
+              0.03897472391450729,
+              -0.10134793085657412
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.014621980962391312,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "143045",
+      "metadata": {
+        "task_type": "forecasting",
+        "response": "[-0.021624257832335125, 'down']",
+        "domain": "Finance",
+        "id": "143045",
+        "question": "The CFO’s comments during DDOG's recent earnings call were: \"founder and CEO; and David Obstler, Datadog's CFO. During this call, we will make forward\nThe words anticipate, believe, continue, estimate, expect, intend, will, and similar expressions are intended to identify forward-looking statements or similar indications of future expectations. These statements reflect our views only as of today and are subject to a variety of risks and uncertainties that could cause actual results to differ materially. For a discussion of the material risks and other important factors that could affect our actual results, please refer to our Form 10-Q for the quarter ended June 30, 2023. Additional information will be made available in our upcoming Form 10-Q for the fiscal quarter ended September 30, 2023 and other filings with the SEC.\nThis information is also available on the investor relations section of our website, along with a replay of this call. We will also discuss non-GAAP financial measures, which are reconciled to their most directly comparable GAAP financial measures in the tables in our earnings release, which is available at investors.datadoghq.com. With that, I'd like to turn the call over to Olivier.\".\nAdditionally, the historical return of DDOG two weeks prior to the earnings call was [-0.07136358102554141, -0.010663012087714363, 0.011892951808162744, -0.015548440723817336, 0.013182409032686637, -0.01681603935257936, -0.01073658710030334, 0.03533572851139666, -0.030351021891544816, 0.28472649940374684].\nYour goal is to predict whether DDOG's stock price and return will increase or decrease the day after the earnings call."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.07136358102554141,
+              -0.010663012087714363,
+              0.011892951808162744,
+              -0.015548440723817336,
+              0.013182409032686637,
+              -0.01681603935257936,
+              -0.01073658710030334,
+              0.03533572851139666,
+              -0.030351021891544816,
+              0.28472649940374684
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.021624257832335125,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "143422",
+      "metadata": {
+        "question": "The CFO’s comments during TW's recent earnings call were: \"looking statements within the meaning of the Private Securities Litigation Reform Act of 1995.\nStatements related to among other things, our guidance and the ICD acquisition are forward-looking statements. Actual results may differ materially from these forward-looking statements. Information concerning factors that could cause actual results to differ from forward-looking statements is contained in our earnings release, earnings presentation and periodic reports filed with the SEC. In addition on today's call we will reference certain non-GAAP measures as well as certain market industry data.\nInformation regarding these non-GAAP measures including reconciliations to GAAP measures is in our earnings release and earnings presentation. Information regarding market and industry data including sources is in our earnings presentation. Now let me turn the call over to\".\nAdditionally, the historical return of TW two weeks prior to the earnings call was [-0.0005714526321546343, 0.01629505736821546, 0.010314092346341619, 0.00241300018198487, 0.009165779787988937, 0.0036697626896133873, 0.0043875439288343365, 0.0008191098672545305, -0.017004682332025456, -0.028769645897053775].\nYour goal is to predict whether TW's stock price and return will increase or decrease the day after the earnings call.",
+        "task_type": "forecasting",
+        "id": "143422",
+        "response": "[0.017620716687912097, 'up']",
+        "domain": "Finance"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.0005714526321546343,
+              0.01629505736821546,
+              0.010314092346341619,
+              0.00241300018198487,
+              0.009165779787988937,
+              0.0036697626896133873,
+              0.0043875439288343365,
+              0.0008191098672545305,
+              -0.017004682332025456,
+              -0.028769645897053775
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.017620716687912097,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "147930",
+      "metadata": {
+        "response": "[-0.041143359381475286, 'down']",
+        "question": "The CFO’s comments during DDOG's recent earnings call were: \"founder and CEO; and David Obstler, Datadog's CFO. During this call, we will make forward\nThe words anticipate, believe, continue, estimate, expect, intend, will, and similar expressions are intended to identify forward-looking statements or similar indications of future expectations. These statements reflect our views only as of today and are subject to a variety of risks and uncertainties that could cause actual results to differ materially. For a discussion of the material risks and other important factors that could affect our actual results, please refer to our Form 10-Q for the quarter ended June 30, 2024. Additional information will be made available in our upcoming Form 10-Q for the fiscal quarter ended September 30, 2024, and other filings with the SEC.\nThis information is also available on the Investor Relations section of our website, along with a replay of this call. We will also discuss non-GAAP financial measures, which are reconciled to their most directly comparable GAAP financial measures in the tables in our earnings release, which is available at investors.datadoghq.com. With that, I'd like to turn the call over to Olivier.\".\nAdditionally, the historical return of DDOG two weeks prior to the earnings call was [0.021874235998253555, -0.0018167119297878287, 0.018912651011385284, -0.004659761341436752, -0.021223479580059434, -0.017378828625215226, 0.01865970616989987, -0.004061759451675195, 0.026389467982595338, 0.01121922176969603].\nYour goal is to predict whether DDOG's stock price and return will increase or decrease the day after the earnings call.",
+        "task_type": "forecasting",
+        "domain": "Finance",
+        "id": "147930"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.021874235998253555,
+              -0.0018167119297878287,
+              0.018912651011385284,
+              -0.004659761341436752,
+              -0.021223479580059434,
+              -0.017378828625215226,
+              0.01865970616989987,
+              -0.004061759451675195,
+              0.026389467982595338,
+              0.01121922176969603
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.041143359381475286,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "145296",
+      "metadata": {
+        "domain": "Finance",
+        "id": "145296",
+        "task_type": "forecasting",
+        "question": "The CFO’s comments during PRTS's recent earnings call were: \"quarter conference call. Joining me today are David Meniane, chief executive officer; Ryan Lockwood, chief financial officer; and Michael Huffaker, chief operating officer. Before I turn it over to David to start the meeting, I have some important disclosures. The prepared remarks and responses to your questions could contain certain forward\nActual results may differ materially from those contained in or implied by these forward-looking statements due to risks and uncertainties associated with the business. For a discussion of the material risks and other important factors that could affect results, please refer to the CarParts.com annual report on Form 10-K and 10-Qs as filed with the SEC, both of which can be found on our Investor Relations website. On the call, both GAAP and non-GAAP financial measures will be discussed. A reconciliation of GAAP to non-GAAP financial measures is provided in the CarParts.com press release issued today.\nAnd with that, I would now like to turn the call over to David.\".\nAdditionally, the historical return of PRTS two weeks prior to the earnings call was [-0.07142859846015659, -0.0683760056755851, 0.009174302896359121, 0.027272700672307915, 0.0, -0.026548647359614486, 0.09090911061310525, 0.04166662527455389, -0.007999992370605447, -0.032258033504347416].\nYour goal is to predict whether PRTS's stock price and return will increase or decrease the day after the earnings call.",
+        "response": "[-0.15833337472544606, 'down']"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.07142859846015659,
+              -0.0683760056755851,
+              0.009174302896359121,
+              0.027272700672307915,
+              0.0,
+              -0.026548647359614486,
+              0.09090911061310525,
+              0.04166662527455389,
+              -0.007999992370605447,
+              -0.032258033504347416
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.15833337472544606,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "150289",
+      "metadata": {
+        "task_type": "forecasting",
+        "id": "150289",
+        "question": "The CFO’s comments during AMAT's recent earnings call were: \"looking statements, which are subject to risks and uncertainties that could cause our actual results to differ. Information concerning the risks and uncertainties is contained in Applied's most recent form 10\nToday's call also includes non-GAAP financial measures. Reconciliations to GAAP measures are found in today's earnings press release and in our quarterly earnings materials, which are available on our website at ir.appliedmaterials.com. Before we begin, I have a calendar announcement. On Tuesday evening, December 12th, Applied will lead a panel on the Future of Logic near the IEDM Conference in San Francisco.\nJoining us will be leading technology executives from Intel, Samsung, and TSMC, along with Google, Qualcomm, Synopsis, and the EV Group. There won't be a webcast, so we hope you'll join us in San Francisco. And with that introduction, I'd like to turn the call over to Gary Dickerson.\".\nAdditionally, the historical return of AMAT two weeks prior to the earnings call was [0.008952609213884744, 0.004364799739480674, 0.009831958059016932, 0.017567369532833776, -0.007349385774529593, 0.0524550321005981, -0.006238293888149449, 0.028983505792717246, 0.008372335012742926, -0.003604281676448662].\nYour goal is to predict whether AMAT's stock price and return will increase or decrease the day after the earnings call.",
+        "domain": "Finance",
+        "response": "[-0.040178435758340014, 'down']"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.008952609213884744,
+              0.004364799739480674,
+              0.009831958059016932,
+              0.017567369532833776,
+              -0.007349385774529593,
+              0.0524550321005981,
+              -0.006238293888149449,
+              0.028983505792717246,
+              0.008372335012742926,
+              -0.003604281676448662
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.040178435758340014,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "146871",
+      "metadata": {
+        "id": "146871",
+        "task_type": "forecasting",
+        "response": "[-0.015873060135259243, 'down']",
+        "domain": "Finance",
+        "question": "The CFO’s comments during SONO's recent earnings call were: \"quarter fiscal 2024 earnings conference call. I'm James Baglanis and with me today are Sonos CEO, Patrick Spence; CFO, Saori Casey; and chief legal and strategy officer, Eddie Lazarus. For those who joined the call early, today's hold music is a sampling from our Sonos Radio station, Backyard Barbecue. Before I hand it over to Patrick, I would like to remind everyone that today's discussion will include forward\nThese statements reflect our views as of today only and should not be considered as representing our views of any subsequent date. These statements are also subject to material risks and uncertainties that could cause actual results to differ materially from expectations reflected in the forward-looking statements. A discussion of these risk factors is fully detailed under the caption Risk Factors in our filings with the SEC. During this call, we will refer to certain non-GAAP financial measures.\nFor information regarding our non-GAAP financials and a reconciliation of GAAP to non-GAAP measures, please refer to today's press release regarding our third quarter fiscal 2024 results posted to the Investor Relations portion of our website. As a reminder, the press release, supplemental earnings presentation, and a conference call transcript will be available on our Investor Relations website, investors.sonos.com. I will now turn the call over to Patrick.\".\nAdditionally, the historical return of SONO two weeks prior to the earnings call was [0.011922492287816278, -0.0007363938835065476, 0.01621225290909334, -0.026831028758709574, 0.00596124614390825, -0.03037035906756369, -0.04201682080394231, -0.04545452125663252, 0.040100211489424886, -0.0385541806899562].\nYour goal is to predict whether SONO's stock price and return will increase or decrease the day after the earnings call."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.011922492287816278,
+              -0.0007363938835065476,
+              0.01621225290909334,
+              -0.026831028758709574,
+              0.00596124614390825,
+              -0.03037035906756369,
+              -0.04201682080394231,
+              -0.04545452125663252,
+              0.040100211489424886,
+              -0.0385541806899562
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.015873060135259243,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "155089",
+      "metadata": {
+        "domain": "Finance",
+        "task_type": "forecasting",
+        "id": "155089",
+        "response": "[0.0022277073448260243, 'up']",
+        "question": "The CFO’s comments during HON's recent earnings call were: \"quarter 2024 earnings conference call. On the call with me today are chief executive officer, Vimal Kapur; and senior vice president and chief financial officer, Greg Lewis. This webcast and the presentation materials, including non\nFrom time to time, we post new information that may be of interest or material to our investors on this website. Our discussion today includes forward-looking statements that are based on our best view of the world and of our business as we see them today and are subject to risks and uncertainties, including the ones described in our SEC filings. This morning, we will review our financial results for the first quarter, share our guidance for the second quarter, and provide an update on full year 2024. As always, we'll leave time for your questions at the end.\nWith that, I'll turn the call over to CEO, Vimal Kapur.\".\nAdditionally, the historical return of HON two weeks prior to the earnings call was [-0.003606392778345957, -0.010807544594399587, -0.017109892604535548, -0.0018875041081922728, 0.003782309080166968, 0.016642185030799395, 0.006795047199472659, 0.0029655443258385095, -0.006984139714245163, -0.009086641277797458].\nYour goal is to predict whether HON's stock price and return will increase or decrease the day after the earnings call."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.003606392778345957,
+              -0.010807544594399587,
+              -0.017109892604535548,
+              -0.0018875041081922728,
+              0.003782309080166968,
+              0.016642185030799395,
+              0.006795047199472659,
+              0.0029655443258385095,
+              -0.006984139714245163,
+              -0.009086641277797458
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.0022277073448260243,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "147920",
+      "metadata": {
+        "response": "[0.05380200900093435, 'up']",
+        "domain": "Finance",
+        "task_type": "forecasting",
+        "question": "The CFO’s comments during DKNG's recent earnings call were: \"GAAP measures to the most directly comparable GAAP measures are available in our earnings release and presentation, which can be found on our website and in our quarterly report on Form 10\nI will now turn the call over to Jason Robins.\".\nAdditionally, the historical return of DKNG two weeks prior to the earnings call was [-0.0031956997822021327, 0.016276198762758654, -0.008735758756355017, 0.005875194306771858, 0.04964713818329991, -0.008115054026212487, -0.028517939243052792, 0.006255974806109954, 0.028933502948409018, -0.028119895858673027].\nYour goal is to predict whether DKNG's stock price and return will increase or decrease the day after the earnings call.",
+        "id": "147920"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.0031956997822021327,
+              0.016276198762758654,
+              -0.008735758756355017,
+              0.005875194306771858,
+              0.04964713818329991,
+              -0.008115054026212487,
+              -0.028517939243052792,
+              0.006255974806109954,
+              0.028933502948409018,
+              -0.028119895858673027
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.05380200900093435,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "152448",
+      "metadata": {
+        "id": "152448",
+        "response": "[0.049561356647781274, 'up']",
+        "question": "The CFO’s comments during D's recent earnings call were: \"GAAP measures to the most directly comparable GAAP financial measures, which we can calculate, are contained in the earnings release kit. I encourage you to visit our investor relations website to review webcast slides, as well as the earnings release kit. Joining today's call are Bob Blue, chair, president, and chief executive officer; Steven Ridge, executive vice president and chief financial officer; and Diane Leopold, executive vice president and chief operating officer. I will now turn the call over to Bob.\".\nAdditionally, the historical return of D two weeks prior to the earnings call was [0.011770042127837055, 0.01163311981750681, -0.019018153420935713, 0.011271525361445933, 0.014043690519375485, 0.008133519638075626, -0.01112077437586867, 0.020727655029301628, -0.014905999524360447].\nYour goal is to predict whether D's stock price and return will increase or decrease the day after the earnings call.",
+        "domain": "Finance",
+        "task_type": "forecasting"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 9,
+            "serie": [
+              0.011770042127837055,
+              0.01163311981750681,
+              -0.019018153420935713,
+              0.011271525361445933,
+              0.014043690519375485,
+              0.008133519638075626,
+              -0.01112077437586867,
+              0.020727655029301628,
+              -0.014905999524360447
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.049561356647781274,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "147611",
+      "metadata": {
+        "response": "[-0.12200690908189338, 'down']",
+        "task_type": "forecasting",
+        "id": "147611",
+        "question": "The CFO’s comments during RELY's recent earnings call were: \"founder and chief executive officer of Remitly; and Hemanth Munipalli, our chief financial officer. Our results and additional management commentary are available in our earnings release, presentation slides, which can be found at ir.remitly.com.\nPlease note that this call will be simultaneously webcast on the investor relations website. Before we start, I would like to remind you that we'll be making forward-looking statements within the meaning of Federal Securities laws, including but not limited to statements regarding Remitly's future financial results and management's expectations and plans. These statements are neither promises nor guarantees and involve risks and uncertainties that may cause actual results to vary materially from those presented here. You should not place undue reliance on any forward-looking statements.\nPlease refer to our earnings release and SEC filings for more information regarding the risk factors that may affect our results. Any forward-looking statements made in this conference call, including responses to your questions, are based on current expectations as of today, and Remitly assumes no obligation to update or revise them, whether as a result of new developments or otherwise, except as required by law. The following presentation contains non-GAAP financial measures. For a reconciliation of these non-GAAP financial measures to the most directly comparable GAAP metric, please see our earnings press release, and the appendix to our earnings presentation, which are available on the IR section of our website.\nNow, I will turn the call over to Matt to begin.\".\nAdditionally, the historical return of RELY two weeks prior to the earnings call was [0.0005379359225257119, -0.004838717781831536, -0.005942766558150847, 0.023913072998898333, -0.02176219979254035, -0.0358111685558008, 0.01631958360766461, -0.00885934950960754, -0.003910597559552698, -0.016264666821065976].\nYour goal is to predict whether RELY's stock price and return will increase or decrease the day after the earnings call.",
+        "domain": "Finance"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.0005379359225257119,
+              -0.004838717781831536,
+              -0.005942766558150847,
+              0.023913072998898333,
+              -0.02176219979254035,
+              -0.0358111685558008,
+              0.01631958360766461,
+              -0.00885934950960754,
+              -0.003910597559552698,
+              -0.016264666821065976
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.12200690908189338,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "153913",
+      "metadata": {
+        "response": "[0.09424914603495438, 'up']",
+        "task_type": "forecasting",
+        "domain": "Finance",
+        "question": "The CFO’s comments during PTON's recent earnings call were: \"CEOs; as well as chief financial officer, Liz Coddington. Our comments and responses to your questions reflect management's views as of today only and will include statements related to our business that are forward\nActual results may differ materially from those contained in and implied by these forward-looking statements due to risks and uncertainties associated with our business. For a discussion of the material risks and other important factors that could impact our actual results, please refer to our SEC filings and today's shareholder letter, both of which can be found on our Investor Relations website. During this call, we will discuss both GAAP and non-GAAP financial measures. A reconciliation of GAAP to non-GAAP financial measures is provided in today's shareholder letter.\nI'll now turn the call over to Karen.\".\nAdditionally, the historical return of PTON two weeks prior to the earnings call was [-0.00980391240220746, 0.006600653833452208, 0.02622956176241198, -0.022364271278590753, -0.00980391240220746, 0.04290432860343918, 0.04430375401359932, -0.057575775747238156, 0.0353698190433589, -0.02795028365517005].\nYour goal is to predict whether PTON's stock price and return will increase or decrease the day after the earnings call.",
+        "id": "153913"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.00980391240220746,
+              0.006600653833452208,
+              0.02622956176241198,
+              -0.022364271278590753,
+              -0.00980391240220746,
+              0.04290432860343918,
+              0.04430375401359932,
+              -0.057575775747238156,
+              0.0353698190433589,
+              -0.02795028365517005
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.09424914603495438,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "151254",
+      "metadata": {
+        "task_type": "forecasting",
+        "response": "[0.04540241168784309, 'up']",
+        "domain": "Finance",
+        "id": "151254",
+        "question": "The CFO’s comments during D's recent earnings call were: \"GAAP measures to the most directly comparable GAAP financial measures, which we can calculate, are contained in the earnings release kit. I encourage you to visit our investor relations website to review webcast slides, as well as the earnings release kit. Joining today's call are Bob Blue, chair, president, and chief executive officer; Steven Ridge, senior vice president, Chief financial officer; and Diane Leopold, executive vice president and chief operating officer. I will now turn the call over to Bob.\".\nAdditionally, the historical return of D two weeks prior to the earnings call was [-0.012243947994147741, 0.020743773754674733, 0.004708855596789352, 0.010606775324632167, -0.021723198209827377, -0.001995910846171456, 0.007999911522086567, -0.002480262433430136, 0.021382633151365793, 0.0615869927212489].\nYour goal is to predict whether D's stock price and return will increase or decrease the day after the earnings call."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.012243947994147741,
+              0.020743773754674733,
+              0.004708855596789352,
+              0.010606775324632167,
+              -0.021723198209827377,
+              -0.001995910846171456,
+              0.007999911522086567,
+              -0.002480262433430136,
+              0.021382633151365793,
+              0.0615869927212489
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.04540241168784309,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "148281",
+      "metadata": {
+        "domain": "Finance",
+        "id": "148281",
+        "question": "The CFO’s comments during HLF's recent earnings call were: \"looking statements on Page 2 of our presentation and in our earnings release issued earlier today, which are both available under the investor relations section of our website. The presentation and earnings release include a discussion of some of the more important factors that could cause results to differ from those expressed in any forward\nAs is customary, the content of today's call and presentation will be governed by this language. In addition, during today's call, we will be discussing certain non-GAAP financial measures. These non-GAAP financial measures exclude certain unusual or nonrecurring items that management believes impact the comparability of the period's reference. Please refer to our earnings release and presentation materials for additional information regarding these non-GAAP financial measures and the reconciliations to the most directly comparable GAAP measure.\nAnd with that, I will now turn the call over to chairman and CEO, Michael Johnson.\".\nAdditionally, the historical return of HLF two weeks prior to the earnings call was [0.04374248242713019, 0.029103608330517172, 0.02828054249827283, 0.016501607922148276, -0.00432900030777672, -0.03478257624548575, -0.0078828484146507, 0.00794548144042695, -0.025900956412895915, 0.0034682876264224838].\nYour goal is to predict whether HLF's stock price and return will increase or decrease the day after the earnings call.",
+        "task_type": "forecasting",
+        "response": "[0.080645136480898, 'up']"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.04374248242713019,
+              0.029103608330517172,
+              0.02828054249827283,
+              0.016501607922148276,
+              -0.00432900030777672,
+              -0.03478257624548575,
+              -0.0078828484146507,
+              0.00794548144042695,
+              -0.025900956412895915,
+              0.0034682876264224838
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.080645136480898,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "154621",
+      "metadata": {
+        "task_type": "forecasting",
+        "domain": "Finance",
+        "id": "154621",
+        "question": "The CFO’s comments during SLQT's recent earnings call were: \"and\nAnd finally, a reminder that certain statements made today may be forward-looking statements. These statements are made based upon management's current expectations and beliefs concerning future events impacting the company and therefore, involve a number of uncertainties and risks, including, but not limited to those described in our earnings release, quarterly report on Form 10-Q for the period ended September 30th, 2024, and other filings with the SEC. Therefore, the actual results of operations or financial condition of the company could differ materially from those expressed or implied in our forward-looking statements. And with that, I'd like to turn the call over to our chief executive officer, Tim Danker.\nTim?\".\nAdditionally, the historical return of SLQT two weeks prior to the earnings call was [-0.020408204226431526, -0.0416666278615585, 0.03260866396255957, 0.052631592156154205, 0.014999985694885254, -0.00985220749181659, -0.004975119657066318, 0.0, 0.019999980926513672, -0.004901956201103785].\nYour goal is to predict whether SLQT's stock price and return will increase or decrease the day after the earnings call.",
+        "response": "[0.07389167363620164, 'up']"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.020408204226431526,
+              -0.0416666278615585,
+              0.03260866396255957,
+              0.052631592156154205,
+              0.014999985694885254,
+              -0.00985220749181659,
+              -0.004975119657066318,
+              0.0,
+              0.019999980926513672,
+              -0.004901956201103785
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.07389167363620164,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "152364",
+      "metadata": {
+        "response": "[-0.7743694665599661, 'down']",
+        "id": "152364",
+        "question": "The CFO’s comments during MGNX's recent earnings call were: \"quarter corporate progress and financial results conference call in just a moment. All participants are in listen\".\nAdditionally, the historical return of MGNX two weeks prior to the earnings call was [0.013222027527540536, 0.017857092562801213, -0.0026990528121938473, 0.05209746087112288, -0.02122185978510005, 0.0295663470019758, 0.04467139499242467, -0.019548050443950804, -0.08660432745933311, 0.0006821438598856311].\nYour goal is to predict whether MGNX's stock price and return will increase or decrease the day after the earnings call.",
+        "task_type": "forecasting",
+        "domain": "Finance"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.013222027527540536,
+              0.017857092562801213,
+              -0.0026990528121938473,
+              0.05209746087112288,
+              -0.02122185978510005,
+              0.0295663470019758,
+              0.04467139499242467,
+              -0.019548050443950804,
+              -0.08660432745933311,
+              0.0006821438598856311
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.7743694665599661,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "141764",
+      "metadata": {
+        "response": "[-0.01335620584963848, 'down']",
+        "id": "141764",
+        "question": "The CFO’s comments during NEP's recent earnings call were: \"quarter and full\nOur executive team will then be available to answer your questions. We will be making forward-looking statements during this call based on current expectations and assumptions, which are subject to risks and uncertainties. Actual results could differ materially from our forward-looking statements if any of our key assumptions are incorrect or because of other factors discussed in today's earnings news release and the comments made during this conference call and the Risk Factors section of the accompanying presentation or in our latest reports and filings with the Securities and Exchange Commission, each of which can be found on our websites, www.nexteraenergy.com and www.nexteraenergypartners.com. We do not undertake any duty to update any forward-looking statements.\nToday's presentation also includes references to non-GAAP financial measures. You should refer to the information contained in the slides accompanying today's presentation for definitional information and reconciliation of historical non-GAAP measures to the closest GAAP financial measure. With that, I will turn the call over to John.\".\nAdditionally, the historical return of NEP two weeks prior to the earnings call was [0.0006929657847478676, -0.03635729748759997, -0.040603710446807995, -0.0029961861114449206, -0.019909869866659324, 0.03372929832299154, 0.03262899763846283, -0.03698390894216019, 0.0887397812611408].\nYour goal is to predict whether NEP's stock price and return will increase or decrease the day after the earnings call.",
+        "domain": "Finance",
+        "task_type": "forecasting"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 9,
+            "serie": [
+              0.0006929657847478676,
+              -0.03635729748759997,
+              -0.040603710446807995,
+              -0.0029961861114449206,
+              -0.019909869866659324,
+              0.03372929832299154,
+              0.03262899763846283,
+              -0.03698390894216019,
+              0.0887397812611408
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.01335620584963848,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "144856",
+      "metadata": {
+        "response": "[0.024583487126687897, 'up']",
+        "domain": "Finance",
+        "question": "The CFO’s comments during TMO's recent earnings call were: \"quarter and full\nSo before we begin, let me briefly cover our Safe Harbor Statement. Various remarks that we may make about the company's future expectations, plans, and prospects constitute forward-looking statements for purposes of the Safe Harbor provisions under the Private Securities Litigation Reform Act of 1995. Actual results may differ materially from those indicated by these forward-looking statements as a result of various important factors, including those discussed in the company's most recent Annual Report on Form 10-K and subsequent quarterly reports on Form 10-Q which are on file with the SEC and available in the Investors section of our website under the heading Financials, SEC Filings. While we may elect to update forward-looking statements at some point in the future, we specifically disclaim any obligation to do so even if our estimates change.\nTherefore, you should not rely on these forward-looking statements as representing our views as of any dates subsequent to today. Also, during this call, we will be referring to certain financial measures not prepared in accordance with Generally Accepted Accounting Principles or GAAP. A reconciliation of these non-GAAP financial measures to the most directly comparable GAAP measure is available in the press release of our fourth quarter 2023 earnings and also available in the Investors section of our website under the heading Financials. So with that, I'll now turn the call over to Marc.\".\nAdditionally, the historical return of TMO two weeks prior to the earnings call was [0.009587249390398789, 0.013463996371228415, 0.0029722751327443397, -0.004788558471613191, -0.019519228740562777, -0.0032963564422952008, 0.016945125486853563, 0.019074342796033594, 0.01676303949725466, -0.04961907587199432].\nYour goal is to predict whether TMO's stock price and return will increase or decrease the day after the earnings call.",
+        "task_type": "forecasting",
+        "id": "144856"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.009587249390398789,
+              0.013463996371228415,
+              0.0029722751327443397,
+              -0.004788558471613191,
+              -0.019519228740562777,
+              -0.0032963564422952008,
+              0.016945125486853563,
+              0.019074342796033594,
+              0.01676303949725466,
+              -0.04961907587199432
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.024583487126687897,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "149981",
+      "metadata": {
+        "response": "[0.02975203680394589, 'up']",
+        "id": "149981",
+        "domain": "Finance",
+        "task_type": "forecasting",
+        "question": "The CFO’s comments during TEVA's recent earnings call were: \"quarter financial results in more detail before providing an overview of Teva's 2024 financial outlook. Please note that today's call will run approximately one hour. And with that, I will turn the call over to Richard.\nRichard?\".\nAdditionally, the historical return of TEVA two weeks prior to the earnings call was [-0.003626469884079664, 0.0172884929949626, 0.027728037341722578, 0.04351610182419896, -0.001668015385415722, -0.011695934853767964, 0.006762461895349903, -0.006717038180603985, -0.008453117676639699, 0.03154312478028087].\nYour goal is to predict whether TEVA's stock price and return will increase or decrease the day after the earnings call."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.003626469884079664,
+              0.0172884929949626,
+              0.027728037341722578,
+              0.04351610182419896,
+              -0.001668015385415722,
+              -0.011695934853767964,
+              0.006762461895349903,
+              -0.006717038180603985,
+              -0.008453117676639699,
+              0.03154312478028087
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.02975203680394589,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "150579",
+      "metadata": {
+        "question": "The CFO’s comments during TEVA's recent earnings call were: \"GAAP financial measures can be found on our earnings release and in our SEC forms 10\nAnd with that, I will now turn the call over to Richard. Richard, if you would please.\".\nAdditionally, the historical return of TEVA two weeks prior to the earnings call was [0.018447330276395446, 0.042264182612581136, 0.02099927248670408, -0.003546112722136785, -0.004982252494537098, 0.00715310334364494, -0.007102299858777639, 0.005722523605145469, -0.00782365626377135, 0.12831541120625456].\nYour goal is to predict whether TEVA's stock price and return will increase or decrease the day after the earnings call.",
+        "id": "150579",
+        "task_type": "forecasting",
+        "domain": "Finance",
+        "response": "[0.0165184391780564, 'up']"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.018447330276395446,
+              0.042264182612581136,
+              0.02099927248670408,
+              -0.003546112722136785,
+              -0.004982252494537098,
+              0.00715310334364494,
+              -0.007102299858777639,
+              0.005722523605145469,
+              -0.00782365626377135,
+              0.12831541120625456
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.0165184391780564,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "150117",
+      "metadata": {
+        "response": "[-0.00411887551137724, 'down']",
+        "question": "The CFO’s comments during XOM's recent earnings call were: \"quarter earnings news release, which is posted in the same location. Shortly, Darren will give you an overview of our 2023 performance.\nThen we'll take your questions. In conjunction with our recent announcement about acquiring Pioneer Natural Resources, we've included additional information about the transaction on Slide 2. Please be aware that this presentation is not intended to be a solicitation of any vote or approval. During today's call, we'll make forward-looking statements, which are subject to risks and uncertainties.\nPlease refer to our cautionary statement on Slide 3. You can find more information on the risks and uncertainties that apply to any forward-looking statements in our SEC filings on our website. Note that we also provided supplemental information at the end of our earnings slides, including an overview of full-year results, which are posted on the website. And now, I'll turn it over to Darren.\".\nAdditionally, the historical return of XOM two weeks prior to the earnings call was [-0.001340841572610496, 0.011258001739647527, 0.017260749814996368, 0.025401563402791982, 0.008518536169816349, 0.0012621593858184177, 0.0166779270255899, -0.019456332348019356, -0.004085223087721412, -0.00410182773989598].\nYour goal is to predict whether XOM's stock price and return will increase or decrease the day after the earnings call.",
+        "id": "150117",
+        "task_type": "forecasting",
+        "domain": "Finance"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              -0.001340841572610496,
+              0.011258001739647527,
+              0.017260749814996368,
+              0.025401563402791982,
+              0.008518536169816349,
+              0.0012621593858184177,
+              0.0166779270255899,
+              -0.019456332348019356,
+              -0.004085223087721412,
+              -0.00410182773989598
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.00411887551137724,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "155166",
+      "metadata": {
+        "id": "155166",
+        "domain": "Finance",
+        "response": "[-0.03740305081534634, 'down']",
+        "task_type": "forecasting",
+        "question": "The CFO’s comments during PANW's recent earnings call were: \"and\nDuring the course of today's call, we may make forward-looking statements and projections regarding the company's business operations and financial performance. These statements are made today, are subject to a number of risks and uncertainties that could cause our actual results to differ from those forward-looking statements. Please review our press release and recent SEC filings for a description of these risks and uncertainties. We assume no obligation to update any forward-looking statements made in the presentations today.\nWe will also refer to non-GAAP financial measures. These measures should not be considered as a substitute for financial measures prepared in accordance with GAAP. The most directly comparable GAAP financial metrics and reconciliations are in the press release and the appendix to the investor presentation. Unless otherwise noted specifically, all results and comparisons are on a fiscal year-over-year basis.\nWe also note that management is scheduled to participate in the Bank of America Global Technology Conference in June. I will now turn the call over to Nikesh.\".\nAdditionally, the historical return of PANW two weeks prior to the earnings call was [0.016468648131327646, -0.008215433812203243, -0.024223610116273164, 0.00608782666899943, 0.016068843109159126, -0.002349020529621604, 0.03574981254167775, 0.014280197715441867, 0.003377761627444853, 0.018625083518885477].\nYour goal is to predict whether PANW's stock price and return will increase or decrease the day after the earnings call."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.016468648131327646,
+              -0.008215433812203243,
+              -0.024223610116273164,
+              0.00608782666899943,
+              0.016068843109159126,
+              -0.002349020529621604,
+              0.03574981254167775,
+              0.014280197715441867,
+              0.003377761627444853,
+              0.018625083518885477
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.03740305081534634,
+              "down"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "149888",
+      "metadata": {
+        "id": "149888",
+        "question": "The CFO’s comments during UPS's recent earnings call were: \"looking statements within the federal securities laws and address our expectations for the future performance or operating results of our company. These statements are subject to risks and uncertainties which are described in our 2023 Form 10\nThese reports, when filed, are available on the UPS investor relations website and from the SEC. Unless stated otherwise, our discussion today refers to adjusted results. For the second quarter, GAAP results include an after-tax charge of $120 million or $0.14 cents per diluted share, comprised of a one-time payment of $94 million to settle an international regulatory matter and transformation and other charges of $26 million. A reconciliation to GAAP financial results is available on the UPS investor relations website and also available in the webcast of today's call.\nFollowing our prepared remarks, we will take questions from those joining us via the teleconference. [Operator instructions] And now, I'll turn the call over to Carol.\".\nAdditionally, the historical return of UPS two weeks prior to the earnings call was [0.0102025010311253, 0.01909334166914345, 0.029730836696924445, 0.012644812143431494, 0.022060424455066174, 0.0003394158271823322, -0.017777215771734967, 0.0029013469449017393, 0.0, -0.12054001230668099].\nYour goal is to predict whether UPS's stock price and return will increase or decrease the day after the earnings call.",
+        "task_type": "forecasting",
+        "domain": "Finance",
+        "response": "[0.006657298162430436, 'up']"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.0102025010311253,
+              0.01909334166914345,
+              0.029730836696924445,
+              0.012644812143431494,
+              0.022060424455066174,
+              0.0003394158271823322,
+              -0.017777215771734967,
+              0.0029013469449017393,
+              0.0,
+              -0.12054001230668099
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              0.006657298162430436,
+              "up"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "145074",
+      "metadata": {
+        "response": "[-0.16303274855171934, 'down']",
+        "domain": "Finance",
+        "question": "The CFO’s comments during KVYO's recent earnings call were: \"founder and CEO; and Amanda Whalen, CFO.\nAs a reminder, our commentary today will include non-GAAP measures. Reconciliations to the most directly comparable GAAP measures can be found in today's earnings press release or earnings release supplemental materials, which can be found on our Investor Relations website. Additionally, some of our comments today may contain forward-looking statements that are subject to risks, uncertainties, and assumptions, which could change. Should any of these risks materialize or should our assumptions prove to be incorrect, actual company results could differ materially from these forward-looking statements.\nA description of these risks, uncertainties and assumptions, and other factors that could affect our financial results are included in our SEC filings, including our most recent report on Form 10-K and subsequent reports on Form 10-Q. Except as required by law, we do not undertake any responsibility to update these forward-looking statements. With that, I'll now turn it over to Andrew.\".\nAdditionally, the historical return of KVYO two weeks prior to the earnings call was [0.011235962896063878, 0.00878553348540212, 0.0048667679880463055, 0.0005098255925835016, -0.016050982627139776, -0.015277062892427584, 0.042335016093348665, -0.004288551250323791, -0.007094060940825875, 0.02985460639555093].\nYour goal is to predict whether KVYO's stock price and return will increase or decrease the day after the earnings call.",
+        "task_type": "forecasting",
+        "id": "145074"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 10,
+            "serie": [
+              0.011235962896063878,
+              0.00878553348540212,
+              0.0048667679880463055,
+              0.0005098255925835016,
+              -0.016050982627139776,
+              -0.015277062892427584,
+              0.042335016093348665,
+              -0.004288551250323791,
+              -0.007094060940825875,
+              0.02985460639555093
+            ]
+          }
+        ],
+        "output": [
+          {
+            "longitud_puntos": 2,
+            "serie": [
+              -0.16303274855171934,
+              "down"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

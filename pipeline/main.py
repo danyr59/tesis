@@ -1,3 +1,11 @@
+import sys
+from pathlib import Path
+
+# Asegurar que la raíz del proyecto esté en sys.path al ejecutar como script directo
+REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
 import argparse
 from dotenv import load_dotenv
 from pipeline.student_agent.agent import StudentAgent

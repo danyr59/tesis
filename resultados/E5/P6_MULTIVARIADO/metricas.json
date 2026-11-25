@@ -1,0 +1,44 @@
+{
+  "escenario": "E5_llama_qwen",
+  "tipo_escenario": "Cross-Family",
+  "perfil": "P6_MULTIVARIADO",
+  "teacher": "N/A",
+  "student": "Qwen/Qwen2.5-1.5B-Instruct",
+  "downstream": {
+    "r2": -0.1314917537809971,
+    "mape": 0.1018872388080912,
+    "rmse": 0.12259750839737799,
+    "mae": 0.0988153609997855,
+    "per_feature": {
+      "Presion_Sistolica": {
+        "mse": 0.01675393095440814,
+        "rmse": 0.12943697676633265,
+        "mae": 0.10434881328607759,
+        "mape": 0.08708353878633608,
+        "r2": -0.6184196437190017
+      },
+      "Presion_Diastolica": {
+        "mse": 0.013399923831222054,
+        "rmse": 0.11575804002842331,
+        "mae": 0.09328190871349341,
+        "mape": 0.11669093882984632,
+        "r2": 0.35543613615700753
+      }
+    }
+  },
+  "juez": {
+    "aprobado": true,
+    "confianza": 1.0,
+    "score_alucinacion": 0.0
+  },
+  "alucinaciones": {
+    "tasa_alucinacion": 0.0,
+    "total_predictions": 0,
+    "total_hallucinations": 0,
+    "is_clean": true
+  },
+  "eficiencia": {
+    "tiempo_segundos": 312.68,
+    "vram_pico_gb": 4.14
+  }
+}

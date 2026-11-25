@@ -1,0 +1,44 @@
+{
+  "escenario": "E7_gemma_gemma",
+  "tipo_escenario": "Intra-Familia",
+  "perfil": "P6_MULTIVARIADO",
+  "teacher": "N/A",
+  "student": "google/gemma-2-2b-it",
+  "downstream": {
+    "r2": 8.700214716123034e-05,
+    "mape": 0.42268095220148383,
+    "rmse": 0.5225084556087419,
+    "mae": 0.41705501071178164,
+    "per_feature": {
+      "Presion_Sistolica": {
+        "mse": 0.325731073165962,
+        "rmse": 0.5707285459532947,
+        "mae": 0.45577675090612424,
+        "mape": 0.3773365745396832,
+        "r2": -0.009058619793021583
+      },
+      "Presion_Diastolica": {
+        "mse": 0.22494945342497696,
+        "rmse": 0.4742883652641892,
+        "mae": 0.3783332705174391,
+        "mape": 0.4680253298632844,
+        "r2": 0.009232624087344043
+      }
+    }
+  },
+  "juez": {
+    "aprobado": true,
+    "confianza": 1.0,
+    "score_alucinacion": 0.0
+  },
+  "alucinaciones": {
+    "tasa_alucinacion": 0.0,
+    "total_predictions": 0,
+    "total_hallucinations": 0,
+    "is_clean": true
+  },
+  "eficiencia": {
+    "tiempo_segundos": 271.26,
+    "vram_pico_gb": 4.14
+  }
+}

@@ -1,0 +1,2156 @@
+{
+  "escenario": "E1_qwen_qwen",
+  "perfil": "P5_COMPLEJO",
+  "query": "Monitorear el consumo de ancho de banda en un centro de datos empresarial. Dominio: Telecomunicaciones y Servidores. Variable estricta: Únicamente 'Ancho_Banda_Gbps'. Perfil matemático: P5_COMPLEJO, con fuerte estacionalidad por horario laboral, alto ruido de tráfico y picos anómalos esporádicos por sobrecarga. Escala: promedio de 45 Gbps.",
+  "dominio": "servidores",
+  "structured_prompt": {
+    "values": {
+      "tema": "Monitorización de ancho de banda en un centro de datos empresarial",
+      "dominio": "Telecomunicaciones y Servidores",
+      "localizacion": "Centro de datos empresarial",
+      "frecuencia": "Minuto",
+      "start_date": "2024-01-01",
+      "variables": [
+        "Ancho_Banda_Gbps"
+      ],
+      "target_value": 45.0,
+      "tipo_serie": "univariada",
+      "profile_id": "P5_COMPLEJO",
+      "num_series_configuradas": 20,
+      "puntos_por_serie_configurados": 400
+    },
+    "missing_parameters": [],
+    "pending_questions": [],
+    "justification": "La monitorización del ancho de banda en un centro de datos empresarial requiere un perfil complejo debido a la estacionalidad por horario laboral, el ruido de tráfico y picos anómalos esporádicos por sobrecarga.",
+    "suggested_search": "Análisis de series temporales de ancho de banda en centros de datos",
+    "search_strategy": "Utilizar técnicas de detección de anomalías y pronóstico para prevenir sobrecargas y mejorar la eficiencia del centro de datos.",
+    "confidence": 0.9
+  },
+  "metadata_summary": {
+    "count": 49,
+    "refinements_applied": [
+      "adjust_frequency"
+    ],
+    "domain": "Telecomunicaciones y Servidores",
+    "rag_dataset": "TSQA",
+    "diversity_score": 0.2602040816326531
+  },
+  "seed_dataset": [
+    {
+      "id": "171537",
+      "metadata": {
+        "id": "171537",
+        "response": "The data indicates central tendencies with values heavily clustered around 0.38, signifying a mode slightly below the mean which results from a predominantly decreasing trend.",
+        "question": "Based on these values: [0.45, 0.43, 0.42, 0.41, 0.4, 0.39, 0.39, 0.39, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38, 0.37, 0.37, 0.36, 0.36, 0.36, 0.35, 0.35, 0.34, 0.34], analyze the central tendency of this data.",
+        "domain": "Healthcare",
+        "task_type": "statistical_property_analysis"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.45,
+              0.43,
+              0.42,
+              0.41,
+              0.4,
+              0.39,
+              0.39,
+              0.39,
+              0.38,
+              0.38,
+              0.38,
+              0.38,
+              0.38,
+              0.38,
+              0.38,
+              0.37,
+              0.37,
+              0.36,
+              0.36,
+              0.36,
+              0.35,
+              0.35,
+              0.34,
+              0.34
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "170191",
+      "metadata": {
+        "response": "The data shows a clear upward trend. Starting at 1735.7 and steadily increasing, reaching a peak of 1826.44. The trend is characterized by continued growth without significant downward movement.",
+        "task_type": "trend analysis",
+        "question": "Discuss the trend observed in the data points [1735.7, 1737.09, 1745.78, 1757.29, 1778.71, 1801.85, 1815.23, 1823.39, 1825.87, 1824.66, 1826.44, 1825.4].",
+        "id": "170191",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 12,
+            "serie": [
+              1735.7,
+              1737.09,
+              1745.78,
+              1757.29,
+              1778.71,
+              1801.85,
+              1815.23,
+              1823.39,
+              1825.87,
+              1824.66,
+              1826.44,
+              1825.4
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "189401",
+      "metadata": {
+        "id": "189401",
+        "domain": "Healthcare",
+        "task_type": "trend_analysis",
+        "question": "Analyze the trend in the data points [7308.97, 7311.3, 7314.62, 7325.38, 7339.36, 7335.85, 7334.23, 7344.79, 7340.36, 7333.43, 7335.74, 7329.26, 7322.23, 7327.66, 7326.32, 7319.72, 7315.49, 7318.75, 7317.23, 7312.61, 7314.88, 7315.47, 7307.29, 7307.05].",
+        "response": "The data initially shows an upward trend from 7308.97 to 7339.36. Then, there are fluctuations but a general decrease towards the end, from 7336 to 7307. This trend indicates initial growth followed by a decline."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              7308.97,
+              7311.3,
+              7314.62,
+              7325.38,
+              7339.36,
+              7335.85,
+              7334.23,
+              7344.79,
+              7340.36,
+              7333.43,
+              7335.74,
+              7329.26,
+              7322.23,
+              7327.66,
+              7326.32,
+              7319.72,
+              7315.49,
+              7318.75,
+              7317.23,
+              7312.61,
+              7314.88,
+              7315.47,
+              7307.29,
+              7307.05
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "165637",
+      "metadata": {
+        "task_type": "trend_analysis",
+        "response": "The data shows an initial upward trend, where the values increase from 0.31 to 0.72. It remains stable at 0.72 for a few instances before reflecting a gradual decrease towards the end, down to 0.62. This suggests an initial growth phase followed by stabilization and slight decline.",
+        "question": "Analyze the trend of the data points [0.31, 0.33, 0.36, 0.39, 0.43, 0.48, 0.53, 0.57, 0.62, 0.66, 0.69, 0.71, 0.72, 0.72, 0.72, 0.72, 0.71, 0.7, 0.69, 0.68, 0.66, 0.65, 0.63, 0.62].",
+        "id": "165637",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.31,
+              0.33,
+              0.36,
+              0.39,
+              0.43,
+              0.48,
+              0.53,
+              0.57,
+              0.62,
+              0.66,
+              0.69,
+              0.71,
+              0.72,
+              0.72,
+              0.72,
+              0.72,
+              0.71,
+              0.7,
+              0.69,
+              0.68,
+              0.66,
+              0.65,
+              0.63,
+              0.62
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "171098",
+      "metadata": {
+        "task_type": "structural analysis",
+        "response": "The answer is (c) 11.09 to 8.03. This segment shows the largest decrease over a short period, indicating a structural change compared to the relatively smoother changes in other segments.",
+        "domain": "Healthcare",
+        "id": "171098",
+        "question": "Which segment in the selected data [17.47, 18.5, 19.88, 20.81, 20.66, 19.94, 19.22, 18.81, 18.59, 17.38, 16.31, 15.75, 15.16, 13.78, 12.0, 11.09, 10.31, 9.19, 8.03, 8.0, 8.53, 9.44, 10.38, 11.41] shows a clear structural change? (a) 19.88 to 20.81, (b) 15.75 to 13.78, (c) 11.09 to 8.03, (d) 8.53 to 11.41"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              17.47,
+              18.5,
+              19.88,
+              20.81,
+              20.66,
+              19.94,
+              19.22,
+              18.81,
+              18.59,
+              17.38,
+              16.31,
+              15.75,
+              15.16,
+              13.78,
+              12.0,
+              11.09,
+              10.31,
+              9.19,
+              8.03,
+              8.0,
+              8.53,
+              9.44,
+              10.38,
+              11.41
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "178714",
+      "metadata": {
+        "id": "178714",
+        "question": "Analyze the trend of the data points [78.09, 78.25, 78.62, 79.62, 79.25, 79.78, 79.56, 81.84, 84.25, 83.53, 86.59, 86.94, 85.59, 85.53, 83.28, 81.47, 78.53, 78.28, 77.19, 76.19, 77.31, 77.38, 77.5, 76.66] over time.",
+        "task_type": "trend analysis",
+        "response": "The data shows an upward trend initially, reaching a peak at 86.94, followed by a downward trend. The general pattern is of a rise from 78.09 to 86.94, then a decline back to around 76.66. This suggests a cycle of growth followed by a contraction.",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              78.09,
+              78.25,
+              78.62,
+              79.62,
+              79.25,
+              79.78,
+              79.56,
+              81.84,
+              84.25,
+              83.53,
+              86.59,
+              86.94,
+              85.59,
+              85.53,
+              83.28,
+              81.47,
+              78.53,
+              78.28,
+              77.19,
+              76.19,
+              77.31,
+              77.38,
+              77.5,
+              76.66
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "163674",
+      "metadata": {
+        "domain": "Healthcare",
+        "response": "The data shows an increasing trend initially, from 0.3 to 0.72, followed by a slight decline to 0.61. This suggests an initial growth period followed by a modest downward trend.",
+        "question": "Analyze the trend in the following data points [0.3, 0.32, 0.34, 0.37, 0.41, 0.45, 0.51, 0.56, 0.6, 0.64, 0.67, 0.7, 0.71, 0.72, 0.72, 0.71, 0.7, 0.69, 0.68, 0.67, 0.65, 0.64, 0.62, 0.61].",
+        "task_type": "trend_analysis",
+        "id": "163674"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.3,
+              0.32,
+              0.34,
+              0.37,
+              0.41,
+              0.45,
+              0.51,
+              0.56,
+              0.6,
+              0.64,
+              0.67,
+              0.7,
+              0.71,
+              0.72,
+              0.72,
+              0.71,
+              0.7,
+              0.69,
+              0.68,
+              0.67,
+              0.65,
+              0.64,
+              0.62,
+              0.61
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "178134",
+      "metadata": {
+        "domain": "Healthcare",
+        "response": "The data shows a generally decreasing trend after reaching a peak, indicating a 'boom and bust' like pattern, which could suggest mean reversion characteristics. Calculating statistical measures like the mean or variance might reveal stable mean behavior with notable variance indicating some level of fluctuation.",
+        "question": "What statistical properties can you deduce from the data points [593.72, 595.65, 602.7, 608.13, 603.72, 605.78, 610.75, 612.48, 616.79, 611.64, 602.1, 596.79, 593.21, 589.44, 580.98, 572.8, 568.27, 568.96, 571.14, 567.48, 565.19, 561.53, 558.22, 559.99]?",
+        "id": "178134",
+        "task_type": "statistical_analysis"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              593.72,
+              595.65,
+              602.7,
+              608.13,
+              603.72,
+              605.78,
+              610.75,
+              612.48,
+              616.79,
+              611.64,
+              602.1,
+              596.79,
+              593.21,
+              589.44,
+              580.98,
+              572.8,
+              568.27,
+              568.96,
+              571.14,
+              567.48,
+              565.19,
+              561.53,
+              558.22,
+              559.99
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "183145",
+      "metadata": {
+        "question": "With reference to the data points [0.35, 0.34, 0.34, 0.33, 0.33, 0.33, 0.33, 0.32, 0.32, 0.32, 0.31, 0.31, 0.31, 0.31, 0.3, 0.3, 0.3, 0.3, 0.29, 0.29, 0.29, 0.29, 0.28, 0.28], what can be said about its central tendency?",
+        "task_type": "summary_statistical_property",
+        "response": "The series indicates a decreasing trend with central tendency shifting downwards. The mean of this set is approximately 0.312, reflecting a gradual reduction in value, with no sudden increases, aligning with both mean and median measures.",
+        "id": "183145",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.35,
+              0.34,
+              0.34,
+              0.33,
+              0.33,
+              0.33,
+              0.33,
+              0.32,
+              0.32,
+              0.32,
+              0.31,
+              0.31,
+              0.31,
+              0.31,
+              0.3,
+              0.3,
+              0.3,
+              0.3,
+              0.29,
+              0.29,
+              0.29,
+              0.29,
+              0.28,
+              0.28
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "185665",
+      "metadata": {
+        "domain": "Healthcare",
+        "task_type": "cross-sectional analysis",
+        "response": "These data points first show an increasing pattern followed by stabilization. There's a rise from 0.36 to 0.6, followed by a consistent plateau around 0.6, and then a slight decline back down. This sequence suggests periods of growth and stability before a gradual decline begins.",
+        "id": "185665",
+        "question": "Perform a cross-sectional analysis on the data points [0.36, 0.39, 0.42, 0.45, 0.48, 0.51, 0.54, 0.56, 0.57, 0.59, 0.6, 0.6, 0.6, 0.6, 0.6, 0.59, 0.58, 0.57, 0.55, 0.54, 0.52, 0.5, 0.48, 0.46]. How do these values compare?"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.36,
+              0.39,
+              0.42,
+              0.45,
+              0.48,
+              0.51,
+              0.54,
+              0.56,
+              0.57,
+              0.59,
+              0.6,
+              0.6,
+              0.6,
+              0.6,
+              0.6,
+              0.59,
+              0.58,
+              0.57,
+              0.55,
+              0.54,
+              0.52,
+              0.5,
+              0.48,
+              0.46
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "189696",
+      "metadata": {
+        "task_type": "trend_analysis",
+        "response": "The data from 22.59 to 29.72 shows an overall upward trend with some fluctuations. Initial values increase steadily until reaching a peak around 31.0, followed by a slight decline and stabilization. This suggests a general growth with some small dips in between.",
+        "domain": "Healthcare",
+        "question": "Analyze the trend in the time series data: [22.59, 22.72, 25.41, 28.06, 28.56, 28.16, 29.19, 30.12, 28.59, 25.06, 22.75, 22.69, 22.25, 21.09, 21.91, 25.44, 28.53, 29.09, 28.75, 30.25, 31.0, 30.44, 28.88, 29.72].",
+        "id": "189696"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              22.59,
+              22.72,
+              25.41,
+              28.06,
+              28.56,
+              28.16,
+              29.19,
+              30.12,
+              28.59,
+              25.06,
+              22.75,
+              22.69,
+              22.25,
+              21.09,
+              21.91,
+              25.44,
+              28.53,
+              29.09,
+              28.75,
+              30.25,
+              31.0,
+              30.44,
+              28.88,
+              29.72
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "177121",
+      "metadata": {
+        "domain": "Healthcare",
+        "task_type": "summary_statistical_property",
+        "question": "Analyze the statistical properties of the data points [266.13, 274.22, 278.5, 276.73, 274.47, 276.33, 284.01, 283.1, 275.91, 276.43, 276.99, 278.36, 279.79, 283.11, 286.82, 291.7, 293.77, 290.42, 286.17, 281.7, 287.16, 282.47, 278.25, 284.96].",
+        "id": "177121",
+        "response": "The data shows a mean of around 281, suggesting that the points are centered about this value over the period surveyed. The standard deviation suggests moderate variability around the mean, given the periodic fluctuations observed throughout the series."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              266.13,
+              274.22,
+              278.5,
+              276.73,
+              274.47,
+              276.33,
+              284.01,
+              283.1,
+              275.91,
+              276.43,
+              276.99,
+              278.36,
+              279.79,
+              283.11,
+              286.82,
+              291.7,
+              293.77,
+              290.42,
+              286.17,
+              281.7,
+              287.16,
+              282.47,
+              278.25,
+              284.96
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "175944",
+      "metadata": {
+        "question": "What can be inferred about the central tendency of the data points [0.37, 0.37, 0.36, 0.36, 0.35, 0.35, 0.34, 0.34, 0.33, 0.33, 0.32, 0.32, 0.32, 0.32, 0.32, 0.31, 0.31, 0.31, 0.3, 0.3, 0.3, 0.3, 0.3, 0.29]?",
+        "response": "The central tendency of the data points centers around 0.32. This is indicated by the frequent repetition and clustering of values close to 0.32, suggesting that it may be around the mean or median of this data set.",
+        "task_type": "statistical_property_analysis",
+        "domain": "Healthcare",
+        "id": "175944"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.37,
+              0.37,
+              0.36,
+              0.36,
+              0.35,
+              0.35,
+              0.34,
+              0.34,
+              0.33,
+              0.33,
+              0.32,
+              0.32,
+              0.32,
+              0.32,
+              0.32,
+              0.31,
+              0.31,
+              0.31,
+              0.3,
+              0.3,
+              0.3,
+              0.3,
+              0.3,
+              0.29
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "168986",
+      "metadata": {
+        "response": "The data shows an increasing trend initially, as values rise from 17.47 to around 26.81, indicating general growth. This is followed by a decrease, with values declining to 12.28. Thereafter, there is a slight upward recovery ending at 16.28. This suggests an initial growth phase, followed by a decline and a recovery.",
+        "task_type": "trend_analysis",
+        "id": "168986",
+        "question": "Analyze the trend in the data points [17.47, 19.72, 21.41, 24.09, 24.94, 26.41, 26.75, 26.81, 25.84, 24.44, 22.78, 20.75, 17.91, 16.06, 14.12, 13.06, 12.5, 11.81, 12.28, 12.75, 12.69, 13.66, 14.91, 16.28] and describe the overall movement.",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              17.47,
+              19.72,
+              21.41,
+              24.09,
+              24.94,
+              26.41,
+              26.75,
+              26.81,
+              25.84,
+              24.44,
+              22.78,
+              20.75,
+              17.91,
+              16.06,
+              14.12,
+              13.06,
+              12.5,
+              11.81,
+              12.28,
+              12.75,
+              12.69,
+              13.66,
+              14.91,
+              16.28
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "165039",
+      "metadata": {
+        "task_type": "trend_analysis",
+        "id": "165039",
+        "question": "Analyze the trend in the time series data points [11.75, 9.91, 9.16, 6.91, 3.81, 2.75, 4.38, 6.44, 7.56, 9.91, 14.72, 19.03, 21.62, 23.06, 26.41, 29.66, 30.81, 30.22, 31.0, 32.38, 32.22, 30.16, 28.94, 28.72].",
+        "domain": "Healthcare",
+        "response": "The data shows an initial downward trend from 11.75 to 2.75, followed by an upward trend from 2.75 to 32.38 with minor fluctuations. This suggests a recovery or growth period after the initial decline."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              11.75,
+              9.91,
+              9.16,
+              6.91,
+              3.81,
+              2.75,
+              4.38,
+              6.44,
+              7.56,
+              9.91,
+              14.72,
+              19.03,
+              21.62,
+              23.06,
+              26.41,
+              29.66,
+              30.81,
+              30.22,
+              31.0,
+              32.38,
+              32.22,
+              30.16,
+              28.94,
+              28.72
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "179051",
+      "metadata": {
+        "task_type": "statistical properties",
+        "domain": "Healthcare",
+        "question": "Analyze the statistical properties of the data points [15.06, 24.44, 24.41, 22.5, 19.97, 16.59, 12.66, 9.72, 8.12, 7.84, 10.41, 11.81, 12.84, 16.19, 19.06, 20.5, 23.97, 26.19, 26.5, 26.16, 24.31, 21.53, 19.38, 16.78]. Discuss the mean and variance of this set.",
+        "id": "179051",
+        "response": "This data shows an increasing trend overall, with values rising and stabilizing towards the end. Calculating the mean and variance can quantify the central tendency and dispersion. To compute: Mean = sum(data points) / number of data points, Variance = sum((each value - mean)^2) / number of data points. Applying these formulas to the given dataset will provide precise values."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              15.06,
+              24.44,
+              24.41,
+              22.5,
+              19.97,
+              16.59,
+              12.66,
+              9.72,
+              8.12,
+              7.84,
+              10.41,
+              11.81,
+              12.84,
+              16.19,
+              19.06,
+              20.5,
+              23.97,
+              26.19,
+              26.5,
+              26.16,
+              24.31,
+              21.53,
+              19.38,
+              16.78
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "171167",
+      "metadata": {
+        "id": "171167",
+        "response": "The data shows a general downward trend with some minor fluctuations. It starts high at 24.03 and generally decreases to around 21.53 towards the end, despite some intermediate increases and decreases. This overall decline suggests a downward trend in this time segment.",
+        "task_type": "trend_analysis",
+        "domain": "Healthcare",
+        "question": "Analyze the following data points [24.03, 23.91, 22.19, 21.12, 21.94, 21.41, 19.34, 18.84, 20.91, 22.5, 21.94, 21.22, 21.94, 23.19, 22.41, 20.81, 21.34, 23.03, 23.06, 21.19, 20.75, 22.19, 22.75, 21.53] and describe the trend observed."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              24.03,
+              23.91,
+              22.19,
+              21.12,
+              21.94,
+              21.41,
+              19.34,
+              18.84,
+              20.91,
+              22.5,
+              21.94,
+              21.22,
+              21.94,
+              23.19,
+              22.41,
+              20.81,
+              21.34,
+              23.03,
+              23.06,
+              21.19,
+              20.75,
+              22.19,
+              22.75,
+              21.53
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "181975",
+      "metadata": {
+        "task_type": "descriptive_statistics",
+        "domain": "Healthcare",
+        "response": "The mean of the data is approximately -989.28. This average value represents the general level around which the data points are clustered. Given the downward trend over the series, this mean suggests a tendency towards increasingly negative values.",
+        "question": "Based on the data series [-958.29, -961.86, -959.31, -958.54, -964.13, -969.51, -973.13, -975.24, -980.44, -986.5, -990.92, -992.58, -990.29, -994.6, -1000.02, -1005.38, -1012.76, -1017.26, -1019.84, -1021.04, -1018.5, -1015.43, -1008.16, -1003.08], compute the mean and provide an interpretation in the context of this data.",
+        "id": "181975"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -958.29,
+              -961.86,
+              -959.31,
+              -958.54,
+              -964.13,
+              -969.51,
+              -973.13,
+              -975.24,
+              -980.44,
+              -986.5,
+              -990.92,
+              -992.58,
+              -990.29,
+              -994.6,
+              -1000.02,
+              -1005.38,
+              -1012.76,
+              -1017.26,
+              -1019.84,
+              -1021.04,
+              -1018.5,
+              -1015.43,
+              -1008.16,
+              -1003.08
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "168770",
+      "metadata": {
+        "id": "168770",
+        "task_type": "trend analysis",
+        "question": "Analyze the trend in the data points [26.91, 25.38, 23.56, 21.91, 21.44, 22.03, 22.53, 22.72, 23.16, 23.59, 23.0, 21.25, 19.28, 18.22, 17.38, 16.53, 15.94, 16.5, 17.28, 17.91, 18.41, 19.94, 21.78, 23.5]. Describe any observable trends.",
+        "domain": "Healthcare",
+        "response": "The data shows a clear downward trend initially as values decrease from 26.91 to 15.94. After hitting the lowest point at 15.94, there is an apparent upward trend as values increase to 23.5. This pattern suggests the presence of a U-shaped trend, indicating a shift from decline to growth."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              26.91,
+              25.38,
+              23.56,
+              21.91,
+              21.44,
+              22.03,
+              22.53,
+              22.72,
+              23.16,
+              23.59,
+              23.0,
+              21.25,
+              19.28,
+              18.22,
+              17.38,
+              16.53,
+              15.94,
+              16.5,
+              17.28,
+              17.91,
+              18.41,
+              19.94,
+              21.78,
+              23.5
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "187056",
+      "metadata": {
+        "domain": "Healthcare",
+        "question": "Analyze the trend in the data points [29.19, 30.09, 31.44, 32.09, 31.75, 32.31, 33.19, 33.31, 33.34, 33.88, 35.06, 35.81, 35.56, 34.91, 35.06, 35.34, 34.66, 33.62, 33.47, 34.31, 34.41, 33.78, 34.16, 34.78]. What is the apparent trend?",
+        "id": "187056",
+        "task_type": "trend analysis",
+        "response": "Overall, the trend is upward with minor fluctuations. This is evident from the gradual increase from 29.19 to 35.81, followed by a slight decrease and stabilization around 34.78. The trend suggests an overall increase in value with small variations."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              29.19,
+              30.09,
+              31.44,
+              32.09,
+              31.75,
+              32.31,
+              33.19,
+              33.31,
+              33.34,
+              33.88,
+              35.06,
+              35.81,
+              35.56,
+              34.91,
+              35.06,
+              35.34,
+              34.66,
+              33.62,
+              33.47,
+              34.31,
+              34.41,
+              33.78,
+              34.16,
+              34.78
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "184791",
+      "metadata": {
+        "domain": "Healthcare",
+        "response": "The data shows an initial upward trend, peaking at various points around 22.19, followed by a slight decline with minor fluctuations. The upward movement is evident from the increase from 18.53 to 22.19, and the subsequent downtrend is seen as values decrease towards 20.31.",
+        "question": "Analyze the trend in the data points [18.53, 18.84, 18.97, 20.19, 22.19, 21.91, 20.12, 20.06, 22.06, 23.03, 21.94, 21.41, 22.41, 22.81, 20.41, 18.19, 17.72, 18.72, 17.69, 15.94, 17.0, 19.5, 20.81, 20.31]. What trend do you observe?",
+        "id": "184791",
+        "task_type": "trend_analysis"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              18.53,
+              18.84,
+              18.97,
+              20.19,
+              22.19,
+              21.91,
+              20.12,
+              20.06,
+              22.06,
+              23.03,
+              21.94,
+              21.41,
+              22.41,
+              22.81,
+              20.41,
+              18.19,
+              17.72,
+              18.72,
+              17.69,
+              15.94,
+              17.0,
+              19.5,
+              20.81,
+              20.31
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "187866",
+      "metadata": {
+        "question": "Analyze the following data points [326.37, 328.08, 330.86, 334.35, 335.69, 339.38, 343.52, 346.96, 349.71, 343.78, 339.48, 339.77, 336.49, 327.72, 318.01, 314.58, 312.69, 307.38, 301.93, 300.7, 295.65, 288.99, 293.35, 297.29] and describe the overall trend.",
+        "domain": "Healthcare",
+        "id": "187866",
+        "response": "Initially, there is an upward trend in the data from 326.37 to 349.71, indicating an increase. Subsequently, a downward trend is observed as the values decrease to 288.99. A slight recovery is noted towards the end as values increase to 297.29. This analysis suggests an overall pattern of a rise, then a fall, followed by a minor rebound.",
+        "task_type": "trend_analysis"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              326.37,
+              328.08,
+              330.86,
+              334.35,
+              335.69,
+              339.38,
+              343.52,
+              346.96,
+              349.71,
+              343.78,
+              339.48,
+              339.77,
+              336.49,
+              327.72,
+              318.01,
+              314.58,
+              312.69,
+              307.38,
+              301.93,
+              300.7,
+              295.65,
+              288.99,
+              293.35,
+              297.29
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "166883",
+      "metadata": {
+        "response": "Overall, the data shows a decreasing trend. The values start high at 28.97 and gradually decrease to around 13.19. While there are minor increases, the overall pattern is a decline.",
+        "domain": "Healthcare",
+        "id": "166883",
+        "task_type": "trend analysis",
+        "question": "Analyze the trend in the data points [28.97, 28.84, 27.62, 26.47, 25.44, 23.66, 22.62, 20.84, 19.91, 19.53, 18.16, 16.59, 16.94, 14.97, 13.44, 14.78, 14.12, 12.94, 13.47, 13.16, 12.44, 12.56, 12.12, 13.19]."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              28.97,
+              28.84,
+              27.62,
+              26.47,
+              25.44,
+              23.66,
+              22.62,
+              20.84,
+              19.91,
+              19.53,
+              18.16,
+              16.59,
+              16.94,
+              14.97,
+              13.44,
+              14.78,
+              14.12,
+              12.94,
+              13.47,
+              13.16,
+              12.44,
+              12.56,
+              12.12,
+              13.19
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "185755",
+      "metadata": {
+        "question": "Summarize the main characteristics of the time series data points [0.25, 0.27, 0.31, 0.35, 0.39, 0.46, 0.55, 0.59, 0.62, 0.7, 0.71, 0.7].",
+        "response": "The data shows an upward trend starting from 0.25 and peaking at 0.71 before slightly stabilizing around 0.7. The trend reflects a consistent increase followed by a brief period of stability. This indicates a general growth over the time span observed.",
+        "id": "185755",
+        "domain": "Healthcare",
+        "task_type": "summarization"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 12,
+            "serie": [
+              0.25,
+              0.27,
+              0.31,
+              0.35,
+              0.39,
+              0.46,
+              0.55,
+              0.59,
+              0.62,
+              0.7,
+              0.71,
+              0.7
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "169058",
+      "metadata": {
+        "question": "Summarize the nature of the data points [0.32, 0.31, 0.31, 0.3, 0.3, 0.29, 0.29, 0.28, 0.28, 0.27, 0.27, 0.26, 0.26, 0.26, 0.26, 0.26, 0.28, 0.3, 0.34, 0.38, 0.42, 0.46, 0.5, 0.55].",
+        "id": "169058",
+        "response": "The data starts with a decreasing trend from 0.32 to 0.26, followed by a period of stability around 0.26, and then an upward trend towards 0.55. The entire sequence indicates a change from initial decline to growth phase.",
+        "task_type": "data_summary",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.32,
+              0.31,
+              0.31,
+              0.3,
+              0.3,
+              0.29,
+              0.29,
+              0.28,
+              0.28,
+              0.27,
+              0.27,
+              0.26,
+              0.26,
+              0.26,
+              0.26,
+              0.26,
+              0.28,
+              0.3,
+              0.34,
+              0.38,
+              0.42,
+              0.46,
+              0.5,
+              0.55
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "176584",
+      "metadata": {
+        "domain": "Healthcare",
+        "task_type": "summary statistics",
+        "question": "Provide the summary statistics, including mean, median, and range, of the selected data points [0.66, 0.91, 0.62, -0.69, -1.91, -3.47, -5.34, -7.5, -9.06, -8.72, -7.53, -5.88, -2.81, -0.72, 1.09, 1.97, 2.56, 2.59, 4.25, 4.69, 5.94, 7.88, 8.53, 8.0].",
+        "id": "176584",
+        "response": "Mean = Sum / Count = 6.78 / 24 ≈ 0.283. Median is the midpoint value after sorting: -0.06 (average of -0.69 and 0.3 due to even number of terms). Range = Max - Min = 8.53 - (-9.06) = 17.59. The values provide a basic overview of the central tendency and dispersion."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.66,
+              0.91,
+              0.62,
+              -0.69,
+              -1.91,
+              -3.47,
+              -5.34,
+              -7.5,
+              -9.06,
+              -8.72,
+              -7.53,
+              -5.88,
+              -2.81,
+              -0.72,
+              1.09,
+              1.97,
+              2.56,
+              2.59,
+              4.25,
+              4.69,
+              5.94,
+              7.88,
+              8.53,
+              8.0
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "177227",
+      "metadata": {
+        "task_type": "statistical_analysis",
+        "question": "Analyze the central tendency of the time series data [0.44, 0.43, 0.42, 0.41, 0.4, 0.4, 0.39, 0.39, 0.39, 0.38, 0.38, 0.38, 0.38, 0.37, 0.37, 0.37, 0.36, 0.36, 0.35, 0.35, 0.34, 0.34, 0.34, 0.33].",
+        "domain": "Healthcare",
+        "response": "The central tendency of the data shows a consistent decrease with a median around 0.385. Given the continuous downward trend, the mean and median would both reflect this downward path, indicating a central tendency focused more towards the lower end of the dataset.",
+        "id": "177227"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.44,
+              0.43,
+              0.42,
+              0.41,
+              0.4,
+              0.4,
+              0.39,
+              0.39,
+              0.39,
+              0.38,
+              0.38,
+              0.38,
+              0.38,
+              0.37,
+              0.37,
+              0.37,
+              0.36,
+              0.36,
+              0.35,
+              0.35,
+              0.34,
+              0.34,
+              0.34,
+              0.33
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "174220",
+      "metadata": {
+        "id": "174220",
+        "question": "The data points [19.5, 19.12, 17.84, 14.62, 14.22, 11.59, 10.66, 10.44, 11.03, 11.41, 12.66, 13.16, 12.94, 12.44, 13.12, 12.19, 11.06, 11.28, 11.19, 10.91, 11.84, 12.81, 12.69, 13.19] display a longer duration of decrease than increase. True or False?",
+        "task_type": "exploratory_data_analysis",
+        "domain": "Healthcare",
+        "response": "True. The data points begin at 19.5, decreasing steadily to 10.44, then exhibit brief increases but primarily reflect a longer duration of overall decline."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              19.5,
+              19.12,
+              17.84,
+              14.62,
+              14.22,
+              11.59,
+              10.66,
+              10.44,
+              11.03,
+              11.41,
+              12.66,
+              13.16,
+              12.94,
+              12.44,
+              13.12,
+              12.19,
+              11.06,
+              11.28,
+              11.19,
+              10.91,
+              11.84,
+              12.81,
+              12.69,
+              13.19
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "179213",
+      "metadata": {
+        "task_type": "trend_analysis",
+        "domain": "Healthcare",
+        "response": "The data shows an overall decreasing trend with some fluctuations. It begins with values around -573.18 and gradually decreases to approximately -551.42. This indicates a general decline, despite some brief increases.",
+        "id": "179213",
+        "question": "Analyze the overall trend in the data points [-573.18, -571.88, -569.84, -566.4, -565.99, -568.14, -565.63, -560.52, -556.26, -553.84, -552.66, -551.54, -549.21, -545.31, -540.38, -537.14, -538.47, -536.16, -533.13, -538.16, -538.61, -537.49, -543.59, -551.42] and summarize it."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -573.18,
+              -571.88,
+              -569.84,
+              -566.4,
+              -565.99,
+              -568.14,
+              -565.63,
+              -560.52,
+              -556.26,
+              -553.84,
+              -552.66,
+              -551.54,
+              -549.21,
+              -545.31,
+              -540.38,
+              -537.14,
+              -538.47,
+              -536.16,
+              -533.13,
+              -538.16,
+              -538.61,
+              -537.49,
+              -543.59,
+              -551.42
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "173839",
+      "metadata": {
+        "question": "What conclusions can you draw from analyzing the following data points: [52.41, 50.34, 49.5, 48.81, 47.16, 45.62, 45.47, 46.41, 46.69, 45.75, 44.94, 45.03, 44.31, 42.0, 40.81, 41.47, 42.53, 41.12, 42.81, 44.34, 44.66, 45.44, 47.59, 49.47]?",
+        "domain": "Healthcare",
+        "response": "The data shows an overall declining trend initially, which stabilizes and then demonstrates a slight uptick towards the end. This pattern suggests a temporary downturn followed by a period of stabilization and recovery.",
+        "task_type": "data interpretation",
+        "id": "173839"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              52.41,
+              50.34,
+              49.5,
+              48.81,
+              47.16,
+              45.62,
+              45.47,
+              46.41,
+              46.69,
+              45.75,
+              44.94,
+              45.03,
+              44.31,
+              42.0,
+              40.81,
+              41.47,
+              42.53,
+              41.12,
+              42.81,
+              44.34,
+              44.66,
+              45.44,
+              47.59,
+              49.47
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "186027",
+      "metadata": {
+        "response": "The data shows an upward trend initially, where values consistently increase from 0.26 to 0.73. After reaching its peak at 0.73, the trend flattens, indicating a period of stability without growth. The reasoning is based on the observation that each subsequent data point increases until it plateaus, evident from the repeated 0.73 values.",
+        "domain": "Healthcare",
+        "id": "186027",
+        "question": "Analyze the data points [0.26, 0.27, 0.29, 0.32, 0.35, 0.39, 0.43, 0.48, 0.53, 0.57, 0.61, 0.64, 0.67, 0.69, 0.71, 0.72, 0.73, 0.73, 0.73, 0.73, 0.72, 0.72, 0.71, 0.7] and describe the trend observed in this data.",
+        "task_type": "trend_analysis"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.26,
+              0.27,
+              0.29,
+              0.32,
+              0.35,
+              0.39,
+              0.43,
+              0.48,
+              0.53,
+              0.57,
+              0.61,
+              0.64,
+              0.67,
+              0.69,
+              0.71,
+              0.72,
+              0.73,
+              0.73,
+              0.73,
+              0.73,
+              0.72,
+              0.72,
+              0.71,
+              0.7
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "165069",
+      "metadata": {
+        "question": "Analyze the trend in the data points [-15.69, -16.44, -18.28, -19.91, -22.81, -25.03, -27.16, -28.03, -28.84, -28.72, -28.69, -27.97, -27.28, -26.28, -26.31, -25.97, -26.25, -25.22, -23.97, -21.84, -20.47, -18.16, -16.66, -17.19]. What general trend do you observe?",
+        "id": "165069",
+        "domain": "Healthcare",
+        "response": "The data shows a general decreasing trend from -15.69 to -28.84 and then a slow increase towards -16.66 before another slight decrease. The overall pattern is a downward trend with some minor fluctuations.",
+        "task_type": "trend_analysis"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -15.69,
+              -16.44,
+              -18.28,
+              -19.91,
+              -22.81,
+              -25.03,
+              -27.16,
+              -28.03,
+              -28.84,
+              -28.72,
+              -28.69,
+              -27.97,
+              -27.28,
+              -26.28,
+              -26.31,
+              -25.97,
+              -26.25,
+              -25.22,
+              -23.97,
+              -21.84,
+              -20.47,
+              -18.16,
+              -16.66,
+              -17.19
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "172893",
+      "metadata": {
+        "response": "The data exhibits a moderate decline from 190.97 to 175.24 followed by a subsequent increase up to 196.07. This suggests an initial downward trend that transitions into an upward trend.",
+        "id": "172893",
+        "task_type": "summary_analysis",
+        "question": "Summarize the key movements in the dataset [190.97, 191.33, 186.63, 181.72, 182.08, 180.24, 175.24, 176.74, 179.32, 184.96, 191.27, 196.07].",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 12,
+            "serie": [
+              190.97,
+              191.33,
+              186.63,
+              181.72,
+              182.08,
+              180.24,
+              175.24,
+              176.74,
+              179.32,
+              184.96,
+              191.27,
+              196.07
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "168973",
+      "metadata": {
+        "task_type": "trend_analysis",
+        "response": "The data initially shows an upward trend with values gradually rising from 29.78 to a peak at 33.59. After reaching the peak, the values start to decline reaching 25.12, followed by a second upward trend ending at 33.34. The overall movement suggests two main rising actions separated by a decline.",
+        "id": "168973",
+        "domain": "Healthcare",
+        "question": "Analyze the data points [29.78, 30.38, 32.38, 33.16, 33.59, 32.5, 31.38, 29.0, 27.12, 25.12, 25.81, 26.16, 26.75, 28.88, 29.69, 30.62, 31.38, 31.28, 31.06, 30.81, 31.53, 31.75, 32.25, 33.34] and describe any visible trend."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              29.78,
+              30.38,
+              32.38,
+              33.16,
+              33.59,
+              32.5,
+              31.38,
+              29.0,
+              27.12,
+              25.12,
+              25.81,
+              26.16,
+              26.75,
+              28.88,
+              29.69,
+              30.62,
+              31.38,
+              31.28,
+              31.06,
+              30.81,
+              31.53,
+              31.75,
+              32.25,
+              33.34
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "181257",
+      "metadata": {
+        "task_type": "trend_analysis",
+        "id": "181257",
+        "question": "Analyze the general trend in the data points [1050.65, 1051.83, 1045.98, 1035.93, 1029.57, 1025.59, 1021.67, 1021.11, 1020.71, 1017.83, 1013.42, 1014.99, 1021.99, 1030.35, 1032.6, 1027.67, 1032.81, 1044.41, 1046.03, 1039.98, 1038.19, 1042.6, 1041.75, 1041.73].",
+        "response": "The data shows a downward trend initially from 1050.65 to 1013.42, then an upward trend from 1013.42 to 1046.03 before stabilizing. This indicates an initial drop followed by a recovery and stabilization phase.",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              1050.65,
+              1051.83,
+              1045.98,
+              1035.93,
+              1029.57,
+              1025.59,
+              1021.67,
+              1021.11,
+              1020.71,
+              1017.83,
+              1013.42,
+              1014.99,
+              1021.99,
+              1030.35,
+              1032.6,
+              1027.67,
+              1032.81,
+              1044.41,
+              1046.03,
+              1039.98,
+              1038.19,
+              1042.6,
+              1041.75,
+              1041.73
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "177035",
+      "metadata": {
+        "question": "Analyze the overall trend in the data points [0.33, 0.35, 0.39, 0.43, 0.47, 0.52, 0.56, 0.6, 0.64, 0.67, 0.69, 0.71, 0.72, 0.73, 0.73, 0.73, 0.73, 0.72, 0.72, 0.71, 0.7, 0.68, 0.67, 0.65].",
+        "id": "177035",
+        "domain": "Healthcare",
+        "response": "The data shows an increasing trend initially, as the values gradually rise from 0.33 to 0.73. After reaching a peak, the values stabilize at 0.73, and then start to decrease slightly towards the end, with a downward trend from 0.73 to 0.65. This indicates a cycle of growth reaching a plateau followed by a slight decline.",
+        "task_type": "trend analysis"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.33,
+              0.35,
+              0.39,
+              0.43,
+              0.47,
+              0.52,
+              0.56,
+              0.6,
+              0.64,
+              0.67,
+              0.69,
+              0.71,
+              0.72,
+              0.73,
+              0.73,
+              0.73,
+              0.73,
+              0.72,
+              0.72,
+              0.71,
+              0.7,
+              0.68,
+              0.67,
+              0.65
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "167736",
+      "metadata": {
+        "question": "Analyze the trend of the following data points: [-5.5, -4.0, -3.5, -4.0, -4.5, -4.5, -4.0, -1.5, 1.5, 4.0, 8.0, 11.5, 14.5, 18.0, 20.0, 21.0, 22.5, 23.0, 25.0, 26.0, 27.0, 29.0, 31.0, 33.5].",
+        "task_type": "trend_analysis",
+        "response": "The data shows an increasing trend overall. The series begins with small oscillations but begins to steadily increase from 4.0 onward, reaching a peak at 33.5. Thus, the general trend is a positive slope indicative of growth.",
+        "domain": "Healthcare",
+        "id": "167736"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -5.5,
+              -4.0,
+              -3.5,
+              -4.0,
+              -4.5,
+              -4.5,
+              -4.0,
+              -1.5,
+              1.5,
+              4.0,
+              8.0,
+              11.5,
+              14.5,
+              18.0,
+              20.0,
+              21.0,
+              22.5,
+              23.0,
+              25.0,
+              26.0,
+              27.0,
+              29.0,
+              31.0,
+              33.5
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "176728",
+      "metadata": {
+        "id": "176728",
+        "task_type": "trend_analysis",
+        "domain": "Healthcare",
+        "question": "Analyze the trend in these data points: [13.78, 14.28, 15.12, 15.31, 15.72, 17.44, 18.44, 17.5, 17.16, 18.03, 18.66, 17.69, 16.97, 17.5, 16.94, 15.5, 14.88, 14.25, 13.06, 12.53, 13.28, 13.06, 11.66, 10.62].",
+        "response": "The data shows an initial upward trend from 13.78 to 18.66, indicating a rise in values. This is followed by a general downward trend from 17.69 to 10.62, suggesting a decline towards the end. The overall trend is increasing initially and then decreasing."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              13.78,
+              14.28,
+              15.12,
+              15.31,
+              15.72,
+              17.44,
+              18.44,
+              17.5,
+              17.16,
+              18.03,
+              18.66,
+              17.69,
+              16.97,
+              17.5,
+              16.94,
+              15.5,
+              14.88,
+              14.25,
+              13.06,
+              12.53,
+              13.28,
+              13.06,
+              11.66,
+              10.62
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "168580",
+      "metadata": {
+        "question": "Analyze the overall trend of the data points [28.75, 30.72, 31.0, 30.38, 30.78, 30.88, 29.38, 27.12, 25.81, 25.69, 24.62, 23.09, 22.81, 24.25, 25.25, 24.59, 24.25, 24.34, 24.38, 22.25, 20.03, 19.41, 19.72, 19.22].",
+        "id": "168580",
+        "response": "The overall trend is a gradual decline. Initially, there are some fluctuations with an upward movement from 28.75 to around 31.0, but subsequently, the numbers show a steady downward trend reaching a low of approximately 19.22. This decline suggests a downward trend over the observed period.",
+        "task_type": "trend_analysis",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              28.75,
+              30.72,
+              31.0,
+              30.38,
+              30.78,
+              30.88,
+              29.38,
+              27.12,
+              25.81,
+              25.69,
+              24.62,
+              23.09,
+              22.81,
+              24.25,
+              25.25,
+              24.59,
+              24.25,
+              24.34,
+              24.38,
+              22.25,
+              20.03,
+              19.41,
+              19.72,
+              19.22
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "174766",
+      "metadata": {
+        "response": "b) 32.66 to 34.88. This segment shows the highest gain, with an increase of (34.88 - 32.66 = 2.22), compared to other given segments where increases are lower.",
+        "domain": "Healthcare",
+        "id": "174766",
+        "task_type": "comparing_gains_and_losses",
+        "question": "Identify the segment with the highest gain in the series data [30.78, 29.31, 28.56, 29.75, 30.72, 29.53, 29.0, 30.66, 32.31, 31.88, 29.59, 29.03, 30.06, 30.0, 28.88, 29.53, 32.66, 34.88, 34.91, 35.06]. Options: a) 30.66 to 32.31 b) 32.66 to 34.88 c) 29.75 to 30.72 d) 34.88 to 35.06"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 20,
+            "serie": [
+              30.78,
+              29.31,
+              28.56,
+              29.75,
+              30.72,
+              29.53,
+              29.0,
+              30.66,
+              32.31,
+              31.88,
+              29.59,
+              29.03,
+              30.06,
+              30.0,
+              28.88,
+              29.53,
+              32.66,
+              34.88,
+              34.91,
+              35.06
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "180968",
+      "metadata": {
+        "response": "A) Increasing. The overall trend shows a growth from 15.62 to 18.28. Despite some fluctuations, this is an increasing trend as values generally rise towards the end.",
+        "id": "180968",
+        "task_type": "trend analysis",
+        "question": "Consider the data points [15.62, 15.5, 15.5, 15.09, 14.81, 11.22, 10.88, 10.59, 10.25, 12.06, 15.19, 18.31, 20.44, 21.22, 20.94, 18.81, 15.56, 14.69, 13.28, 12.75, 14.19, 14.56, 16.94, 18.28]. What is the overall trend of this data series? A) Increasing B) Decreasing C) Cyclical D) Stable",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              15.62,
+              15.5,
+              15.5,
+              15.09,
+              14.81,
+              11.22,
+              10.88,
+              10.59,
+              10.25,
+              12.06,
+              15.19,
+              18.31,
+              20.44,
+              21.22,
+              20.94,
+              18.81,
+              15.56,
+              14.69,
+              13.28,
+              12.75,
+              14.19,
+              14.56,
+              16.94,
+              18.28
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "185505",
+      "metadata": {
+        "response": "True. The dataset starts at 19.66 and initially decreases to 5.47 before increasing again up to 16.0. Despite fluctuations, an overall increasing trend can be observed from the lowest point, indicating a recovery or growth phase.",
+        "id": "185505",
+        "question": "Considering the data points [19.66, 17.38, 13.59, 9.78, 6.91, 5.94, 5.47, 5.84, 6.97, 9.09, 11.34, 12.16, 12.38, 13.09, 14.16, 14.47, 14.44, 15.09, 15.91, 16.34, 16.0, 15.44, 15.5, 14.97], is there an overall increasing trend present?",
+        "task_type": "trend_identification",
+        "domain": "Healthcare"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              19.66,
+              17.38,
+              13.59,
+              9.78,
+              6.91,
+              5.94,
+              5.47,
+              5.84,
+              6.97,
+              9.09,
+              11.34,
+              12.16,
+              12.38,
+              13.09,
+              14.16,
+              14.47,
+              14.44,
+              15.09,
+              15.91,
+              16.34,
+              16.0,
+              15.44,
+              15.5,
+              14.97
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "168375",
+      "metadata": {
+        "question": "Analyze the trend in the data points [-4834.49, -4831.56, -4830.96, -4825.8, -4823.54, -4819.9, -4815.25, -4815.33, -4815.45, -4808.36, -4808.72, -4812.76, -4805.4, -4806.25, -4815.3, -4815.73, -4816.44, -4816.78, -4812.94, -4810.37, -4807.44, -4808.59, -4811.06, -4817.12].",
+        "response": "The data shows an overall downward trend with some fluctuations. Initially, the values are near -4834 but gradually decrease, suggesting a continuous decline with minor temporary rises. The values reach their local minimum near -4805 but eventually start to rise slightly towards the end.",
+        "domain": "Healthcare",
+        "id": "168375",
+        "task_type": "trend_analysis"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -4834.49,
+              -4831.56,
+              -4830.96,
+              -4825.8,
+              -4823.54,
+              -4819.9,
+              -4815.25,
+              -4815.33,
+              -4815.45,
+              -4808.36,
+              -4808.72,
+              -4812.76,
+              -4805.4,
+              -4806.25,
+              -4815.3,
+              -4815.73,
+              -4816.44,
+              -4816.78,
+              -4812.94,
+              -4810.37,
+              -4807.44,
+              -4808.59,
+              -4811.06,
+              -4817.12
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "191089",
+      "metadata": {
+        "domain": "Healthcare",
+        "id": "191089",
+        "task_type": "pattern summarization",
+        "question": "Study the data points [3664.79, 3672.76, 3667.7, 3664.79, 3666.39, 3667.98, 3670.67, 3670.81, 3673.38, 3672.99, 3676.06, 3683.17, 3679.71, 3673.36, 3669.67, 3671.2, 3672.25, 3665.12, 3668.63, 3672.66, 3665.83, 3666.32, 3665.72, 3664.86] and summarize the primary movement trend in this dataset.",
+        "response": "The primary trend is upward. The prices consistently climb from the mid-3660s to higher 3670s, and only subtle local deviations are visible in between the lows and peaks. The final few points suggest dipping, but the broader increase stands as the major movement."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              3664.79,
+              3672.76,
+              3667.7,
+              3664.79,
+              3666.39,
+              3667.98,
+              3670.67,
+              3670.81,
+              3673.38,
+              3672.99,
+              3676.06,
+              3683.17,
+              3679.71,
+              3673.36,
+              3669.67,
+              3671.2,
+              3672.25,
+              3665.12,
+              3668.63,
+              3672.66,
+              3665.83,
+              3666.32,
+              3665.72,
+              3664.86
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "175136",
+      "metadata": {
+        "task_type": "statistical_property_analysis",
+        "domain": "Healthcare",
+        "id": "175136",
+        "question": "Evaluate the statistical properties of these points: [0.3, 0.27, 0.26, 0.25, 0.24, 0.24, 0.24, 0.23, 0.23, 0.23, 0.23, 0.23, 0.23, 0.23, 0.23, 0.23, 0.23, 0.23, 0.23, 0.23, 0.23, 0.23, 0.22, 0.22]",
+        "response": "The data series has low variability as it is clustered around the values 0.23 and 0.24 for a majority of its points, indicating a weak central tendency. It stabilizes quickly after an initial drop from 0.3, suggesting no strong bias or drift."
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.3,
+              0.27,
+              0.26,
+              0.25,
+              0.24,
+              0.24,
+              0.24,
+              0.23,
+              0.23,
+              0.23,
+              0.23,
+              0.23,
+              0.23,
+              0.23,
+              0.23,
+              0.23,
+              0.23,
+              0.23,
+              0.23,
+              0.23,
+              0.23,
+              0.23,
+              0.22,
+              0.22
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "184138",
+      "metadata": {
+        "question": "Calculate and interpret the mean of the data points [-2893.78, -2897.69, -2895.36, -2890.19, -2889.77, -2898.53, -2905.8, -2902.7, -2889.96, -2883.31, -2891.36, -2896.85, -2899.59, -2890.97, -2886.65, -2889.19, -2890.4, -2897.38, -2889.05, -2886.35, -2888.45, -2890.68, -2898.07, -2889.09].",
+        "response": "The mean of the data is approximately -2892.85. This is calculated by summing all the values (-2893.78 + -2897.69 + ... + -2889.09) and dividing by the number of data points (24). The mean provides a measure of central tendency, indicating that these values generally cluster around this central point in the dataset.",
+        "task_type": "central_tendency",
+        "domain": "Healthcare",
+        "id": "184138"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              -2893.78,
+              -2897.69,
+              -2895.36,
+              -2890.19,
+              -2889.77,
+              -2898.53,
+              -2905.8,
+              -2902.7,
+              -2889.96,
+              -2883.31,
+              -2891.36,
+              -2896.85,
+              -2899.59,
+              -2890.97,
+              -2886.65,
+              -2889.19,
+              -2890.4,
+              -2897.38,
+              -2889.05,
+              -2886.35,
+              -2888.45,
+              -2890.68,
+              -2898.07,
+              -2889.09
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "183752",
+      "metadata": {
+        "response": "b) Cyclical downturns. The data exhibits periods of rising values, reaching peaks, followed by decreases which repeat, denoting cyclical downturns and upturns rather than a singular trend direction.",
+        "task_type": "data interpretation",
+        "id": "183752",
+        "domain": "Healthcare",
+        "question": "Analyze the series [20.88, 21.06, 22.22, 21.78, 19.56, 17.5, 17.41, 17.47, 15.34, 13.62, 14.0, 23.0, 23.5, 24.81, 26.66, 27.12, 25.47, 23.0, 21.25, 18.69, 15.47, 12.72, 12.19, 12.44]. What overall behavior does this data exhibit? a) Consistent growth b) Cyclical downturns c) Random fluctuations d) A single upward trend"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              20.88,
+              21.06,
+              22.22,
+              21.78,
+              19.56,
+              17.5,
+              17.41,
+              17.47,
+              15.34,
+              13.62,
+              14.0,
+              23.0,
+              23.5,
+              24.81,
+              26.66,
+              27.12,
+              25.47,
+              23.0,
+              21.25,
+              18.69,
+              15.47,
+              12.72,
+              12.19,
+              12.44
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "179470",
+      "metadata": {
+        "task_type": "trend_analysis",
+        "response": "The data shows a general downward trend. Although there are slight fluctuations in the beginning, the numbers mostly decrease, with some short periods of stable or slight increases. The overall movement from 163.95 to 133.51 indicates a decline.",
+        "question": "Analyze the following data points [163.95, 162.79, 161.59, 162.25, 167.83, 167.05, 161.68, 162.18, 158.54, 152.88, 148.38, 144.42, 144.38, 140.44, 133.45, 133.8, 137.55, 138.49, 131.99, 130.53, 135.79, 134.69, 134.16, 133.51] and summarize the overall trend.",
+        "domain": "Healthcare",
+        "id": "179470"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              163.95,
+              162.79,
+              161.59,
+              162.25,
+              167.83,
+              167.05,
+              161.68,
+              162.18,
+              158.54,
+              152.88,
+              148.38,
+              144.42,
+              144.38,
+              140.44,
+              133.45,
+              133.8,
+              137.55,
+              138.49,
+              131.99,
+              130.53,
+              135.79,
+              134.69,
+              134.16,
+              133.51
+            ]
+          }
+        ],
+        "output": []
+      }
+    },
+    {
+      "id": "174649",
+      "metadata": {
+        "question": "Summarize the main movement exhibited by these data points: [0.44, 0.48, 0.52, 0.56, 0.6, 0.64, 0.67, 0.69, 0.71, 0.73, 0.74, 0.74, 0.74, 0.74, 0.74, 0.73, 0.73, 0.72, 0.71, 0.7, 0.68, 0.67, 0.65, 0.63].",
+        "domain": "Healthcare",
+        "response": "The data reveals a strong upward trend from 0.44 to 0.74 followed by a period of stability at the top, before slightly trending back down. The sequence indicates a peak followed by a marginal decrease, with the majority of the values exhibiting growth.",
+        "id": "174649",
+        "task_type": "summarization"
+      },
+      "series": {
+        "input": [
+          {
+            "longitud_puntos": 24,
+            "serie": [
+              0.44,
+              0.48,
+              0.52,
+              0.56,
+              0.6,
+              0.64,
+              0.67,
+              0.69,
+              0.71,
+              0.73,
+              0.74,
+              0.74,
+              0.74,
+              0.74,
+              0.74,
+              0.73,
+              0.73,
+              0.72,
+              0.71,
+              0.7,
+              0.68,
+              0.67,
+              0.65,
+              0.63
+            ]
+          }
+        ],
+        "output": []
+      }
+    }
+  ]
+}

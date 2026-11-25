@@ -5,7 +5,7 @@ class Settings:
   # RAG (índice TSQA en ChromaDB)
   RAG_TOP_K = int(os.getenv("RAG_TOP_K", "50"))
   RAG_COLLECTION_NAME = "time_series_generation"
-  RAG_DB_PATH = os.getenv("RAG_DB_PATH", "./rag/maestro")
+  RAG_DB_PATH = os.getenv("RAG_DB_PATH", os.getenv("CHROMA_DB_PATH", "./rag/maestro"))
   RAG_DATASET_NAME = "TSQA"
 
   # Iteración Maestro / Estudiante
@@ -62,11 +62,17 @@ class Settings:
 
   @classmethod
   def get_teacher_model_path(cls):
-    return os.getenv("TEACHER_MODEL_PATH", os.getenv("TEACHER_MODEL_ID", "./models/profesor"))
+    local_path = os.getenv("TEACHER_MODEL_PATH")
+    if local_path and os.path.exists(local_path) and os.listdir(local_path):
+      return local_path
+    return cls.get_teacher_model_id()
 
   @classmethod
   def get_student_model_path(cls):
-    return os.getenv("STUDENT_MODEL_PATH", os.getenv("STUDENT_MODEL_ID", "./models/student"))
+    local_path = os.getenv("STUDENT_MODEL_PATH")
+    if local_path and os.path.exists(local_path) and os.listdir(local_path):
+      return local_path
+    return cls.get_student_model_id()
 
   @classmethod
   def synthetic_csv_path(cls) -> str:
@@ -93,4 +99,22 @@ class Settings:
 
   @classmethod
   def get_teacher_model_path_adapter(cls) -> str:
-    return os.getenv("TEACHER_MODEL_PATH_ADAPTERS", "./models/teacher_adapters")
+    env_path = os.getenv("TEACHER_MODEL_PATH_ADAPTERS", os.getenv("TEACHER_ADAPTERS_PATH"))
+    if env_path and os.path.exists(env_path):
+      return env_path
+
+    # Detección inteligente por familia según el modelo maestro configurado
+    teacher_id = cls.get_teacher_model_id().lower()
+    base_adapters = "./models/teacher_adapters"
+    if "qwen" in teacher_id and os.path.exists(f"{base_adapters}/qwen"):
+      return f"{base_adapters}/qwen"
+    if "llama" in teacher_id and os.path.exists(f"{base_adapters}/llama"):
+      return f"{base_adapters}/llama"
+    if "gemma" in teacher_id and os.path.exists(f"{base_adapters}/gemma"):
+      return f"{base_adapters}/gemma"
+
+    # Fallback si adapter_config.json está en la raíz de teacher_adapters
+    if os.path.exists(f"{base_adapters}/adapter_config.json"):
+      return base_adapters
+
+    return None
