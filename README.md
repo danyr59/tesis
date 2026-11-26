@@ -242,8 +242,8 @@ El pipeline detectará automáticamente la ruta del adaptador y cargará los pes
 
 ### 2. Clonar el Repositorio y Crear el Entorno Virtual
 ```bash
-git clone https://github.com/danielrangelsanch/proyecto_tesis.git
-cd proyecto_tesis
+git clone https://github.com/danyr59/tesis.git
+cd tesis
 
 python3 -m venv .venv
 source .venv/bin/activate  # En Windows: .venv\Scripts\activate
